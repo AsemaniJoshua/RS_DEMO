@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand Colors extracted from image */
+  --brand-blue: #0052cc;
+  /* Approximate "Book Appointment" button blue */
+  --brand-teal: #00acac;
+  /* Approximate "DrGeorge" teal - gradient start */
+  --brand-teal-light: #2dd4bf;
+  /* Gradient end */
+
+  /* UI Colors */
+  --background: #ffffff;
+  --foreground: #171717;
+  --nav-text: #4b5563;
+  /* Gray-600 for nav items */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-teal-light: var(--brand-teal-light);
+  --color-nav-text: var(--nav-text);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --nav-text: #d1d5db;
+    /* Gray-300 for dark mode */
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
