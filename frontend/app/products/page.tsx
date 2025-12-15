@@ -303,7 +303,7 @@ export default function ProductsPage() {
             </section>
 
             {/* Features Section */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-gray-50">
                 <div className="mx-auto max-w-[1400px] px-12">
                     <div className="grid md:grid-cols-3 gap-8">
                         {[
