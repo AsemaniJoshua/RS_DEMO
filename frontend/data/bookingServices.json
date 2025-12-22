@@ -1,0 +1,26 @@
+[
+  {
+    "name": "General Consultation",
+    "price": "$95",
+    "duration": "45 min",
+    "description": "Comprehensive health consultation - discuss any health concerns"
+  },
+  {
+    "name": "Virtual Medication Review",
+    "price": "$75",
+    "duration": "30 min",
+    "description": "Comprehensive review of all medications and drug interactions"
+  },
+  {
+    "name": "Diabetes & Weight Loss Consultation",
+    "price": "$145",
+    "duration": "60 min",
+    "description": "Personalized program for diabetes and weight management"
+  },
+  {
+    "name": "Health & Wellness Strategy Session",
+    "price": "$120",
+    "duration": "45 min",
+    "description": "Comprehensive health planning and optimization"
+  }
+]

@@ -1,68 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import mediaItemsData from "@/data/mediaItems.json";
+import pressMentionsData from "@/data/pressMentions.json";
+
+// Note: Metadata export not possible in client components
+// SEO handled through layout.tsx or consider server component wrapper
 
 export default function MediaPage() {
     const [activeFilter, setActiveFilter] = useState("All");
 
     const filters = ["All", "TV", "Radio", "Press", "Explainers"];
 
-    const mediaItems = [
-        {
-            category: "TV",
-            title: "Medication Safety Tips on Good Morning Health",
-            description: "Dr. George shares essential medication safety tips for seniors on this morning show segment.",
-            date: "Dec 12, 2024",
-            duration: "8:45",
-            thumbnail: "/media-tv-1.jpg",
-            platform: "ABC Health Network"
-        },
-        {
-            category: "Radio",
-            title: "The Dangers of Drug Interactions - Health Radio",
-            description: "In-depth discussion about common drug interactions and how to prevent them.",
-            date: "Dec 8, 2024",
-            duration: "25:30",
-            thumbnail: "/media-radio-1.jpg",
-            platform: "HealthTalk FM"
-        },
-        {
-            category: "Explainers",
-            title: "Understanding Your Prescription Labels",
-            description: "A detailed breakdown of what everything on your medication bottle means.",
-            date: "Dec 5, 2024",
-            duration: "6:20",
-            thumbnail: "/media-explainer-1.jpg",
-            platform: "YouTube"
-        },
-        {
-            category: "TV",
-            title: "Diabetes Management: Beyond Medication",
-            description: "Live interview discussing holistic approaches to diabetes management.",
-            date: "Nov 30, 2024",
-            duration: "12:15",
-            thumbnail: "/media-tv-2.jpg",
-            platform: "Health Channel"
-        },
-        {
-            category: "Press",
-            title: "Local Pharmacist Fights Teen Drug Abuse",
-            description: "Featured article in City Health Magazine about community education programs.",
-            date: "Nov 28, 2024",
-            duration: "Article",
-            thumbnail: "/media-press-1.jpg",
-            platform: "City Health Magazine"
-        },
-        {
-            category: "Explainers",
-            title: "How to Choose Quality Supplements",
-            description: "Evidence-based guide to selecting safe and effective dietary supplements.",
-            date: "Nov 25, 2024",
-            duration: "9:40",
-            thumbnail: "/media-explainer-2.jpg",
-            platform: "YouTube"
-        }
-    ];
+    const mediaItems = mediaItemsData;
+    const pressMentions = pressMentionsData;
 
     const filteredMedia = activeFilter === "All"
         ? mediaItems
@@ -217,23 +169,7 @@ export default function MediaPage() {
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
-                        {[
-                            {
-                                publication: "Health Today Magazine",
-                                title: "10 Pharmacists Leading the Future of Healthcare",
-                                date: "December 2024"
-                            },
-                            {
-                                publication: "Medical News Daily",
-                                title: "Expert Insights on Medication Management",
-                                date: "November 2024"
-                            },
-                            {
-                                publication: "Wellness Journal",
-                                title: "The Role of Pharmacists in Chronic Disease Care",
-                                date: "October 2024"
-                            }
-                        ].map((press, index) => (
+                        {pressMentions.map((press, index) => (
                             <div key={index} className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 hover:border-[#0066ff] transition-all duration-300">
                                 <div className="w-12 h-12 bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-xl flex items-center justify-center text-white mb-4">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -260,12 +196,16 @@ export default function MediaPage() {
                         Available for interviews, guest appearances, and expert commentary on health and medication topics.
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-4">
-                        <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200">
-                            Contact for Media Inquiries
-                        </button>
-                        <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200">
-                            Download Media Kit
-                        </button>
+                        <Link href="/contact">
+                            <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200 cursor-pointer">
+                                Contact for Media Inquiries
+                            </button>
+                        </Link>
+                        <Link href="/contact">
+                            <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200 cursor-pointer">
+                                Download Media Kit
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </section>

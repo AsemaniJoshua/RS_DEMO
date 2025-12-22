@@ -1,0 +1,68 @@
+[
+  {
+    "category": "Drug Safety",
+    "title": "Understanding Drug Interactions: A Complete Guide",
+    "slug": "understanding-drug-interactions",
+    "excerpt": "Learn how different medications interact with each other and what you need to know to stay safe.",
+    "date": "Dec 10, 2024",
+    "readTime": "8 min read",
+    "author": "Dr. George",
+    "image": "/blog-drug-safety.jpg",
+    "featured": true
+  },
+  {
+    "category": "Supplements",
+    "title": "Vitamin D Supplements: Who Really Needs Them?",
+    "slug": "vitamin-d-supplements",
+    "excerpt": "Evidence-based insights on vitamin D supplementation, dosing, and potential interactions.",
+    "date": "Dec 8, 2024",
+    "readTime": "6 min read",
+    "author": "Dr. George",
+    "image": "/blog-supplements.jpg",
+    "featured": false
+  },
+  {
+    "category": "Diabetes",
+    "title": "Managing Type 2 Diabetes: Medication and Lifestyle",
+    "slug": "managing-type-2-diabetes",
+    "excerpt": "A comprehensive approach to diabetes management combining medication optimization and lifestyle changes.",
+    "date": "Dec 5, 2024",
+    "readTime": "10 min read",
+    "author": "Dr. George",
+    "image": "/blog-diabetes.jpg",
+    "featured": false
+  },
+  {
+    "category": "Teen Drug Abuse",
+    "title": "Recognizing Teen Prescription Drug Abuse: A Parent's Guide",
+    "slug": "teen-prescription-drug-abuse",
+    "excerpt": "Warning signs and practical steps for parents to prevent prescription medication misuse in teens.",
+    "date": "Dec 3, 2024",
+    "readTime": "7 min read",
+    "author": "Dr. George",
+    "image": "/blog-teen-abuse.jpg",
+    "featured": false
+  },
+  {
+    "category": "Wellness",
+    "title": "5 Natural Ways to Boost Your Immune System",
+    "slug": "boost-immune-system",
+    "excerpt": "Science-backed strategies for strengthening your immune system through diet, sleep, and lifestyle.",
+    "date": "Nov 30, 2024",
+    "readTime": "5 min read",
+    "author": "Dr. George",
+    "image": "/blog-wellness.jpg",
+    "featured": false
+  },
+  {
+    "category": "Drug Safety",
+    "title": "Common Medication Errors and How to Avoid Them",
+    "slug": "common-medication-errors",
+    "excerpt": "Practical tips to prevent the most common medication mistakes that can compromise your health.",
+    "date": "Nov 28, 2024",
+    "readTime": "6 min read",
+    "author": "Dr. George",
+    "image": "/blog-med-errors.jpg",
+    "featured": false
+  }
+]

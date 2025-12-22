@@ -78,7 +78,7 @@ export default function Hero() {
                     <div className="relative lg:h-[600px] h-[400px]">
                         <div className="absolute inset-0 bg-gradient-to-br from-teal-400/10 to-blue-600/10 rounded-3xl"></div>
                         <Image
-                            src="/doctor-hero.png"
+                            src="/dr-george.png"
                             alt="Professional Healthcare Expert - Dr. George"
                             fill
                             className="object-cover rounded-3xl"

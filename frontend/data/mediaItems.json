@@ -1,0 +1,56 @@
+[
+  {
+    "category": "TV",
+    "title": "Medication Safety Tips on Good Morning Health",
+    "description": "Dr. George shares essential medication safety tips for seniors on this morning show segment.",
+    "date": "Dec 12, 2024",
+    "duration": "8:45",
+    "thumbnail": "/media-tv-1.jpg",
+    "platform": "ABC Health Network"
+  },
+  {
+    "category": "Radio",
+    "title": "The Dangers of Drug Interactions - Health Radio",
+    "description": "In-depth discussion about common drug interactions and how to prevent them.",
+    "date": "Dec 8, 2024",
+    "duration": "25:30",
+    "thumbnail": "/media-radio-1.jpg",
+    "platform": "HealthTalk FM"
+  },
+  {
+    "category": "Explainers",
+    "title": "Understanding Your Prescription Labels",
+    "description": "A detailed breakdown of what everything on your medication bottle means.",
+    "date": "Dec 5, 2024",
+    "duration": "6:20",
+    "thumbnail": "/media-explainer-1.jpg",
+    "platform": "YouTube"
+  },
+  {
+    "category": "TV",
+    "title": "Diabetes Management: Beyond Medication",
+    "description": "Live interview discussing holistic approaches to diabetes management.",
+    "date": "Nov 30, 2024",
+    "duration": "12:15",
+    "thumbnail": "/media-tv-2.jpg",
+    "platform": "Health Channel"
+  },
+  {
+    "category": "Press",
+    "title": "Local Pharmacist Fights Teen Drug Abuse",
+    "description": "Featured article in City Health Magazine about community education programs.",
+    "date": "Nov 28, 2024",
+    "duration": "Article",
+    "thumbnail": "/media-press-1.jpg",
+    "platform": "City Health Magazine"
+  },
+  {
+    "category": "Explainers",
+    "title": "How to Choose Quality Supplements",
+    "description": "Evidence-based guide to selecting safe and effective dietary supplements.",
+    "date": "Nov 25, 2024",
+    "duration": "9:40",
+    "thumbnail": "/media-explainer-2.jpg",
+    "platform": "YouTube"
+  }
+]

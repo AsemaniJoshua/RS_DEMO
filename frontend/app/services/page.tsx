@@ -1,8 +1,20 @@
+import Link from "next/link";
+
+export const metadata = {
+  title: "Health Services - Medication Review, Diabetes & Wellness Consulting",
+  description: "Personalized health services including virtual medication reviews, diabetes management, weight loss programs, and comprehensive wellness consultations with Dr. George.",
+  openGraph: {
+    title: "Expert Health Services by Dr. George",
+    description: "Medication reviews, diabetes management, and personalized wellness programs",
+    type: "website"
+  }
+};
+
 export default function ServicesPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="py-20 lg:py-28 bg-white">
+            <section className="py-20 lg:py-22 bg-white">
                 <div className="mx-auto max-w-[1400px] px-12">
                     <div className="max-w-4xl mx-auto text-center">
                         {/* Badge */}
@@ -28,15 +40,19 @@ export default function ServicesPage() {
 
                         {/* CTA Buttons */}
                         <div className="flex flex-wrap items-center justify-center gap-4">
-                            <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-lg transition-all duration-200">
-                                View Services
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                    <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </button>
-                            <button className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200">
-                                Book Now
-                            </button>
+                            <Link href="/booking">
+                                <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-lg transition-all duration-200 cursor-pointer">
+                                    Book Consultation
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </button>
+                            </Link>
+                            <Link href="/services#services">
+                                <button className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer">
+                                    View All Services
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -165,12 +181,14 @@ export default function ServicesPage() {
                                 </ul>
 
                                 {/* CTA Button */}
-                                <button className="w-full h-12 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] transition-all duration-200 flex items-center justify-center gap-2">
-                                    Book This Session
+                            <Link href="/booking">
+                                <button className="w-full h-12 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                                    Book This Service
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                        <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
                                 </button>
+                            </Link>
                             </div>
                         ))}
                     </div>
@@ -318,12 +336,16 @@ export default function ServicesPage() {
                         Book your consultation today and take the first step toward optimized health and wellness.
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-4">
-                        <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200">
-                            Schedule Consultation
-                        </button>
-                        <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200">
-                            Contact Us
-                        </button>
+                        <Link href="/booking">
+                            <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200 cursor-pointer">
+                                Book Your Consultation
+                            </button>
+                        </Link>
+                        <Link href="/contact">
+                            <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200 cursor-pointer">
+                                Contact Us
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </section>

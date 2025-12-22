@@ -1,0 +1,125 @@
+{
+  "topics": [
+    {
+      "title": "Medication Safety & Management",
+      "description": "Essential strategies for preventing medication errors and optimizing therapy outcomes.",
+      "points": [
+        "Drug interactions",
+        "Polypharmacy management",
+        "Patient safety protocols"
+      ]
+    },
+    {
+      "title": "Chronic Disease Prevention",
+      "description": "Proactive approaches to preventing and managing chronic conditions through lifestyle and medication.",
+      "points": [
+        "Diabetes prevention",
+        "Heart health strategies",
+        "Evidence-based interventions"
+      ]
+    },
+    {
+      "title": "Teen Drug Abuse Prevention",
+      "description": "Critical insights for parents, educators, and communities on preventing prescription drug misuse.",
+      "points": [
+        "Warning signs",
+        "Prevention strategies",
+        "Community education"
+      ]
+    },
+    {
+      "title": "Health Literacy & Patient Education",
+      "description": "Empowering patients and caregivers with knowledge to make informed health decisions.",
+      "points": [
+        "Communication strategies",
+        "Health literacy best practices",
+        "Patient engagement"
+      ]
+    },
+    {
+      "title": "Pharmacy Practice Innovation",
+      "description": "Modern approaches to pharmacy services and patient care optimization.",
+      "points": [
+        "Clinical pharmacy services",
+        "Technology integration",
+        "Workflow optimization"
+      ]
+    },
+    {
+      "title": "Supplement Safety",
+      "description": "Navigating the complex world of dietary supplements with evidence-based guidance.",
+      "points": [
+        "Quality assessment",
+        "Drug-supplement interactions",
+        "Regulation and safety"
+      ]
+    }
+  ],
+  "pastEngagements": [
+    {
+      "event": "Annual Healthcare Summit",
+      "organization": "National Health Association",
+      "date": "December 2024",
+      "location": "New York, NY",
+      "topic": "Medication Safety in Modern Healthcare"
+    },
+    {
+      "event": "Pharmacy Leadership Conference",
+      "organization": "State Pharmacists Association",
+      "date": "November 2024",
+      "location": "Chicago, IL",
+      "topic": "Innovation in Patient Care"
+    },
+    {
+      "event": "Community Health Workshop",
+      "organization": "City Health Department",
+      "date": "October 2024",
+      "location": "Los Angeles, CA",
+      "topic": "Chronic Disease Prevention"
+    },
+    {
+      "event": "University Health Sciences Seminar",
+      "organization": "State University",
+      "date": "September 2024",
+      "location": "Austin, TX",
+      "topic": "Pharmacy Practice Evolution"
+    },
+    {
+      "event": "Corporate Wellness Program",
+      "organization": "Fortune 500 Company",
+      "date": "August 2024",
+      "location": "San Francisco, CA",
+      "topic": "Employee Health & Medication Management"
+    },
+    {
+      "event": "Teen Health Education Summit",
+      "organization": "Youth Services Coalition",
+      "date": "July 2024",
+      "location": "Seattle, WA",
+      "topic": "Preventing Prescription Drug Abuse"
+    }
+  ],
+  "testimonials": [
+    {
+      "quote": "Dr. George's presentation was engaging, informative, and perfectly tailored to our audience. Our team gained valuable insights on medication safety.",
+      "name": "Sarah Johnson",
+      "title": "Conference Director",
+      "organization": "National Health Association",
+      "rating": 5
+    },
+    {
+      "quote": "Outstanding speaker! The content was evidence-based and delivered with clarity. Attendees are still talking about the practical strategies shared.",
+      "name": "Michael Chen",
+      "title": "Education Coordinator",
+      "organization": "State Pharmacists Association",
+      "rating": 5
+    },
+    {
+      "quote": "Dr. George made complex health topics accessible and actionable. The workshop exceeded our expectations and received rave reviews.",
+      "name": "Emily Rodriguez",
+      "title": "Community Health Manager",
+      "organization": "City Health Department",
+      "rating": 5
+    }
+  ]
+}

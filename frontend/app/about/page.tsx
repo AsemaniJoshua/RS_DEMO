@@ -1,4 +1,15 @@
 import Image from "next/image";
+import Link from "next/link";
+
+export const metadata = {
+  title: "About Dr. George - Pharmacist & Health Educator",
+  description: "Meet Dr. George, a passionate pharmacist with 15+ years of clinical experience dedicated to empowering individuals with evidence-based health guidance and education.",
+  openGraph: {
+    title: "About Dr. George - Pharmacist & Health Educator",
+    description: "Learn about Dr. George's mission to bridge the gap between complex medical information and practical health guidance",
+    type: "profile"
+  }
+};
 
 const UserCheckIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -42,13 +53,17 @@ export default function AboutPage() {
 
                             {/* CTA Buttons */}
                             <div className="flex flex-wrap gap-4">
-                                <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-lg transition-all duration-200">
-                                    Book Consultation
-                                    <ArrowRightIcon />
-                                </button>
-                                <button className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200">
-                                    Speaking Inquiries
-                                </button>
+                                <Link href="/booking">
+                                    <button className="inline-flex items-center gap-2 h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-lg transition-all duration-200 cursor-pointer">
+                                        Book Consultation
+                                        <ArrowRightIcon />
+                                    </button>
+                                </Link>
+                                <Link href="/speaking">
+                                    <button className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer">
+                                        Speaking Inquiries
+                                    </button>
+                                </Link>
                             </div>
                         </div>
 
@@ -56,7 +71,7 @@ export default function AboutPage() {
                         <div className="relative">
                             <div className="relative h-[500px] rounded-3xl overflow-hidden shadow-2xl">
                                 <Image
-                                    src="/doctor-hero.png"
+                                    src="/dr-george.png"
                                     alt="Dr. George - Healthcare Professional"
                                     fill
                                     className="object-cover"
@@ -451,12 +466,16 @@ export default function AboutPage() {
                         </p>
 
                         <div className="flex flex-wrap items-center justify-center gap-4">
-                            <button className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-xl shadow-lg transition-all duration-200">
-                                Book Consultation
+                            <Link href="/booking">
+                            <button className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-xl shadow-lg transition-all duration-200 cursor-pointer">
+                                Start Your Journey
                             </button>
-                            <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200">
-                                Speaking Inquiries
+                        </Link>
+                        <Link href="/contact">
+                            <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200 cursor-pointer">
+                                Contact Me
                             </button>
+                        </Link>
                         </div>
                     </div>
                 </div>

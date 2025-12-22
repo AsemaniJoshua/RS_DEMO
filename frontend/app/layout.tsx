@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+"use client";
+
+import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -14,24 +16,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "RxWithDrGeorge - Healthcare Expert",
-  description: "Empowering healthier communities through drug safety education and telepharmacy services",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isLoginPage = pathname === "/login";
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
+        {!isLoginPage && <Navbar />}
         {children}
-        <Footer />
+        {!isLoginPage && <Footer />}
       </body>
     </html>
   );

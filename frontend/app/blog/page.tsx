@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import Image from "next/image";
+import blogPostsData from "@/data/blogPosts.json";
+
+// Note: Metadata export not possible in client components
+// Consider moving to a server component wrapper if SEO is critical
 
 export default function BlogPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -11,68 +16,7 @@ export default function BlogPage() {
 
     const categories = ["All", "Drug Safety", "Supplements", "Diabetes", "Teen Drug Abuse", "Wellness"];
 
-    const blogPosts = [
-        {
-            category: "Drug Safety",
-            title: "Understanding Drug Interactions: A Complete Guide",
-            excerpt: "Learn how different medications interact with each other and what you need to know to stay safe.",
-            date: "Dec 10, 2024",
-            readTime: "8 min read",
-            author: "Dr. George",
-            image: "/blog-drug-safety.jpg",
-            featured: true
-        },
-        {
-            category: "Supplements",
-            title: "Vitamin D Supplements: Who Really Needs Them?",
-            excerpt: "Evidence-based insights on vitamin D supplementation, dosing, and potential interactions.",
-            date: "Dec 8, 2024",
-            readTime: "6 min read",
-            author: "Dr. George",
-            image: "/blog-supplements.jpg",
-            featured: false
-        },
-        {
-            category: "Diabetes",
-            title: "Managing Type 2 Diabetes: Medication and Lifestyle",
-            excerpt: "A comprehensive approach to diabetes management combining medication optimization and lifestyle changes.",
-            date: "Dec 5, 2024",
-            readTime: "10 min read",
-            author: "Dr. George",
-            image: "/blog-diabetes.jpg",
-            featured: false
-        },
-        {
-            category: "Teen Drug Abuse",
-            title: "Recognizing Teen Prescription Drug Abuse: A Parent's Guide",
-            excerpt: "Warning signs and practical steps for parents to prevent prescription medication misuse in teens.",
-            date: "Dec 3, 2024",
-            readTime: "7 min read",
-            author: "Dr. George",
-            image: "/blog-teen-abuse.jpg",
-            featured: false
-        },
-        {
-            category: "Wellness",
-            title: "5 Natural Ways to Boost Your Immune System",
-            excerpt: "Science-backed strategies for strengthening your immune system through diet, sleep, and lifestyle.",
-            date: "Nov 30, 2024",
-            readTime: "5 min read",
-            author: "Dr. George",
-            image: "/blog-wellness.jpg",
-            featured: false
-        },
-        {
-            category: "Drug Safety",
-            title: "Common Medication Errors and How to Avoid Them",
-            excerpt: "Practical tips to prevent the most common medication mistakes that can compromise your health.",
-            date: "Nov 28, 2024",
-            readTime: "6 min read",
-            author: "Dr. George",
-            image: "/blog-med-errors.jpg",
-            featured: false
-        }
-    ];
+    const blogPosts = blogPostsData;
 
     // Debounce search query
     useEffect(() => {
@@ -239,12 +183,14 @@ export default function BlogPage() {
                                             </div>
                                         </div>
 
-                                        <button className="text-[#0066ff] font-medium hover:underline flex items-center gap-2">
-                                            Read More
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <Link href={`/blog/${featuredPost.slug}`}>
+                                        <button className="text-[#0066ff] font-medium hover:underline flex items-center gap-2 cursor-pointer">
+                                            Read Full Article
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                             </svg>
                                         </button>
+                                    </Link>
                                     </div>
                                 </article>
                             )}
@@ -293,7 +239,7 @@ export default function BlogPage() {
                                 <div className="text-center mt-8">
                                     <button
                                         onClick={handleLoadMore}
-                                        className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] transition-all duration-200 inline-flex items-center gap-2"
+                                        className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] transition-all duration-200 inline-flex items-center gap-2 cursor-pointer"
                                     >
                                         Load More Articles
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -337,7 +283,7 @@ export default function BlogPage() {
                                                         setActiveCategory(category);
                                                         setSearchQuery("");
                                                     }}
-                                                    className="px-4 py-2 rounded-full border-2 border-[#0066ff] text-[#0066ff] text-sm font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200"
+                                                    className="px-4 py-2 rounded-full border-2 border-[#0066ff] text-[#0066ff] text-sm font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer"
                                                 >
                                                     {category}
                                                 </button>
@@ -349,7 +295,7 @@ export default function BlogPage() {
                                                     setSearchQuery("");
                                                     setActiveCategory("All");
                                                 }}
-                                                className="mt-4 text-[#0066ff] font-medium hover:underline"
+                                                className="mt-4 text-[#0066ff] font-medium hover:underline cursor-pointer"
                                             >
                                                 Clear all filters
                                             </button>
@@ -374,15 +320,19 @@ export default function BlogPage() {
                                                     </h4>
                                                     <p className="text-xs text-gray-500">{post.date}</p>
                                                 </div>
-                                                <button className="text-[#0066ff] text-xs font-medium hover:underline whitespace-nowrap">
-                                                    View
-                                                </button>
+                                                <Link href={`/blog/${post.slug}`}>
+                                                    <button className="text-[#0066ff] text-xs font-medium hover:underline whitespace-nowrap cursor-pointer">
+                                                        View
+                                                    </button>
+                                                </Link>
                                             </div>
                                         ))}
                                     </div>
-                                    <button className="w-full mt-4 h-10 rounded-full border-2 border-[#0066ff] text-[#0066ff] text-sm font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200">
-                                        View Full Newsroom
-                                    </button>
+                                    <Link href="/blog">
+                                        <button className="w-full mt-4 h-10 rounded-full border-2 border-[#0066ff] text-[#0066ff] text-sm font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer">
+                                            View Full Newsroom
+                                        </button>
+                                    </Link>
                                 </div>
 
                                 {/* Need Personal Guidance CTA */}
@@ -391,9 +341,11 @@ export default function BlogPage() {
                                     <p className="text-white/90 text-sm mb-4">
                                         Book a consultation for personalized health advice tailored to your needs.
                                     </p>
-                                    <button className="w-full h-10 rounded-full bg-white text-[#0066ff] text-sm font-medium hover:bg-gray-100 transition-all duration-200">
+                                <Link href="/booking">
+                                    <button className="w-full h-10 rounded-full bg-white text-[#0066ff] text-sm font-medium hover:bg-gray-100 transition-all duration-200 cursor-pointer">
                                         Book Consultation
                                     </button>
+                                </Link>
                                 </div>
 
                                 {/* Categories */}
@@ -404,7 +356,7 @@ export default function BlogPage() {
                                             <button
                                                 key={index}
                                                 onClick={() => setActiveCategory(category)}
-                                                className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeCategory === category
+                                                className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${activeCategory === category
                                                     ? "bg-[#0066ff] text-white"
                                                     : "hover:bg-gray-100 text-gray-700"
                                                     }`}
@@ -436,7 +388,7 @@ export default function BlogPage() {
                                 placeholder="Enter your email"
                                 className="flex-1 h-12 px-4 rounded-full border-2 border-white/20 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:border-white"
                             />
-                            <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 transition-all duration-200">
+                            <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 transition-all duration-200 cursor-pointer">
                                 Subscribe
                             </button>
                         </div>
@@ -454,12 +406,16 @@ export default function BlogPage() {
                         Book a consultation for expert advice tailored to your specific health needs.
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-4">
-                        <button className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-xl transition-all duration-200">
-                            Book Consultation
-                        </button>
-                        <button className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200">
-                            View Services
-                        </button>
+                        <Link href="/booking">
+                            <button className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-xl transition-all duration-200 cursor-pointer">
+                                Book a Consultation
+                            </button>
+                        </Link>
+                        <Link href="/blog">
+                            <button className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer">
+                                Browse All Articles
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </section>

@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1,
+    "name": "MEDICATION SAFETY ESSENTIALS",
+    "category": "eBook",
+    "price": "$29.99",
+    "description": "Comprehensive guide to understanding your medications, preventing errors, and optimizing your therapy.",
+    "features": [
+      "100+ pages of expert guidance",
+      "Drug interaction checker",
+      "Medication tracker templates"
+    ],
+    "image": "/product-ebook-1.jpg",
+    "popular": true
+  },
+  {
+    "id": 2,
+    "name": "DIABETES MEAL PLANNING GUIDE",
+    "category": "Guide",
+    "price": "$19.99",
+    "description": "Evidence-based meal plans and nutrition strategies for managing blood sugar levels effectively.",
+    "features": [
+      "30-day meal plans",
+      "Shopping lists included",
+      "Recipe customization tips"
+    ],
+    "image": "/product-guide-1.jpg",
+    "popular": false
+  },
+  {
+    "id": 3,
+    "name": "SUPPLEMENT SELECTION MASTERCLASS",
+    "category": "Course",
+    "price": "$79.99",
+    "description": "Learn how to choose quality supplements and avoid dangerous interactions with medications.",
+    "features": [
+      "4 hours of video content",
+      "Quality assessment checklists",
+      "Industry insider tips"
+    ],
+    "image": "/product-course-1.jpg",
+    "popular": true
+  },
+  {
+    "id": 4,
+    "name": "TEEN HEALTH COMMUNICATION TOOLKIT",
+    "category": "Guide",
+    "price": "$24.99",
+    "description": "For parents: effective strategies to discuss medications and health topics with teenagers.",
+    "features": [
+      "Conversation starters",
+      "Warning sign checklist",
+      "Resource directory"
+    ],
+    "image": "/product-guide-2.jpg",
+    "popular": false
+  },
+  {
+    "id": 5,
+    "name": "WEIGHT LOSS & MEDICATION MASTERY",
+    "category": "Course",
+    "price": "$99.99",
+    "description": "Complete course on managing weight while optimizing medication effectiveness.",
+    "features": [
+      "6-week structured program",
+      "Downloadable workbooks",
+      "Email support included"
+    ],
+    "image": "/product-course-2.jpg",
+    "popular": true
+  },
+  {
+    "id": 6,
+    "name": "PHARMACY CONSULTATION CHECKLIST",
+    "category": "eBook",
+    "price": "$14.99",
+    "description": "Never miss important questions during your pharmacy visit with this comprehensive checklist.",
+    "features": [
+      "Printable templates",
+      "Question frameworks",
+      "Follow-up guides"
+    ],
+    "image": "/product-ebook-2.jpg",
+    "popular": false
+  }
+]

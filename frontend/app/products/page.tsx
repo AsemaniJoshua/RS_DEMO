@@ -1,63 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
+import productsData from "@/data/products.json";
+
+// Note: Metadata export not possible in client components
+// SEO handled through layout.tsx or consider server component wrapper
 
 export default function ProductsPage() {
     const [activeFilter, setActiveFilter] = useState("All");
 
-    const filters = ["All", "eBooks", "Guides", "Courses"];
+    const filters = ["All", "eBook", "Guide", "Course"];
 
-    const products = [
-        {
-            category: "eBooks",
-            title: "Complete Medication Safety Guide",
-            price: "$29",
-            description: "Comprehensive guide to understanding your medications, preventing interactions, and optimizing your treatment.",
-            image: "/product-ebook-1.jpg",
-            features: ["150+ pages", "PDF format", "Lifetime access"]
-        },
-        {
-            category: "eBooks",
-            title: "Diabetes Management Handbook",
-            price: "$34",
-            description: "Evidence-based strategies for managing diabetes, including medication tips, diet guidelines, and lifestyle modifications.",
-            image: "/product-ebook-2.jpg",
-            features: ["200+ pages", "Interactive PDF", "Recipe section"]
-        },
-        {
-            category: "Guides",
-            title: "Supplement Selection Blueprint",
-            price: "$19",
-            description: "Quick-reference guide to choosing safe and effective dietary supplements based on scientific evidence.",
-            image: "/product-guide-1.jpg",
-            features: ["50+ pages", "Quick reference", "Printable charts"]
-        },
-        {
-            category: "Guides",
-            title: "Heart Health Essentials",
-            price: "$24",
-            description: "Essential guide to cardiovascular health, medication management, and lifestyle strategies for a healthy heart.",
-            image: "/product-guide-2.jpg",
-            features: ["75+ pages", "Visual guides", "Action checklist"]
-        },
-        {
-            category: "Courses",
-            title: "Medication Mastery Course",
-            price: "$97",
-            description: "6-week online course teaching you to take control of your medications and health outcomes.",
-            image: "/product-course-1.jpg",
-            features: ["6 modules", "Video lessons", "Certificate included"]
-        },
-        {
-            category: "Courses",
-            title: "Chronic Disease Self-Management",
-            price: "$127",
-            description: "Comprehensive 8-week program for managing chronic conditions with confidence and competence.",
-            image: "/product-course-2.jpg",
-            features: ["8 modules", "Live Q&A sessions", "Community access"]
-        }
-    ];
+    const products = productsData;
 
     const filteredProducts = activeFilter === "All"
         ? products
@@ -190,9 +146,11 @@ export default function ProductsPage() {
                                     {/* Price & CTA */}
                                     <div className="flex items-center justify-between">
                                         <div className="text-2xl font-bold text-gray-900">{product.price}</div>
-                                        <button className="h-10 px-6 rounded-full bg-[#0066ff] text-white text-sm font-medium hover:bg-[#0052cc] transition-all duration-200">
-                                            Add to Cart
+                                    <Link href="/products">
+                                        <button className="h-10 px-6 rounded-full bg-[#0066ff] text-white text-sm font-medium hover:bg-[#0052cc] transition-all duration-200 cursor-pointer">
+                                            View Details
                                         </button>
+                                    </Link>
                                     </div>
                                 </div>
                             </div>
@@ -321,7 +279,7 @@ export default function ProductsPage() {
                             {
                                 icon: (
                                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" />
                                     </svg>
                                 ),
                                 title: "Evidence-Based",
@@ -360,12 +318,16 @@ export default function ProductsPage() {
                         Contact us for custom educational materials or personalized consultation services.
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-4">
-                        <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200">
-                            Contact Us
-                        </button>
-                        <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200">
-                            View Services
-                        </button>
+                        <Link href="/products">
+                            <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200 cursor-pointer">
+                                View All Products
+                            </button>
+                        </Link>
+                        <Link href="/contact">
+                            <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200 cursor-pointer">
+                                Contact for Bulk Orders
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </section>
