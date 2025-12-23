@@ -51,12 +51,12 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-                    <p className="text-gray-600">Manage platform configuration and preferences</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+                    <p className="text-sm md:text-base text-gray-600">Manage your application settings</p>
                 </div>
                 {hasChanges && (
                     <div className="flex gap-3">
@@ -77,7 +77,8 @@ export default function SettingsPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-gray-200 overflow-x-auto">
+            <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+                <div className="flex gap-2 min-w-max">
                 <button
                     onClick={() => setActiveTab("general")}
                     className={`px-6 py-3 font-semibold transition-colors whitespace-nowrap ${
@@ -138,6 +139,7 @@ export default function SettingsPage() {
                 >
                     Advanced
                 </button>
+                </div>
             </div>
 
             {/* General Settings Tab */}

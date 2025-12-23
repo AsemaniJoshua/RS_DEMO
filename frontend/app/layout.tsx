@@ -24,15 +24,16 @@ export default function RootLayout({
   const pathname = usePathname();
   const isLoginPage = pathname === "/login";
   const isAdminPage = pathname?.startsWith("/admin");
+  const isAuthPage = pathname === "/forgot-password" || pathname === "/verify-otp" || pathname === "/reset-password";
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {!isLoginPage && !isAdminPage && <Navbar />}
+        {!isLoginPage && !isAdminPage && !isAuthPage && <Navbar />}
         {children}
-        {!isLoginPage && !isAdminPage && <Footer />}
+        {!isLoginPage && !isAdminPage && !isAuthPage && <Footer />}
       </body>
     </html>
   );

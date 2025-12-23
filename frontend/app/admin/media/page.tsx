@@ -68,15 +68,15 @@ export default function MediaLibraryPage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Media Library</h1>
-                    <p className="text-gray-600">Manage images, videos, and documents</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Media Library</h1>
+                    <p className="text-sm md:text-base text-gray-600">Manage your media files and resources</p>
                 </div>
                 <Link href="/admin/media/upload">
-                    <button className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center gap-2 font-medium">
+                    <button className="w-full sm:w-auto px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center justify-center gap-2 font-medium">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" strokeWidth="2"/>
                         </svg>
@@ -86,7 +86,7 @@ export default function MediaLibraryPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
                 <div className="bg-white rounded-xl p-6 border border-gray-100">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-600">Total Files</span>
@@ -127,10 +127,10 @@ export default function MediaLibraryPage() {
 
             {/* Toolbar */}
             <div className="bg-white rounded-xl p-4 mb-6 border border-gray-100">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1 w-full md:w-auto">
                         {/* Search */}
-                        <div className="flex-1 max-w-md relative">
+                        <div className="flex-1 max-w-md relative w-full">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                                 <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
                                 <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2"/>
@@ -148,7 +148,7 @@ export default function MediaLibraryPage() {
                         <select
                             value={selectedType}
                             onChange={(e) => setSelectedType(e.target.value)}
-                            className="px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                            className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                         >
                             <option value="all">All Types</option>
                             <option value="image">Images</option>
@@ -189,7 +189,7 @@ export default function MediaLibraryPage() {
 
             {/* Files Grid/List */}
             {viewMode === "grid" ? (
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {filteredFiles.map((file) => (
                         <div 
                             key={file.id} 
@@ -238,7 +238,7 @@ export default function MediaLibraryPage() {
                             {filteredFiles.map((file) => (
                                 <tr key={file.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-col md:flex-row gap-4">
                                             {getFileIcon(file.type)}
                                             <span className="font-medium text-gray-900">{file.name}</span>
                                         </div>

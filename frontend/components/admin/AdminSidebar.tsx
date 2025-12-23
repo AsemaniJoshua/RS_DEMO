@@ -116,7 +116,12 @@ const menuItems = [
     }
 ];
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+    isMobileMenuOpen?: boolean;
+    onMobileMenuClose?: () => void;
+}
+
+export default function AdminSidebar({ isMobileMenuOpen = false, onMobileMenuClose }: AdminSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
 
@@ -127,7 +132,19 @@ export default function AdminSidebar() {
     };
 
     return (
-        <aside className="w-64 bg-[#1a1f35] text-white h-screen fixed left-0 top-0 flex flex-col z-50">
+        <>
+            {/* Mobile Overlay */}
+            {isMobileMenuOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    onClick={onMobileMenuClose}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside className={`w-64 bg-[#1a1f35] text-white h-screen fixed left-0 top-0 flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${
+                isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}>
             {/* Logo/Brand */}
             <div className="p-6 border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -182,5 +199,6 @@ export default function AdminSidebar() {
                 </button>
             </div>
         </aside>
+        </>
     );
 }

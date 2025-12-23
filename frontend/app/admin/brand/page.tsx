@@ -69,12 +69,12 @@ export default function PersonalBrandPage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Personal Brand</h1>
-                    <p className="text-gray-600">Manage your professional profile and public presence</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Personal Brand</h1>
+                    <p className="text-sm md:text-base text-gray-600">Manage your professional profile and presence</p>
                 </div>
                 <div className="flex gap-3">
                     {isEditing ? (
@@ -104,7 +104,7 @@ export default function PersonalBrandPage() {
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
                 <div className="bg-white rounded-xl p-6 border border-gray-100">
                     <div className="text-3xl font-bold text-[#00d4aa] mb-1">{brandData.statistics.yearsExperience}+</div>
                     <div className="text-sm text-gray-600">Years Experience</div>
@@ -124,7 +124,8 @@ export default function PersonalBrandPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-gray-200">
+            <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+                <div className="flex gap-2 min-w-max">
                 <button
                     onClick={() => setActiveTab("profile")}
                     className={`px-6 py-3 font-semibold transition-colors relative ${
@@ -155,6 +156,7 @@ export default function PersonalBrandPage() {
                 >
                     Social Media
                 </button>
+                </div>
             </div>
 
             {/* Profile & Bio Tab */}

@@ -11,19 +11,38 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <main className="flex-1 ml-64">
+      <AdminSidebar 
+        isMobileMenuOpen={isMobileMenuOpen}
+        onMobileMenuClose={() => setIsMobileMenuOpen(false)}
+      />
+      <main className="flex-1 lg:ml-64">
         {/* Static Navbar */}
-        <nav className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-40">
+        <nav className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 sticky top-0 z-40">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-sm text-gray-500">Monday, December 23, 2024</p>
-            </div>
+            {/* Mobile Menu Button + Title */}
             <div className="flex items-center gap-4">
+              {/* Hamburger Menu Button - visible on mobile only */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="12" x2="21" y2="12" strokeLinecap="round"/>
+                  <line x1="3" y1="6" x2="21" y2="6" strokeLinecap="round"/>
+                  <line x1="3" y1="18" x2="21" y2="18" strokeLinecap="round"/>
+                </svg>
+              </button>
+              
+              <div>
+                <h1 className="text-lg md:text-xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p className="text-xs md:text-sm text-gray-500 hidden sm:block">Monday, December 23, 2024</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 md:gap-4">
               {/* Notification Bell */}
               <button className="p-2.5 hover:bg-gray-100 rounded-lg relative transition-colors">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

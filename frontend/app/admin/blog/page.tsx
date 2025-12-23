@@ -40,15 +40,15 @@ export default function BlogPage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Blog Manager</h1>
-                    <p className="text-gray-600">Create and manage your blog posts</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Blog Management</h1>
+                    <p className="text-sm md:text-base text-gray-600">Manage your articles and blog posts</p>
                 </div>
                 <Link href="/admin/blog/new">
-                    <button className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center gap-2 font-medium">
+                    <button className="w-full sm:w-auto px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center justify-center gap-2 font-medium">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="2"/>
                         </svg>
@@ -58,7 +58,7 @@ export default function BlogPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
                 <div className="bg-white rounded-xl p-6 border border-gray-100">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-600">Total Posts</span>
@@ -111,7 +111,7 @@ export default function BlogPage() {
 
             {/* Filters */}
             <div className="bg-white rounded-xl p-4 mb-6 border border-gray-100">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                     {/* Search */}
                     <div className="flex-1 relative">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -131,7 +131,7 @@ export default function BlogPage() {
                     <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
                         {categories.map((cat, idx) => (
                             <option key={idx} value={cat}>{cat}</option>
@@ -142,7 +142,7 @@ export default function BlogPage() {
                     <select
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
                         <option value="All">All Status</option>
                         <option value="Published">Published</option>
@@ -153,7 +153,8 @@ export default function BlogPage() {
 
             {/* Posts Table */}
             <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                <table className="w-full">
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[768px]">
                     <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
                             <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Post</th>
@@ -231,6 +232,7 @@ export default function BlogPage() {
                         )}
                     </tbody>
                 </table>
+                </div>
             </div>
 
             {/* Delete Modal */}

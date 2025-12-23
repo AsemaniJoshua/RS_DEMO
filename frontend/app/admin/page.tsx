@@ -79,8 +79,8 @@ export default function AdminDashboard() {
 
     // Extract data from JSON imports
     const analytics = analyticsData.analytics;
-    const appointments = appointmentsData.appointments;
-    const appointmentDates = appointmentsData.appointmentDates;
+    const appointments = appointmentsData.appointments || {};
+    const appointmentDates = appointmentsData.appointmentDates || [];
     const recentActivities = activitiesData.recentActivities;
     const quickActions = quickActionsData.quickActions;
     const revenueData = chartDataImport.revenueData;
@@ -112,9 +112,9 @@ export default function AdminDashboard() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Banner */}
-            <div className="px-8 py-6">
+            <div className="px-4 md:px-8 py-4 md:py-6">
                 <div 
-                    className={`bg-gradient-to-r from-[#1a1f35] via-[#2a3f55] to-[#00d4aa] rounded-2xl p-8 relative overflow-hidden transform transition-all duration-700 ${
+                    className={`bg-gradient-to-r from-[#1a1f35] via-[#2a3f55] to-[#00d4aa] rounded-2xl p-4 md:p-8 relative overflow-hidden transform transition-all duration-700 ${
                         mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
                     }`}
                 >
@@ -122,22 +122,22 @@ export default function AdminDashboard() {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-[#00d4aa]/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
 
-                    <div className="relative flex items-center justify-between">
+                    <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div className="text-white flex-1">
-                            <h2 className="text-3xl font-bold mb-2">Welcome back, Dr. George!</h2>
-                            <p className="text-gray-300 mb-6">Here's what's happening with your practice today</p>
-                            <div className="flex gap-4">
-                                <div className="bg-white/10 backdrop-blur-sm px-5 py-3 rounded-lg border border-white/20">
-                                    <div className="text-2xl font-bold">24</div>
-                                    <div className="text-sm opacity-90">Today's Appointments</div>
+                            <h2 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, Dr. George!</h2>
+                            <p className="text-gray-300 mb-4 md:mb-6 text-sm md:text-base">Here's what's happening with your practice today</p>
+                            <div className="flex flex-wrap gap-3 md:gap-4">
+                                <div className="bg-white/10 backdrop-blur-sm px-4 md:px-5 py-2 md:py-3 rounded-lg border border-white/20">
+                                    <div className="text-xs text-gray-300">Today's Appointments</div>
+                                    <div className="text-xl md:text-2xl font-bold">12</div>
                                 </div>
-                                <div className="bg-white/10 backdrop-blur-sm px-5 py-3 rounded-lg border border-white/20">
-                                    <div className="text-2xl font-bold">$2.4K</div>
-                                    <div className="text-sm opacity-90">Today's Revenue</div>
+                                <div className="bg-white/10 backdrop-blur-sm px-4 md:px-5 py-2 md:py-3 rounded-lg border border-white/20">
+                                    <div className="text-xs text-gray-300">Pending Reviews</div>
+                                    <div className="text-xl md:text-2xl font-bold">5</div>
                                 </div>
                             </div>
                         </div>
-                        <div className={`ml-8 transform transition-all duration-1000 ${mounted ? 'scale-100 rotate-0' : 'scale-0 rotate-12'}`}>
+                        <div className={`hidden md:block ml-8 transform transition-all duration-1000 ${mounted ? 'scale-100 rotate-0' : 'scale-0 rotate-12'}`}>
                             <div className="relative">
                                 <div className="w-40 h-40 rounded-full overflow-hidden ring-4 ring-white/30 shadow-2xl">
                                     <Image 
@@ -155,8 +155,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Analytics Cards */}
-            <div className="px-8">
-                <div className="grid grid-cols-4 gap-6 mb-8">
+            <div className="px-4 md:px-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
                     {analytics.map((item, idx) => (
                         <div
                             key={idx}
@@ -178,10 +178,10 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Main Content Grid */}
-                <div className="grid grid-cols-12 gap-6 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-6 md:mb-8">
                     {/* Performance Chart */}
-                    <div className="col-span-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
+                    <div className="lg:col-span-8 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
                             <div>
                                 <h3 className="text-lg font-bold text-gray-900">Revenue Overview</h3>
                                 <p className="text-sm text-gray-500 mt-1">Last 6 months performance</p>
@@ -215,7 +215,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Pie Chart */}
-                    <div className="col-span-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div className="lg:col-span-4 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
                         <h3 className="text-lg font-bold text-gray-900 mb-6">Patient Distribution</h3>
                         <div className="flex items-center justify-center">
                             <svg width="200" height="200" viewBox="0 0 200 200">
@@ -265,10 +265,10 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Bottom Grid */}
-                <div className="grid grid-cols-12 gap-6 mb-8">
+                {/* Calendar & Activities */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-6 md:mb-8">
                     {/* Calendar */}
-                    <div className="col-span-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div className="lg:col-span-4 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-gray-900">Calendar</h3>
                             <div className="flex gap-2 items-center">
@@ -356,7 +356,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Recent Activities */}
-                    <div className="col-span-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div className="lg:col-span-4 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
                         <div className="space-y-3">
                             {recentActivities.map((activity, idx) => (
@@ -375,7 +375,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="col-span-4 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div className="lg:col-span-4 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
                         <div className="space-y-3 flex flex-col gap-px">
                             {quickActions.map((action, idx) => (

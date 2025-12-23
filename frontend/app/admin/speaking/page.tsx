@@ -68,42 +68,44 @@ export default function SpeakingConsultingPage() {
     const currentStatuses = activeTab === "speaking" ? speakingData.statuses : consultingData.statuses;
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Speaking & Consulting</h1>
-                    <p className="text-gray-600">Manage your speaking engagements and consulting projects</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Speaking & Consulting</h1>
+                    <p className="text-sm md:text-base text-gray-600">Manage engagements and projects</p>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-gray-200">
-                <button
-                    onClick={() => setActiveTab("speaking")}
-                    className={`px-6 py-3 font-semibold transition-colors relative ${
-                        activeTab === "speaking"
-                            ? "text-[#00d4aa] border-b-2 border-[#00d4aa]"
-                            : "text-gray-600 hover:text-gray-900"
-                    }`}
-                >
-                    Speaking Engagements
-                </button>
-                <button
-                    onClick={() => setActiveTab("consulting")}
-                    className={`px-6 py-3 font-semibold transition-colors relative ${
-                        activeTab === "consulting"
-                            ? "text-[#00d4aa] border-b-2 border-[#00d4aa]"
-                            : "text-gray-600 hover:text-gray-900"
-                    }`}
-                >
-                    Consulting Projects
-                </button>
+            <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+                <div className="flex gap-2 min-w-max">
+                    <button
+                        onClick={() => setActiveTab("speaking")}
+                        className={`px-6 py-3 font-semibold transition-colors relative ${
+                            activeTab === "speaking"
+                                ? "text-[#00d4aa] border-b-2 border-[#00d4aa]"
+                                : "text-gray-600 hover:text-gray-900"
+                        }`}
+                    >
+                        Speaking Engagements
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("consulting")}
+                        className={`px-6 py-3 font-semibold transition-colors relative ${
+                            activeTab === "consulting"
+                                ? "text-[#00d4aa] border-b-2 border-[#00d4aa]"
+                                : "text-gray-600 hover:text-gray-900"
+                        }`}
+                    >
+                        Consulting Projects
+                    </button>
+                </div>
             </div>
 
             {/* Stats Cards */}
             {activeTab === "speaking" ? (
-                <div className="grid grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <div className="bg-white rounded-xl p-6 border border-gray-100">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -163,7 +165,7 @@ export default function SpeakingConsultingPage() {
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <div className="bg-white rounded-xl p-6 border border-gray-100">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -226,8 +228,8 @@ export default function SpeakingConsultingPage() {
 
             {/* Search and Filters */}
             <div className="bg-white rounded-xl p-6 border border-gray-100 mb-6">
-                <div className="flex items-center gap-4">
-                    <div className="flex-1">
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="flex-1 w-full">
                         <div className="relative">
                             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
@@ -245,7 +247,7 @@ export default function SpeakingConsultingPage() {
                     <select
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
-                        className="px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        className="w-full sm:w-auto px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
                         {currentCategories.map((cat, idx) => (
                             <option key={idx} value={cat}>{cat}</option>
@@ -254,14 +256,14 @@ export default function SpeakingConsultingPage() {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        className="w-full sm:w-auto px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
                         {currentStatuses.map((status, idx) => (
                             <option key={idx} value={status}>{status}</option>
                         ))}
                     </select>
                     <Link href={`/admin/speaking/${activeTab}/new`}>
-                        <button className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium whitespace-nowrap">
+                        <button className="w-full sm:w-auto px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center justify-center gap-2 font-medium">
                             + Add {activeTab === "speaking" ? "Engagement" : "Project"}
                         </button>
                     </Link>

@@ -63,22 +63,22 @@ export default function AppointmentsPage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Appointments</h1>
-                    <p className="text-gray-600">Manage patient appointments and schedules</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Appointments</h1>
+                    <p className="text-sm md:text-base text-gray-600">Manage patient appointments and schedules</p>
                 </div>
                 <Link href="/admin/appointments/new">
-                    <button className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium">
+                    <button className="w-full sm:w-auto px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center justify-center gap-2 font-medium">
                         + Schedule Appointment
                     </button>
                 </Link>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
                 <div className="bg-white rounded-xl p-6 border border-gray-100">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -141,7 +141,7 @@ export default function AppointmentsPage() {
 
             {/* Search and Filters */}
             <div className="bg-white rounded-xl p-6 border border-gray-100 mb-6">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
                     <div className="flex-1">
                         <div className="relative">
                             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -160,7 +160,7 @@ export default function AppointmentsPage() {
                     <select
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value)}
-                        className="px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
                         {appointmentsData.types.map((type, idx) => (
                             <option key={idx} value={type}>{type}</option>
@@ -169,7 +169,7 @@ export default function AppointmentsPage() {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
                         {appointmentsData.statuses.map((status, idx) => (
                             <option key={idx} value={status}>{status}</option>
@@ -181,7 +181,7 @@ export default function AppointmentsPage() {
             {/* Appointments Table */}
             <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full">
+                    <table className="w-full min-w-[768px]">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100">
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Patient</th>
