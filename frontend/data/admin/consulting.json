@@ -1,0 +1,91 @@
+{
+  "categories": [
+    "All Categories",
+    "Strategy Consulting",
+    "Operations Optimization",
+    "Digital Transformation",
+    "Staff Training",
+    "Regulatory Compliance",
+    "Business Development"
+  ],
+  "statuses": [
+    "All Statuses",
+    "Active",
+    "Completed",
+    "On Hold"
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "Retail Pharmacy Digital Transformation",
+      "client": "MedCare Pharmacy Chain",
+      "category": "Digital Transformation",
+      "startDate": "2024-01-15",
+      "endDate": "2024-06-30",
+      "status": "Active",
+      "budget": 45000,
+      "completion": 35,
+      "description": "Comprehensive digital transformation strategy for 15-store pharmacy chain"
+    },
+    {
+      "id": 2,
+      "title": "Clinical Services Expansion Strategy",
+      "client": "HealthFirst Pharmacy",
+      "category": "Strategy Consulting",
+      "startDate": "2024-02-01",
+      "endDate": "2024-05-15",
+      "status": "Active",
+      "budget": 32000,
+      "completion": 60,
+      "description": "Strategic planning for expanding clinical pharmacy services"
+    },
+    {
+      "id": 3,
+      "title": "Workflow Optimization Assessment",
+      "client": "Community Care Rx",
+      "category": "Operations Optimization",
+      "startDate": "2023-10-01",
+      "endDate": "2023-12-20",
+      "status": "Completed",
+      "budget": 28000,
+      "completion": 100,
+      "description": "Complete workflow analysis and optimization implementation"
+    },
+    {
+      "id": 4,
+      "title": "Pharmacy Staff Training Program",
+      "client": "Metro Health Pharmacy",
+      "category": "Staff Training",
+      "startDate": "2024-03-01",
+      "endDate": "2024-04-30",
+      "status": "Active",
+      "budget": 18000,
+      "completion": 25,
+      "description": "Comprehensive training program for pharmacy technicians and pharmacists"
+    },
+    {
+      "id": 5,
+      "title": "Regulatory Compliance Audit",
+      "client": "WellCare Pharmacies",
+      "category": "Regulatory Compliance",
+      "startDate": "2024-02-10",
+      "endDate": "2024-03-25",
+      "status": "On Hold",
+      "budget": 22000,
+      "completion": 45,
+      "description": "Full compliance audit and remediation planning"
+    },
+    {
+      "id": 6,
+      "title": "Independent Pharmacy Business Growth",
+      "client": "Jackson's Pharmacy",
+      "category": "Business Development",
+      "startDate": "2023-09-01",
+      "endDate": "2023-11-30",
+      "status": "Completed",
+      "budget": 35000,
+      "completion": 100,
+      "description": "Business development strategy and implementation for independent pharmacy"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "quickActions": [
+    {
+      "id": "appointment",
+      "label": "New Appointment",
+      "href": "/admin/appointments",
+      "color": "bg-[#00d4aa] hover:bg-[#00bfa6]"
+    },
+    {
+      "id": "article",
+      "label": "Write Article",
+      "href": "/admin/blog",
+      "color": "bg-[#0066ff] hover:bg-[#0052cc]"
+    },
+    {
+      "id": "course",
+      "label": "Add Course",
+      "href": "/admin/courses",
+      "color": "bg-[#1a1f35] hover:bg-[#2a3f55]"
+    }
+  ]
+}

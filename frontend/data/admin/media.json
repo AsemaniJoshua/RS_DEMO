@@ -1,0 +1,83 @@
+{
+  "mediaFiles": [
+    {
+      "id": 1,
+      "name": "dr-george-portrait.jpg",
+      "type": "image",
+      "size": "2.4 MB",
+      "uploadDate": "2024-11-20",
+      "dimensions": "1920x1080",
+      "url": "/dr-george.png"
+    },
+    {
+      "id": 2,
+      "name": "diabetes-infographic.png",
+      "type": "image",
+      "size": "1.8 MB",
+      "uploadDate": "2024-11-18",
+      "dimensions": "1600x900",
+      "url": "/course-diabetes.jpg"
+    },
+    {
+      "id": 3,
+      "name": "intro-video.mp4",
+      "type": "video",
+      "size": "45.2 MB",
+      "uploadDate": "2024-11-15",
+      "duration": "3:45",
+      "url": "/video-intro.mp4"
+    },
+    {
+      "id": 4,
+      "name": "course-syllabus.pdf",
+      "type": "document",
+      "size": "856 KB",
+      "uploadDate": "2024-11-12",
+      "pages": 12,
+      "url": "/syllabus.pdf"
+    },
+    {
+      "id": 5,
+      "name": "heart-health-banner.jpg",
+      "type": "image",
+      "size": "3.1 MB",
+      "uploadDate": "2024-11-10",
+      "dimensions": "2400x1200",
+      "url": "/course-heart.jpg"
+    },
+    {
+      "id": 6,
+      "name": "medication-guide.pdf",
+      "type": "document",
+      "size": "1.2 MB",
+      "uploadDate": "2024-11-08",
+      "pages": 24,
+      "url": "/medication-guide.pdf"
+    },
+    {
+      "id": 7,
+      "name": "tutorial-recording.mp4",
+      "type": "video",
+      "size": "67.8 MB",
+      "uploadDate": "2024-11-05",
+      "duration": "12:30",
+      "url": "/tutorial.mp4"
+    },
+    {
+      "id": 8,
+      "name": "nutrition-chart.png",
+      "type": "image",
+      "size": "950 KB",
+      "uploadDate": "2024-11-02",
+      "dimensions": "1200x800",
+      "url": "/course-nutrition.jpg"
+    }
+  ],
+  "stats": {
+    "totalFiles": 8,
+    "totalSize": "123.8 MB",
+    "images": 4,
+    "videos": 2,
+    "documents": 2
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "revenueData": [
+    {
+      "month": "Jan",
+      "value": 65,
+      "amount": "$32K"
+    },
+    {
+      "month": "Feb",
+      "value": 75,
+      "amount": "$38K"
+    },
+    {
+      "month": "Mar",
+      "value": 85,
+      "amount": "$42K"
+    },
+    {
+      "month": "Apr",
+      "value": 70,
+      "amount": "$35K"
+    },
+    {
+      "month": "May",
+      "value": 90,
+      "amount": "$45K"
+    },
+    {
+      "month": "Jun",
+      "value": 95,
+      "amount": "$48K"
+    }
+  ],
+  "pieChartData": [
+    {
+      "label": "Consultations",
+      "color": "#00d4aa",
+      "value": "45%"
+    },
+    {
+      "label": "Follow-ups",
+      "color": "#0066ff",
+      "value": "30%"
+    },
+    {
+      "label": "New Patients",
+      "color": "#1a1f35",
+      "value": "25%"
+    }
+  ]
+}

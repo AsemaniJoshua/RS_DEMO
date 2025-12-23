@@ -54,11 +54,15 @@ export default function Hero() {
                                 variant="primary"
                                 size="lg"
                                 className="bg-gradient-to-r from-[#0066ff] to-[#00ccff] hover:from-[#0052cc] hover:to-[#00b8e6] shadow-lg shadow-blue-500/30"
+                                onClick={() => window.location.href = '/booking'}
                             >
                                 Book a Professional
                                 <ArrowRightIcon />
                             </Button>
-                            <button className="px-8 h-12 rounded-full border-2 border-white/30 text-white font-medium hover:bg-white/10 transition-all duration-200">
+                            <button 
+                                className="px-8 h-12 rounded-full border-2 border-white/30 text-white font-medium hover:bg-white/10 transition-all duration-200"
+                                onClick={() => window.location.href = '/products'}
+                            >
                                 Explore Resources
                             </button>
                         </div>

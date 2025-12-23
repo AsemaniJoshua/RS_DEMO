@@ -1,0 +1,76 @@
+{
+  "ebooks": [
+    {
+      "id": 1,
+      "title": "Complete Guide to Diabetes Care",
+      "author": "Dr. George",
+      "category": "Chronic Disease",
+      "price": "$29",
+      "pages": 245,
+      "downloads": 1284,
+      "status": "Published",
+      "rating": 4.8,
+      "format": "PDF",
+      "publishDate": "2024-01-15"
+    },
+    {
+      "id": 2,
+      "title": "Medication Safety Handbook",
+      "author": "Dr. George",
+      "category": "Patient Care",
+      "price": "$19",
+      "pages": 180,
+      "downloads": 956,
+      "status": "Published",
+      "rating": 4.9,
+      "format": "PDF",
+      "publishDate": "2024-02-20"
+    },
+    {
+      "id": 3,
+      "title": "Heart Health & Prevention",
+      "author": "Dr. George",
+      "category": "Wellness",
+      "price": "$24",
+      "pages": 210,
+      "downloads": 1567,
+      "status": "Published",
+      "rating": 4.7,
+      "format": "PDF",
+      "publishDate": "2024-03-10"
+    },
+    {
+      "id": 4,
+      "title": "Nutrition for Optimal Health",
+      "author": "Dr. George",
+      "category": "Wellness",
+      "price": "$22",
+      "pages": 195,
+      "downloads": 0,
+      "status": "Draft",
+      "rating": 0,
+      "format": "PDF",
+      "publishDate": null
+    },
+    {
+      "id": 5,
+      "title": "Emergency Care Essentials",
+      "author": "Dr. George",
+      "category": "Emergency Care",
+      "price": "$35",
+      "pages": 280,
+      "downloads": 823,
+      "status": "Published",
+      "rating": 4.9,
+      "format": "PDF",
+      "publishDate": "2024-04-05"
+    }
+  ],
+  "categories": [
+    "All Categories",
+    "Chronic Disease",
+    "Patient Care",
+    "Wellness",
+    "Emergency Care"
+  ]
+}

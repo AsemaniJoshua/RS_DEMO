@@ -1,0 +1,97 @@
+{
+  "categories": [
+    "All Categories",
+    "Healthcare Conference",
+    "Medical Education",
+    "Corporate Training",
+    "Webinar",
+    "Podcast Interview",
+    "Panel Discussion"
+  ],
+  "statuses": [
+    "All Statuses",
+    "Upcoming",
+    "Completed",
+    "Cancelled"
+  ],
+  "engagements": [
+    {
+      "id": 1,
+      "title": "Future of Healthcare: AI and Pharmacy",
+      "category": "Healthcare Conference",
+      "date": "2024-02-15",
+      "location": "Boston, MA",
+      "venue": "Boston Convention Center",
+      "attendees": 850,
+      "duration": "45 min",
+      "fee": 5000,
+      "status": "Upcoming",
+      "description": "Keynote presentation on the integration of AI in modern pharmacy practice"
+    },
+    {
+      "id": 2,
+      "title": "Diabetes Management Best Practices",
+      "category": "Medical Education",
+      "date": "2024-03-10",
+      "location": "New York, NY",
+      "venue": "NYU Medical Center",
+      "attendees": 450,
+      "duration": "60 min",
+      "fee": 3500,
+      "status": "Upcoming",
+      "description": "Educational seminar on latest approaches to diabetes patient care"
+    },
+    {
+      "id": 3,
+      "title": "Workplace Wellness Programs",
+      "category": "Corporate Training",
+      "date": "2024-01-20",
+      "location": "San Francisco, CA",
+      "venue": "Virtual",
+      "attendees": 600,
+      "duration": "90 min",
+      "fee": 4000,
+      "status": "Completed",
+      "description": "Training session for corporate HR teams on implementing health programs"
+    },
+    {
+      "id": 4,
+      "title": "The Future Pharmacist Podcast",
+      "category": "Podcast Interview",
+      "date": "2024-01-05",
+      "location": "Remote",
+      "venue": "The Future Pharmacist Show",
+      "attendees": 12000,
+      "duration": "30 min",
+      "fee": 0,
+      "status": "Completed",
+      "description": "Discussion on career paths and opportunities in modern pharmacy"
+    },
+    {
+      "id": 5,
+      "title": "Mental Health in Healthcare Workers",
+      "category": "Webinar",
+      "date": "2024-04-05",
+      "location": "Online",
+      "venue": "Healthcare Professionals Network",
+      "attendees": 320,
+      "duration": "60 min",
+      "fee": 2000,
+      "status": "Upcoming",
+      "description": "Interactive webinar addressing burnout and mental wellness"
+    },
+    {
+      "id": 6,
+      "title": "Pharmacy Innovation Summit Panel",
+      "category": "Panel Discussion",
+      "date": "2023-12-10",
+      "location": "Chicago, IL",
+      "venue": "McCormick Place",
+      "attendees": 1200,
+      "duration": "45 min",
+      "fee": 3000,
+      "status": "Completed",
+      "description": "Panel discussion on innovation and technology in pharmacy practice"
+    }
+  ]
+}

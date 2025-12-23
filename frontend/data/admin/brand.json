@@ -1,0 +1,85 @@
+{
+  "profile": {
+    "name": "Dr. George Anderson",
+    "title": "Clinical Pharmacist & Healthcare Consultant",
+    "tagline": "Empowering better health through personalized pharmaceutical care",
+    "email": "dr.george@rxconsulting.com",
+    "phone": "+1 (555) 789-0123",
+    "location": "Boston, MA, USA",
+    "website": "www.drgeorgepharmacy.com",
+    "photo": "/dr-george.png"
+  },
+  "bio": {
+    "short": "Clinical pharmacist with 15+ years of experience in patient care, medication therapy management, and healthcare consulting.",
+    "full": "Dr. George Anderson is a board-certified clinical pharmacist with over 15 years of experience in direct patient care, medication therapy management, and healthcare consulting. He specializes in chronic disease management, particularly diabetes and cardiovascular health, and has helped thousands of patients optimize their medication regimens for better health outcomes.\n\nDr. Anderson is a sought-after speaker at healthcare conferences and has published numerous articles on pharmaceutical care best practices. He is passionate about reducing medication errors, improving patient adherence, and advancing the role of pharmacists in modern healthcare."
+  },
+  "credentials": [
+    {
+      "id": 1,
+      "title": "Doctor of Pharmacy (PharmD)",
+      "institution": "University of California, San Francisco",
+      "year": "2008"
+    },
+    {
+      "id": 2,
+      "title": "Board Certified Pharmacotherapy Specialist (BCPS)",
+      "institution": "Board of Pharmacy Specialties",
+      "year": "2010"
+    },
+    {
+      "id": 3,
+      "title": "Certified Diabetes Care and Education Specialist (CDCES)",
+      "institution": "Certification Board for Diabetes Care",
+      "year": "2012"
+    },
+    {
+      "id": 4,
+      "title": "Advanced Cardiovascular Life Support (ACLS)",
+      "institution": "American Heart Association",
+      "year": "2023"
+    }
+  ],
+  "expertise": [
+    "Medication Therapy Management",
+    "Chronic Disease Management",
+    "Diabetes Care",
+    "Cardiovascular Health",
+    "Patient Counseling",
+    "Clinical Decision Support",
+    "Healthcare Consulting",
+    "Pharmacy Operations"
+  ],
+  "achievements": [
+    {
+      "id": 1,
+      "title": "Pharmacist of the Year",
+      "organization": "Massachusetts Pharmacists Association",
+      "year": "2022"
+    },
+    {
+      "id": 2,
+      "title": "Excellence in Patient Care Award",
+      "organization": "American College of Clinical Pharmacy",
+      "year": "2020"
+    },
+    {
+      "id": 3,
+      "title": "Published Author",
+      "organization": "Journal of the American Pharmacists Association",
+      "year": "2019"
+    }
+  ],
+  "socialMedia": {
+    "linkedin": "https://linkedin.com/in/drgeorgeanderson",
+    "twitter": "https://twitter.com/DrGeorgeRx",
+    "facebook": "https://facebook.com/DrGeorgePharmacy",
+    "instagram": "https://instagram.com/drgeorge_pharmacy",
+    "youtube": "https://youtube.com/@DrGeorgePharmacy"
+  },
+  "statistics": {
+    "yearsExperience": 15,
+    "patientsServed": 5000,
+    "publicationsCount": 12,
+    "speakingEngagements": 45
+  }
+}

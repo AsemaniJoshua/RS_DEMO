@@ -1,0 +1,72 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "Understanding Diabetes: A Comprehensive Guide",
+      "slug": "understanding-diabetes-guide",
+      "author": "Dr. George",
+      "category": "Health Education",
+      "status": "Published",
+      "views": 2847,
+      "publishDate": "2024-11-20",
+      "excerpt": "Learn about diabetes management, symptoms, and treatment options in this detailed guide.",
+      "tags": ["Diabetes", "Health", "Chronic Disease"]
+    },
+    {
+      "id": 2,
+      "title": "10 Essential Tips for Heart Health",
+      "slug": "heart-health-tips",
+      "author": "Dr. George",
+      "category": "Wellness",
+      "status": "Published",
+      "views": 1923,
+      "publishDate": "2024-11-15",
+      "excerpt": "Discover practical tips to maintain a healthy heart and prevent cardiovascular disease.",
+      "tags": ["Heart Health", "Prevention", "Wellness"]
+    },
+    {
+      "id": 3,
+      "title": "Medication Safety: What You Need to Know",
+      "slug": "medication-safety-guide",
+      "author": "Dr. George",
+      "category": "Patient Care",
+      "status": "Published",
+      "views": 1456,
+      "publishDate": "2024-11-10",
+      "excerpt": "Essential information about safe medication use and avoiding common mistakes.",
+      "tags": ["Medication", "Safety", "Patient Care"]
+    },
+    {
+      "id": 4,
+      "title": "Nutrition Basics for Better Health",
+      "slug": "nutrition-basics",
+      "author": "Dr. George",
+      "category": "Nutrition",
+      "status": "Draft",
+      "views": 0,
+      "publishDate": null,
+      "excerpt": "A beginner's guide to understanding nutrition and making healthier food choices.",
+      "tags": ["Nutrition", "Diet", "Health"]
+    },
+    {
+      "id": 5,
+      "title": "Managing Stress in Modern Life",
+      "slug": "managing-stress",
+      "author": "Dr. George",
+      "category": "Mental Health",
+      "status": "Published",
+      "views": 3124,
+      "publishDate": "2024-11-05",
+      "excerpt": "Effective strategies for managing stress and improving mental wellbeing.",
+      "tags": ["Mental Health", "Stress", "Wellness"]
+    }
+  ],
+  "categories": [
+    "All Categories",
+    "Health Education",
+    "Wellness",
+    "Patient Care",
+    "Nutrition",
+    "Mental Health"
+  ]
+}

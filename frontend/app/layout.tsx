@@ -23,15 +23,16 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isLoginPage = pathname === "/login";
+  const isAdminPage = pathname?.startsWith("/admin");
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {!isLoginPage && <Navbar />}
+        {!isLoginPage && !isAdminPage && <Navbar />}
         {children}
-        {!isLoginPage && <Footer />}
+        {!isLoginPage && !isAdminPage && <Footer />}
       </body>
     </html>
   );

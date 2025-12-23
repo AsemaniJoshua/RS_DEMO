@@ -1,0 +1,28 @@
+{
+  "recentActivities": [
+    {
+      "user": "Sarah Mitchell",
+      "action": "Booked consultation",
+      "time": "2m ago",
+      "color": "bg-[#00d4aa]/10 text-[#00d4aa]"
+    },
+    {
+      "user": "John Davis",
+      "action": "Completed course",
+      "time": "15m ago",
+      "color": "bg-[#0066ff]/10 text-[#0066ff]"
+    },
+    {
+      "user": "Emma Wilson",
+      "action": "Purchased eBook",
+      "time": "1h ago",
+      "color": "bg-[#1a1f35]/10 text-[#1a1f35]"
+    },
+    {
+      "user": "Michael Brown",
+      "action": "Left review",
+      "time": "2h ago",
+      "color": "bg-[#f59e0b]/10 text-[#f59e0b]"
+    }
+  ]
+}

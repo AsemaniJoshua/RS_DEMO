@@ -1,0 +1,151 @@
+{
+  "statuses": [
+    "All Statuses",
+    "Scheduled",
+    "Confirmed",
+    "Completed",
+    "Cancelled",
+    "No Show"
+  ],
+  "types": [
+    "All Types",
+    "Consultation",
+    "Follow-up",
+    "Medication Review",
+    "Health Screening",
+    "Vaccination",
+    "Counseling"
+  ],
+  "appointments": [
+    {
+      "id": 1,
+      "patientName": "Sarah Johnson",
+      "patientEmail": "sarah.johnson@email.com",
+      "patientPhone": "+1 (555) 123-4567",
+      "type": "Consultation",
+      "date": "2024-02-15",
+      "time": "10:00 AM",
+      "duration": "30 min",
+      "status": "Scheduled",
+      "notes": "Initial consultation for diabetes management",
+      "reason": "Discuss new diabetes medication and lifestyle changes"
+    },
+    {
+      "id": 2,
+      "patientName": "Michael Chen",
+      "patientEmail": "m.chen@email.com",
+      "patientPhone": "+1 (555) 234-5678",
+      "type": "Medication Review",
+      "date": "2024-02-15",
+      "time": "11:00 AM",
+      "duration": "20 min",
+      "status": "Confirmed",
+      "notes": "Review current medication regimen",
+      "reason": "Quarterly medication review and refill coordination"
+    },
+    {
+      "id": 3,
+      "patientName": "Emily Rodriguez",
+      "patientEmail": "emily.r@email.com",
+      "patientPhone": "+1 (555) 345-6789",
+      "type": "Health Screening",
+      "date": "2024-02-15",
+      "time": "02:00 PM",
+      "duration": "45 min",
+      "status": "Scheduled",
+      "notes": "Annual health screening package",
+      "reason": "Blood pressure, cholesterol, and diabetes screening"
+    },
+    {
+      "id": 4,
+      "patientName": "David Thompson",
+      "patientEmail": "d.thompson@email.com",
+      "patientPhone": "+1 (555) 456-7890",
+      "type": "Follow-up",
+      "date": "2024-02-16",
+      "time": "09:30 AM",
+      "duration": "20 min",
+      "status": "Confirmed",
+      "notes": "Follow-up on blood pressure management",
+      "reason": "Check progress on new blood pressure medication"
+    },
+    {
+      "id": 5,
+      "patientName": "Lisa Martinez",
+      "patientEmail": "lisa.m@email.com",
+      "patientPhone": "+1 (555) 567-8901",
+      "type": "Vaccination",
+      "date": "2024-02-16",
+      "time": "01:00 PM",
+      "duration": "15 min",
+      "status": "Scheduled",
+      "notes": "Flu vaccine administration",
+      "reason": "Annual flu vaccination"
+    },
+    {
+      "id": 6,
+      "patientName": "Robert Wilson",
+      "patientEmail": "r.wilson@email.com",
+      "patientPhone": "+1 (555) 678-9012",
+      "type": "Counseling",
+      "date": "2024-02-17",
+      "time": "03:00 PM",
+      "duration": "45 min",
+      "status": "Scheduled",
+      "notes": "Smoking cessation counseling session",
+      "reason": "Third session of smoking cessation program"
+    },
+    {
+      "id": 7,
+      "patientName": "Amanda Taylor",
+      "patientEmail": "a.taylor@email.com",
+      "patientPhone": "+1 (555) 789-0123",
+      "type": "Consultation",
+      "date": "2024-02-14",
+      "time": "10:00 AM",
+      "duration": "30 min",
+      "status": "Completed",
+      "notes": "Discussed weight management strategies",
+      "reason": "Weight loss consultation and nutrition advice"
+    },
+    {
+      "id": 8,
+      "patientName": "James Anderson",
+      "patientEmail": "j.anderson@email.com",
+      "patientPhone": "+1 (555) 890-1234",
+      "type": "Follow-up",
+      "date": "2024-02-14",
+      "time": "02:00 PM",
+      "duration": "20 min",
+      "status": "No Show",
+      "notes": "Patient did not attend scheduled appointment",
+      "reason": "Follow-up on asthma medication effectiveness"
+    },
+    {
+      "id": 9,
+      "patientName": "Patricia White",
+      "patientEmail": "p.white@email.com",
+      "patientPhone": "+1 (555) 901-2345",
+      "type": "Medication Review",
+      "date": "2024-02-13",
+      "time": "11:30 AM",
+      "duration": "20 min",
+      "status": "Completed",
+      "notes": "Reviewed all medications, no changes needed",
+      "reason": "Routine medication review for chronic conditions"
+    },
+    {
+      "id": 10,
+      "patientName": "Christopher Lee",
+      "patientEmail": "c.lee@email.com",
+      "patientPhone": "+1 (555) 012-3456",
+      "type": "Consultation",
+      "date": "2024-02-12",
+      "time": "09:00 AM",
+      "duration": "30 min",
+      "status": "Cancelled",
+      "notes": "Patient requested cancellation due to conflict",
+      "reason": "New patient consultation - chronic pain management"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "courses": [
+    {
+      "id": 1,
+      "title": "Diabetes Management Fundamentals",
+      "category": "Chronic Disease",
+      "instructor": "Dr. George",
+      "students": 245,
+      "price": "$99",
+      "status": "Published",
+      "rating": 4.8,
+      "duration": "6 weeks",
+      "thumbnail": "/course-diabetes.jpg"
+    },
+    {
+      "id": 2,
+      "title": "Medication Safety & Compliance",
+      "category": "Patient Care",
+      "instructor": "Dr. George",
+      "students": 189,
+      "price": "$79",
+      "status": "Published",
+      "rating": 4.9,
+      "duration": "4 weeks",
+      "thumbnail": "/course-medication.jpg"
+    },
+    {
+      "id": 3,
+      "title": "Blood Pressure Control",
+      "category": "Chronic Disease",
+      "instructor": "Dr. George",
+      "students": 312,
+      "price": "$89",
+      "status": "Published",
+      "rating": 4.7,
+      "duration": "5 weeks",
+      "thumbnail": "/course-bp.jpg"
+    },
+    {
+      "id": 4,
+      "title": "Nutrition & Wellness Basics",
+      "category": "Wellness",
+      "instructor": "Dr. George",
+      "students": 156,
+      "price": "$69",
+      "status": "Draft",
+      "rating": 0,
+      "duration": "3 weeks",
+      "thumbnail": "/course-nutrition.jpg"
+    },
+    {
+      "id": 5,
+      "title": "Heart Health Essentials",
+      "category": "Chronic Disease",
+      "instructor": "Dr. George",
+      "students": 278,
+      "price": "$95",
+      "status": "Published",
+      "rating": 4.6,
+      "duration": "5 weeks",
+      "thumbnail": "/course-heart.jpg"
+    }
+  ],
+  "categories": [
+    "All Categories",
+    "Chronic Disease",
+    "Patient Care",
+    "Wellness",
+    "Emergency Care"
+  ]
+}

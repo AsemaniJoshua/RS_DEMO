@@ -1,0 +1,69 @@
+{
+  "general": {
+    "siteName": "Dr. George Pharmacy",
+    "siteTagline": "Your Trusted Healthcare Partner",
+    "contactEmail": "contact@drgeorgepharmacy.com",
+    "supportEmail": "support@drgeorgepharmacy.com",
+    "phoneNumber": "+1 (555) 789-0123",
+    "address": "123 Medical Plaza, Boston, MA 02101",
+    "timezone": "America/New_York",
+    "language": "English",
+    "currency": "USD"
+  },
+  "notifications": {
+    "emailNotifications": true,
+    "newAppointmentAlert": true,
+    "courseEnrollmentAlert": true,
+    "newMessageAlert": true,
+    "weeklyReport": true,
+    "monthlyReport": true,
+    "marketingEmails": false,
+    "smsNotifications": true,
+    "pushNotifications": true
+  },
+  "security": {
+    "twoFactorAuth": true,
+    "sessionTimeout": 30,
+    "passwordExpiry": 90,
+    "loginAttempts": 5,
+    "ipWhitelist": false,
+    "apiAccessLog": true,
+    "forceHttps": true
+  },
+  "payment": {
+    "paymentGateway": "Stripe",
+    "testMode": true,
+    "currency": "USD",
+    "taxRate": 6.25,
+    "stripePubKey": "pk_test_xxxxxxxxxxxx",
+    "stripeSecretKey": "sk_test_xxxxxxxxxxxx",
+    "paypalEnabled": true,
+    "paypalClientId": "AXxxxxxxxxxxxxxxxxxx"
+  },
+  "appointments": {
+    "bookingBuffer": 24,
+    "maxAdvanceBooking": 90,
+    "appointmentDuration": 30,
+    "allowCancellation": true,
+    "cancellationWindow": 24,
+    "autoConfirmation": false,
+    "reminderTime": 24
+  },
+  "courses": {
+    "autoApproveEnrollment": true,
+    "certificatesEnabled": true,
+    "maxStudentsPerCourse": 100,
+    "allowFreeCourses": true,
+    "refundPeriod": 7,
+    "courseCompletionCriteria": 80
+  },
+  "advanced": {
+    "maintenanceMode": false,
+    "debugMode": false,
+    "cacheEnabled": true,
+    "cacheDuration": 3600,
+    "apiRateLimit": 1000,
+    "backupFrequency": "daily",
+    "dataRetention": 365
+  }
+}
