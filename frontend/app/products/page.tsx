@@ -112,7 +112,7 @@ export default function ProductsPage() {
                                     </div>
 
                                     {/* Title */}
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">{product.title}</h3>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-3">{product.name}</h3>
 
                                     {/* Description */}
                                     <p className="text-gray-600 text-sm mb-4 leading-relaxed">

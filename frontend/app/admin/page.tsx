@@ -1,4 +1,7 @@
+
 "use client";
+
+import React from "react";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -27,7 +30,7 @@ export default function AdminDashboard() {
     }, []);
 
     // Analytics icons
-    const analyticsIcons: { [key: string]: JSX.Element } = {
+    const analyticsIcons: { [key: string]: React.ReactNode } = {
         patients: (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2"/>
@@ -57,7 +60,7 @@ export default function AdminDashboard() {
     };
 
     // Quick action icons
-    const quickActionIcons: { [key: string]: JSX.Element } = {
+    const quickActionIcons: { [key: string]: React.ReactNode } = {
         appointment: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="2"/>
@@ -79,8 +82,9 @@ export default function AdminDashboard() {
 
     // Extract data from JSON imports
     const analytics = analyticsData.analytics;
-    const appointments = appointmentsData.appointments || {};
-    const appointmentDates = appointmentsData.appointmentDates || [];
+    const appointments = appointmentsData.appointments || [];
+    // Generate appointmentDates from appointments array
+    const appointmentDates = appointments.map((appt: any) => appt.date);
     const recentActivities = activitiesData.recentActivities;
     const quickActions = quickActionsData.quickActions;
     const revenueData = chartDataImport.revenueData;
@@ -320,8 +324,11 @@ export default function AdminDashboard() {
                                 const isToday = day === today.getDate() && 
                                                currentMonth.getMonth() === today.getMonth() && 
                                                currentMonth.getFullYear() === today.getFullYear();
-                                const hasAppointment = appointmentDates.includes(day);
-                                const appointment = appointments[day.toString() as keyof typeof appointments];
+                                // Format current day as YYYY-MM-DD
+                                const month = (currentMonth.getMonth() + 1).toString().padStart(2, '0');
+                                const dateStr = `${currentMonth.getFullYear()}-${month}-${day.toString().padStart(2, '0')}`;
+                                const appointment = appointments.find((appt: any) => appt.date === dateStr);
+                                const hasAppointment = Boolean(appointment);
                                 return (
                                     <div key={day} className="relative group">
                                         <button
@@ -343,8 +350,8 @@ export default function AdminDashboard() {
                                         {/* Appointment Tooltip */}
                                         {hasAppointment && hoveredDate === day && appointment && (
                                             <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg p-3 shadow-lg">
-                                                <div className="font-semibold mb-1">{appointment.title}</div>
-                                                <div className="text-gray-300">{appointment.patient}</div>
+                                                <div className="font-semibold mb-1">{appointment.type}</div>
+                                                <div className="text-gray-300">{appointment.patientName}</div>
                                                 <div className="text-gray-400 mt-1">{appointment.time}</div>
                                                 <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                                             </div>
