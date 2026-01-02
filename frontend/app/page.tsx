@@ -11,13 +11,13 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Hero />
-      <TrustBadges />
-      <Services />
-      <WhyChoose />
-      <Testimonials />
-      <FeaturedContent />
-      <FAQ />
-      <CTA />
+      <div className="fade-in"><TrustBadges /></div>
+      <div className="slide-up"><Services /></div>
+      <div className="fade-in"><WhyChoose /></div>
+      <div className="slide-up"><Testimonials /></div>
+      <div className="fade-in"><FeaturedContent /></div>
+      <div className="slide-up"><FAQ /></div>
+      <div className="scale-in"><CTA /></div>
     </div>
   );
 }

@@ -51,7 +51,7 @@ export default function BlogPage() {
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
             <section className="py-20 lg:py-28 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-4xl mx-auto text-center">
                         {/* Heading */}
                         <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
@@ -102,7 +102,7 @@ export default function BlogPage() {
 
             {/* Blog Content with Sidebar */}
             <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid lg:grid-cols-3 gap-8">
                         {/* Main Content - Left Side */}
                         <div className="lg:col-span-2">
@@ -374,7 +374,7 @@ export default function BlogPage() {
 
             {/* Newsletter Section */}
             <section className="py-20 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-3xl mx-auto bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-2xl p-12 text-center">
                         <h2 className="text-4xl font-bold text-white mb-4">
                             Get Health Insights Delivered
@@ -398,7 +398,7 @@ export default function BlogPage() {
 
             {/* CTA Section */}
             <section className="py-24 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12 text-center">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12 text-center">
                     <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
                         Need Personalized Guidance?
                     </h2>

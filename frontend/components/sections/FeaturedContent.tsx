@@ -64,21 +64,21 @@ export default function FeaturedContent() {
     ];
 
     return (
-        <section className="py-20 bg-white">
-            <div className="mx-auto max-w-[1400px] px-12">
+        <section className="py-12 sm:py-16 lg:py-20 bg-white">
+            <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-12">
+                <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-6 mb-12">
                     <div>
-                        <h2 className="text-4xl font-bold text-gray-900 mb-3">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
                             Featured Content
                         </h2>
-                        <p className="text-gray-600 max-w-xl">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-xl">
                             Explore our latest videos, eBooks, and resources designed to empower your health decisions.
                         </p>
                     </div>
                     <Link
                         href="/resources"
-                        className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200"
+                        className="flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 whitespace-nowrap text-sm sm:text-base"
                     >
                         View All Resources
                         <ArrowRightIcon />
@@ -86,7 +86,7 @@ export default function FeaturedContent() {
                 </div>
 
                 {/* Content Cards */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {contentCards.map((card, index) => (
                         <div
                             key={index}

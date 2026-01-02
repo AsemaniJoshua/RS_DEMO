@@ -57,21 +57,21 @@ export default function Services() {
     ];
 
     return (
-        <section className="py-20 bg-gray-50">
-            <div className="mx-auto max-w-[1400px] px-12">
+        <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+            <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
                         Comprehensive Healthcare{" "}
                         <span className="text-[#0066ff]">Solutions</span>
                     </h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                         From medication safety to wellness optimization, discover how we can support your health journey.
                     </p>
                 </div>
 
                 {/* Service Cards */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {services.map((service, index) => (
                         <div
                             key={index}

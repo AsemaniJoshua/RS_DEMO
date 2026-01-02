@@ -1,0 +1,172 @@
+{
+  "categories": [
+    "All Categories",
+    "Pharmacology",
+    "Patient Care",
+    "Drug Safety",
+    "Clinical Skills",
+    "Wellness"
+  ],
+  "courses": [
+    {
+      "id": 101,
+      "title": "Advanced Pharmacology",
+      "instructor": "Dr. George",
+      "category": "Pharmacology",
+      "thumbnail": "/courses/advanced-pharm.jpg",
+      "price": "$49.99",
+      "rating": 4.8,
+      "students": 1247,
+      "duration": "8 weeks",
+      "lessons": 24,
+      "level": "Advanced",
+      "description": "Deep dive into advanced pharmacological concepts and drug mechanisms",
+      "highlights": [
+        "Advanced drug interactions",
+        "Pharmacokinetics and dynamics",
+        "Clinical case studies",
+        "Certificate of completion"
+      ]
+    },
+    {
+      "id": 102,
+      "title": "Clinical Documentation Best Practices",
+      "instructor": "Dr. George",
+      "category": "Clinical Skills",
+      "thumbnail": "/courses/documentation.jpg",
+      "price": "$39.99",
+      "rating": 4.6,
+      "students": 892,
+      "duration": "4 weeks",
+      "lessons": 16,
+      "level": "Intermediate",
+      "description": "Master the art of accurate and efficient clinical documentation",
+      "highlights": [
+        "Documentation standards",
+        "Legal considerations",
+        "Electronic health records",
+        "Real-world examples"
+      ]
+    },
+    {
+      "id": 103,
+      "title": "Medication Therapy Management",
+      "instructor": "Dr. George",
+      "category": "Patient Care",
+      "thumbnail": "/courses/mtm.jpg",
+      "price": "$59.99",
+      "rating": 4.9,
+      "students": 1534,
+      "duration": "6 weeks",
+      "lessons": 18,
+      "level": "Intermediate",
+      "description": "Comprehensive guide to medication therapy management and optimization",
+      "highlights": [
+        "MTM framework",
+        "Patient counseling techniques",
+        "Medication adherence strategies",
+        "Insurance billing basics"
+      ]
+    },
+    {
+      "id": 104,
+      "title": "Adverse Drug Reactions",
+      "instructor": "Dr. George",
+      "category": "Drug Safety",
+      "thumbnail": "/courses/adr.jpg",
+      "price": "$44.99",
+      "rating": 4.7,
+      "students": 678,
+      "duration": "5 weeks",
+      "lessons": 15,
+      "level": "Intermediate",
+      "description": "Identify, manage, and prevent adverse drug reactions effectively",
+      "highlights": [
+        "ADR classification",
+        "Monitoring protocols",
+        "Reporting systems",
+        "Prevention strategies"
+      ]
+    },
+    {
+      "id": 105,
+      "title": "Introduction to Pharmacy Practice",
+      "instructor": "Dr. George",
+      "category": "Pharmacology",
+      "thumbnail": "/courses/intro-pharmacy.jpg",
+      "price": "$29.99",
+      "rating": 4.5,
+      "students": 2134,
+      "duration": "3 weeks",
+      "lessons": 12,
+      "level": "Beginner",
+      "description": "Essential foundations for aspiring pharmacy professionals",
+      "highlights": [
+        "Pharmacy basics",
+        "Drug classification",
+        "Professional ethics",
+        "Career pathways"
+      ]
+    },
+    {
+      "id": 106,
+      "title": "Holistic Health and Wellness",
+      "instructor": "Dr. George",
+      "category": "Wellness",
+      "thumbnail": "/courses/wellness.jpg",
+      "price": "$34.99",
+      "rating": 4.8,
+      "students": 1089,
+      "duration": "4 weeks",
+      "lessons": 14,
+      "level": "Beginner",
+      "description": "Integrative approach to patient health and wellbeing",
+      "highlights": [
+        "Nutrition fundamentals",
+        "Stress management",
+        "Sleep optimization",
+        "Lifestyle interventions"
+      ]
+    },
+    {
+      "id": 107,
+      "title": "Pediatric Pharmacotherapy",
+      "instructor": "Dr. George",
+      "category": "Pharmacology",
+      "thumbnail": "/courses/pediatric.jpg",
+      "price": "$54.99",
+      "rating": 4.9,
+      "students": 456,
+      "duration": "7 weeks",
+      "lessons": 20,
+      "level": "Advanced",
+      "description": "Specialized pharmacological care for pediatric patients",
+      "highlights": [
+        "Age-specific dosing",
+        "Common pediatric conditions",
+        "Safety considerations",
+        "Parent counseling"
+      ]
+    },
+    {
+      "id": 108,
+      "title": "Geriatric Pharmacy Care",
+      "instructor": "Dr. George",
+      "category": "Patient Care",
+      "thumbnail": "/courses/geriatric.jpg",
+      "price": "$49.99",
+      "rating": 4.7,
+      "students": 723,
+      "duration": "6 weeks",
+      "lessons": 18,
+      "level": "Advanced",
+      "description": "Optimize medication management for elderly populations",
+      "highlights": [
+        "Polypharmacy management",
+        "Age-related changes",
+        "Fall prevention",
+        "Cognitive assessment"
+      ]
+    }
+  ]
+}

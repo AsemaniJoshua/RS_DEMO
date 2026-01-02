@@ -24,7 +24,7 @@ export default function MediaPage() {
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
             <section className="py-20 lg:py-28 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-4xl mx-auto text-center">
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E0F2FE] text-[#0066ff] mb-6">
@@ -67,7 +67,7 @@ export default function MediaPage() {
 
             {/* Media Grid */}
             <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {filteredMedia.map((item, index) => (
                             <article key={index} className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 group">
@@ -158,7 +158,7 @@ export default function MediaPage() {
 
             {/* Press Mentions */}
             <section className="py-20 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-12">
                         <h2 className="text-4xl font-bold text-gray-900 mb-4">
                             Featured <span className="text-[#0066ff]">Press</span>
@@ -188,7 +188,7 @@ export default function MediaPage() {
 
             {/* CTA Section */}
             <section className="py-24 bg-gradient-to-r from-[#0052cc] via-[#0066ff] to-[#00bfa6]">
-                <div className="mx-auto max-w-[1400px] px-12 text-center">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12 text-center">
                     <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
                         Interested in a Media Collaboration?
                     </h2>

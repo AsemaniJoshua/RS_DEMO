@@ -7,9 +7,9 @@ export default function SpeakingPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="pt-12 lg:pt-16 pb-20 lg:pb-24 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <section className="pt-8 sm:pt-12 lg:pt-16 pb-12 sm:pb-16 lg:pb-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                    <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                         {/* Left Content */}
                         <div>
                             {/* Badge */}
@@ -22,20 +22,20 @@ export default function SpeakingPage() {
                             </div>
 
                             {/* Heading */}
-                            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6">
                                 Inspire Your{" "}
                                 <span className="text-[#0066ff]">Audience</span>
                             </h1>
 
                             {/* Description */}
-                            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                            <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">
                                 Dr. George delivers compelling presentations on drug safety, health education, and disease prevention. Available for keynotes, workshops, and consulting engagements.
                             </p>
 
                             {/* CTA Buttons */}
                             <div className="flex flex-wrap gap-4 mb-8">
                                 <Link href="/booking">
-                                    <button className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] transition-all duration-200 flex items-center gap-2 cursor-pointer">
+                                    <button className="h-12 px-6 sm:px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] transition-all duration-200 flex items-center gap-2 cursor-pointer text-sm sm:text-base whitespace-nowrap">
                                         Book a Speaking Engagement
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                             <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -43,7 +43,7 @@ export default function SpeakingPage() {
                                     </button>
                                 </Link>
                                 <Link href="/speaking#topics">
-                                    <button className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer">
+                                    <button className="h-12 px-6 sm:px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer text-sm sm:text-base">
                                         View Topics
                                     </button>
                                 </Link>
@@ -90,18 +90,18 @@ export default function SpeakingPage() {
             </section>
 
             {/* Speaking Topics Section */}
-            <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             Speaking <span className="text-[#0066ff]">Topics</span>
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                             Engaging, evidence-based presentations tailored to your audience's needs.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[
                             {
                                 icon: (
@@ -192,18 +192,18 @@ export default function SpeakingPage() {
             </section>
 
             {/* Past Engagements Section */}
-            <section className="py-20 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             Past <span className="text-[#0066ff]">Engagements</span>
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                             Trusted by leading organizations and institutions.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[
                             {
                                 event: "Annual Healthcare Summit",
@@ -287,18 +287,18 @@ export default function SpeakingPage() {
             </section>
 
             {/* Testimonials Section */}
-            <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             What <span className="text-[#0066ff]">Organizers Say</span>
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                             Feedback from event organizers and attendees.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
                         {[
                             {
                                 quote: "Dr. George's presentation was engaging, informative, and perfectly tailored to our audience. Our team gained valuable insights on medication safety.",
@@ -353,22 +353,22 @@ export default function SpeakingPage() {
             </section>
 
             {/* Booking CTA Section */}
-            <section className="py-24 bg-gradient-to-r from-[#0052cc] via-[#0066ff] to-[#00bfa6]">
-                <div className="mx-auto max-w-[1400px] px-12 text-center">
-                    <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+            <section className="py-12 sm:py-16 lg:py-20 bg-linear-to-r from-[#0052cc] via-[#0066ff] to-[#00bfa6]">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12 text-center">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
                         Ready to Book Dr. George?
                     </h2>
-                    <p className="text-lg text-white/90 max-w-2xl mx-auto mb-10">
+                    <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto mb-10">
                         Transform your next event with engaging, evidence-based health presentations. Check availability and customize your speaking engagement today.
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-4">
                         <Link href="/booking">
-                            <button className="h-14 px-10 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200 text-lg cursor-pointer">
+                            <button className="h-14 px-8 sm:px-10 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200 text-base sm:text-lg cursor-pointer">
                                 Check Availability
                             </button>
                         </Link>
                         <Link href="/contact">
-                            <button className="h-14 px-10 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200 text-lg cursor-pointer">
+                            <button className="h-14 px-6 sm:px-10 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200 text-sm sm:text-lg cursor-pointer whitespace-nowrap">
                                 Download Speaker Kit
                             </button>
                         </Link>

@@ -71,7 +71,7 @@ export default function BookingPage() {
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
             <section className="py-12 lg:py-16 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-3xl mx-auto text-center">
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E0F2FE] text-[#0066ff] mb-6">
@@ -100,7 +100,7 @@ export default function BookingPage() {
 
             {/* Booking Flow */}
             <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid lg:grid-cols-3 gap-8">
                         {/* Main Booking Area (2/3) */}
                         <div className="lg:col-span-2 space-y-8">

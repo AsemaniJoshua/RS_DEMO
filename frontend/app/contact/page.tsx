@@ -28,8 +28,8 @@ export default function ContactPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="py-12 lg:py-16 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-8 sm:py-12 lg:py-16 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-3xl mx-auto text-center">
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E0F2FE] text-[#0066ff] mb-6">
@@ -40,13 +40,13 @@ export default function ContactPage() {
                         </div>
 
                         {/* Heading */}
-                        <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6">
                             Contact{" "}
                             <span className="text-[#0066ff]">Dr. George</span>
                         </h1>
 
                         {/* Description */}
-                        <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                        <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">
                             Have questions about services, products, or consultations? I'm here to help. Reach out and I'll get back to you within 24 hours.
                         </p>
 
@@ -70,18 +70,18 @@ export default function ContactPage() {
             </section>
 
             {/* Contact Form & Info Section */}
-            <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid lg:grid-cols-3 gap-12">
                         {/* Contact Form (2/3 width) */}
                         <div className="lg:col-span-2">
-                            <div className="bg-white rounded-2xl p-8 lg:p-10 border-2 border-gray-100">
-                                <h2 className="text-3xl font-bold text-gray-900 mb-2">Send a Message</h2>
+                            <div className="bg-white rounded-2xl p-6 lg:p-8 xl:p-10 border-2 border-gray-100">
+                                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Send a Message</h2>
                                 <p className="text-gray-600 mb-8">Fill out the form below and I'll respond as soon as possible.</p>
 
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     {/* Name & Email */}
-                                    <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="grid sm:grid-cols-2 gap-6">
                                         <div>
                                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                                                 Full Name *
@@ -115,7 +115,7 @@ export default function ContactPage() {
                                     </div>
 
                                     {/* Phone & Subject */}
-                                    <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="grid sm:grid-cols-2 gap-6">
                                         <div>
                                             <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                                                 Phone Number
@@ -189,7 +189,7 @@ export default function ContactPage() {
                             <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">Contact Information</h3>
                                 <div className="space-y-4">
-                                    <div className="flex items-start gap-3">
+                                <div className="flex items-start gap-3">
                                         <div className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center shrink-0">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
                                                 <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" strokeWidth="2"/>
@@ -284,14 +284,14 @@ export default function ContactPage() {
             </section>
 
             {/* FAQ Section */}
-            <section className="py-20 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center mb-12">
-                            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                                 Frequently Asked <span className="text-[#0066ff]">Questions</span>
                             </h2>
-                            <p className="text-lg text-gray-600">
+                            <p className="text-base sm:text-lg text-gray-600">
                                 Quick answers to common questions about services and consultations.
                             </p>
                         </div>
@@ -316,13 +316,13 @@ export default function ContactPage() {
             </section>
 
             {/* Location/Map Section */}
-            <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             Visit <span className="text-[#0066ff]">My Office</span>
                         </h2>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-base sm:text-lg text-gray-600">
                             Located in the heart of the medical district, easily accessible by public transit.
                         </p>
                     </div>

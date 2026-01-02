@@ -23,7 +23,7 @@ export default function ProductsPage() {
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
             <section className="py-20 lg:py-28 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-4xl mx-auto text-center">
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E0F2FE] text-[#0066ff] mb-6">
@@ -66,7 +66,7 @@ export default function ProductsPage() {
 
             {/* Products Grid */}
             <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredProducts.map((product, index) => (
                             <div key={index} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 group">
@@ -168,7 +168,7 @@ export default function ProductsPage() {
 
             {/* Secure & Instant Delivery */}
             <section className="py-16 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-3xl mx-auto bg-gray-50 rounded-2xl p-8 border border-gray-200">
                         {/* Heading */}
                         <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">
@@ -262,7 +262,7 @@ export default function ProductsPage() {
 
             {/* Features Section */}
             <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid md:grid-cols-3 gap-8">
                         {[
                             {
@@ -310,7 +310,7 @@ export default function ProductsPage() {
 
             {/* CTA Section */}
             <section className="py-24 bg-gradient-to-r from-[#0052cc] via-[#0066ff] to-[#00bfa6]">
-                <div className="mx-auto max-w-[1400px] px-12 text-center">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12 text-center">
                     <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
                         Can't Find What You Need?
                     </h2>

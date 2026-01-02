@@ -52,7 +52,7 @@ export default function Navbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white shadow-sm">
-            <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-12">
+            <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-3 sm:px-6 lg:px-12">
                 {/* Logo Section */}
                 <div className="flex-shrink-0">
                     <Logo />

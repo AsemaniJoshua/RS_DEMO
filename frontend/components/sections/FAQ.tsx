@@ -33,13 +33,13 @@ export default function FAQ() {
     ];
 
     return (
-        <section className="py-20 bg-white">
-            <div className="mx-auto max-w-[1400px] px-12">
+        <section className="py-12 sm:py-16 lg:py-20 bg-white">
+            <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                         Frequently Asked <span className="text-[#0066ff]">Questions</span>
                     </h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                         Get answers to common questions about services, consultations, and how we can help
                     </p>
                 </div>
@@ -52,15 +52,15 @@ export default function FAQ() {
                         >
                             <button
                                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                                className="w-full px-8 py-6 flex items-center justify-between text-left"
+                                className="w-full px-4 sm:px-8 py-4 sm:py-6 flex items-center justify-between text-left"
                             >
-                                <h3 className="font-bold text-gray-900 text-lg pr-4">{faq.question}</h3>
+                                <h3 className="font-bold text-gray-900 text-base sm:text-lg pr-4">{faq.question}</h3>
                                 <svg
                                     width="24"
                                     height="24"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    className={`flex-shrink-0 text-[#0066ff] transition-transform duration-300 ${openIndex === index ? "rotate-180" : ""
+                                    className={`shrink-0 text-[#0066ff] transition-transform duration-300 ${openIndex === index ? "rotate-180" : ""
                                         }`}
                                 >
                                     <path
@@ -73,7 +73,7 @@ export default function FAQ() {
                                 </svg>
                             </button>
                             <div
-                                className={`px-8 overflow-hidden transition-all duration-300 ${openIndex === index ? "pb-6 max-h-96" : "max-h-0"
+                                className={`px-4 sm:px-8 overflow-hidden transition-all duration-300 ${openIndex === index ? "pb-4 sm:pb-6 max-h-96" : "max-h-0"
                                     }`}
                             >
                                 <p className="text-gray-600 leading-relaxed">{faq.answer}</p>

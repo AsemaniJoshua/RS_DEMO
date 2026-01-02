@@ -1,0 +1,193 @@
+{
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@email.com",
+    "avatar": "/avatars/user.png",
+    "phone": "+1 (555) 987-6543",
+    "joinedDate": "2023-06-15",
+    "subscription": "Premium",
+    "stats": {
+      "coursesEnrolled": 5,
+      "coursesCompleted": 2,
+      "appointmentsBooked": 8,
+      "totalLearningHours": 24,
+      "savedItems": 12
+    }
+  },
+  "enrolledCourses": [
+    {
+      "id": 1,
+      "title": "Pharmacology Basics",
+      "instructor": "Dr. George",
+      "thumbnail": "/courses/pharm-basics.jpg",
+      "progress": 65,
+      "status": "in-progress",
+      "lastAccessed": "2024-02-20",
+      "totalLessons": 20,
+      "completedLessons": 13,
+      "enrolledDate": "2023-08-10"
+    },
+    {
+      "id": 2,
+      "title": "Drug Safety Fundamentals",
+      "instructor": "Dr. George",
+      "thumbnail": "/courses/drug-safety.jpg",
+      "progress": 100,
+      "status": "completed",
+      "lastAccessed": "2024-01-15",
+      "totalLessons": 15,
+      "completedLessons": 15,
+      "enrolledDate": "2023-07-05",
+      "completedDate": "2024-01-15"
+    },
+    {
+      "id": 3,
+      "title": "Disease Prevention Strategies",
+      "instructor": "Dr. George",
+      "thumbnail": "/courses/disease-prevention.jpg",
+      "progress": 30,
+      "status": "in-progress",
+      "lastAccessed": "2024-02-18",
+      "totalLessons": 18,
+      "completedLessons": 5,
+      "enrolledDate": "2024-01-20"
+    },
+    {
+      "id": 4,
+      "title": "Patient Counseling",
+      "instructor": "Dr. George",
+      "thumbnail": "/courses/counseling.jpg",
+      "progress": 0,
+      "status": "not-started",
+      "lastAccessed": null,
+      "totalLessons": 12,
+      "completedLessons": 0,
+      "enrolledDate": "2024-02-10"
+    },
+    {
+      "id": 5,
+      "title": "Medication Management",
+      "instructor": "Dr. George",
+      "thumbnail": "/courses/medication-mgmt.jpg",
+      "progress": 100,
+      "status": "completed",
+      "lastAccessed": "2023-12-20",
+      "totalLessons": 10,
+      "completedLessons": 10,
+      "enrolledDate": "2023-09-01",
+      "completedDate": "2023-12-20"
+    }
+  ],
+  "upcomingAppointments": [
+    {
+      "id": 1,
+      "type": "Drug Consultation",
+      "date": "2024-02-25",
+      "time": "14:00",
+      "status": "Confirmed",
+      "mode": "Virtual",
+      "notes": "Follow-up on medication review",
+      "meetingLink": "https://meet.example.com/abc123"
+    },
+    {
+      "id": 2,
+      "type": "Health Assessment",
+      "date": "2024-03-05",
+      "time": "10:30",
+      "status": "Confirmed",
+      "mode": "In-Person",
+      "notes": "Annual health checkup"
+    }
+  ],
+  "pastAppointments": [
+    {
+      "id": 3,
+      "type": "Initial Consultation",
+      "date": "2024-02-10",
+      "time": "15:00",
+      "status": "Completed",
+      "mode": "Virtual"
+    },
+    {
+      "id": 4,
+      "type": "Follow-up",
+      "date": "2024-01-20",
+      "time": "11:00",
+      "status": "Completed",
+      "mode": "In-Person"
+    }
+  ],
+  "bookmarks": {
+    "blogs": [
+      {
+        "id": 1,
+        "title": "Understanding Drug Interactions",
+        "excerpt": "Learn about common drug interactions and how to avoid them",
+        "savedDate": "2024-02-15",
+        "category": "Drug Safety"
+      },
+      {
+        "id": 2,
+        "title": "Healthy Living Tips",
+        "excerpt": "Simple strategies for maintaining a healthy lifestyle",
+        "savedDate": "2024-02-10",
+        "category": "Wellness"
+      }
+    ],
+    "courses": [
+      {
+        "id": 6,
+        "title": "Advanced Pharmacology",
+        "instructor": "Dr. George",
+        "savedDate": "2024-02-18"
+      }
+    ],
+    "resources": [
+      {
+        "id": 1,
+        "title": "Medication Guide PDF",
+        "type": "PDF",
+        "savedDate": "2024-02-12"
+      }
+    ]
+  },
+  "recentActivity": [
+    {
+      "id": 1,
+      "type": "lesson_completed",
+      "title": "Completed: Module 3 - Drug Classifications",
+      "course": "Pharmacology Basics",
+      "date": "2024-02-20T14:30:00",
+      "icon": "check"
+    },
+    {
+      "id": 2,
+      "type": "course_enrollment",
+      "title": "Enrolled in Disease Prevention Strategies",
+      "date": "2024-01-20T10:00:00",
+      "icon": "book"
+    },
+    {
+      "id": 3,
+      "type": "appointment_booked",
+      "title": "Booked: Drug Consultation",
+      "date": "2024-02-18T16:45:00",
+      "icon": "calendar"
+    },
+    {
+      "id": 4,
+      "type": "blog_saved",
+      "title": "Saved: Understanding Drug Interactions",
+      "date": "2024-02-15T09:20:00",
+      "icon": "bookmark"
+    },
+    {
+      "id": 5,
+      "type": "course_completed",
+      "title": "Completed: Drug Safety Fundamentals",
+      "date": "2024-01-15T18:00:00",
+      "icon": "award"
+    }
+  ]
+}

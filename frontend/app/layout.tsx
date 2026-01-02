@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { ScrollAnimations } from "@/components/ui/ScrollAnimations";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,18 +23,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isLoginPage = pathname === "/login";
   const isAdminPage = pathname?.startsWith("/admin");
-  const isAuthPage = pathname === "/forgot-password" || pathname === "/verify-otp" || pathname === "/reset-password";
-
+  const isAuthPage = pathname?.startsWith("/login") || 
+                     pathname?.startsWith("/forgot-password") || 
+                     pathname?.startsWith("/verify-otp") ||
+                     pathname?.startsWith("/reset-password");
+  const isDashboardPage = pathname?.startsWith("/dashboard");
+  
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {!isLoginPage && !isAdminPage && !isAuthPage && <Navbar />}
-        {children}
-        {!isLoginPage && !isAdminPage && !isAuthPage && <Footer />}
+        {!isAdminPage && !isAuthPage && !isDashboardPage && <Navbar />}
+        <ScrollAnimations>
+          {children}
+        </ScrollAnimations>
+        {!isAdminPage && !isAuthPage && !isDashboardPage && <Footer />}
       </body>
     </html>
   );

@@ -1,14 +1,14 @@
 export default function WhyChoose() {
     return (
-        <section className="py-20 bg-gray-50">
-            <div className="mx-auto max-w-[1400px] px-12">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+            <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
                     {/* Left Content */}
                     <div>
-                        <h2 className="text-4xl font-bold text-gray-900 mb-6">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
                             Why Choose <span className="text-[#0066ff]">Dr. George</span>
                         </h2>
-                        <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                        <p className="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed">
                             With over 15 years of clinical experience and a passion for patient education, Dr. George brings a unique blend of expertise and accessibility to healthcare.
                         </p>
 
@@ -56,7 +56,7 @@ export default function WhyChoose() {
                                 }
                             ].map((item, index) => (
                                 <div key={index} className="flex gap-4 group">
-                                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#E0F2FE] text-[#0066ff] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                    <div className="shrink-0 w-12 h-12 rounded-xl bg-[#E0F2FE] text-[#0066ff] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                         {item.icon}
                                     </div>
                                     <div>
@@ -69,7 +69,7 @@ export default function WhyChoose() {
                     </div>
 
                     {/* Right Stats */}
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6">
                         {[
                             {
                                 value: "15+",
@@ -92,8 +92,8 @@ export default function WhyChoose() {
                                 gradient: "from-[#00bfa6] to-[#2dd4bf]"
                             }
                         ].map((stat, index) => (
-                            <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group text-center">
-                                <div className={`text-5xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}>
+                            <div key={index} className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 group text-center">
+                                <div className={`text-4xl sm:text-5xl font-bold bg-linear-to-r ${stat.gradient} bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}>
                                     {stat.value}
                                 </div>
                                 <div className="text-sm text-gray-600 font-medium">{stat.label}</div>

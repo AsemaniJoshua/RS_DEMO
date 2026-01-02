@@ -1,13 +1,13 @@
 export default function CTA() {
     return (
-        <section className="py-24 bg-gradient-to-r from-[#0052cc] via-[#0066ff] to-[#00bfa6] relative overflow-hidden">
+        <section className="py-12 sm:py-16 lg:py-20 bg-linear-to-r from-[#0052cc] via-[#0066ff] to-[#00bfa6] relative overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
             </div>
 
-            <div className="mx-auto max-w-[1400px] px-12 text-center relative z-10">
+            <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12 text-center relative z-10">
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white mb-6">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -18,12 +18,12 @@ export default function CTA() {
                 </div>
 
                 {/* Heading */}
-                <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
                     Start Your Journey to Better Health Today
                 </h2>
 
                 {/* Description */}
-                <p className="text-lg text-white/90 max-w-2xl mx-auto mb-10">
+                <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto mb-10">
                     Join thousands of patients who have transformed their health with personalized, evidence-based guidance. Book your consultation now and take the first step.
                 </p>
 
@@ -38,7 +38,7 @@ export default function CTA() {
                 </div>
 
                 {/* Trust Elements */}
-                <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-white/80 text-sm">
+                <div className="mt-12 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-white/80 text-sm">
                     <div className="flex items-center gap-2">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

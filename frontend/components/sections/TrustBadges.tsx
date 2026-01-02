@@ -1,10 +1,10 @@
 export default function TrustBadges() {
     return (
-        <section className="py-16 bg-white border-b border-gray-100">
-            <div className="mx-auto max-w-[1400px] px-12">
+        <section className="py-10 sm:py-12 lg:py-16 bg-white border-b border-gray-100">
+            <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                 <div className="text-center mb-12">
                     <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Trusted & Certified</p>
-                    <h3 className="text-2xl font-bold text-gray-900">Professional Affiliations & Certifications</h3>
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Professional Affiliations & Certifications</h3>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -50,7 +50,7 @@ export default function TrustBadges() {
 
                 {/* Additional Trust Element */}
                 <div className="mt-12 text-center">
-                    <div className="inline-flex items-center gap-8 text-sm text-gray-600">
+                    <div className="inline-flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

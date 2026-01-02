@@ -29,9 +29,9 @@ export default function AboutPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="py-20 lg:py-28">
-                <div className="mx-auto max-w-[1400px] px-12">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <section className="py-12 sm:py-16 lg:py-20">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                    <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
                         {/* Left Content */}
                         <div>
                             {/* Badge */}
@@ -41,13 +41,13 @@ export default function AboutPage() {
                             </div>
 
                             {/* Heading */}
-                            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6">
                                 Meet{" "}
                                 <span className="text-[#0066ff]">Dr. George</span>
                             </h1>
 
                             {/* Description */}
-                            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                            <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">
                                 A passionate pharmacist and health educator dedicated to empowering individuals with the knowledge they need to make informed health decisions. With over 15 years of clinical experience, Dr. George bridges the gap between complex medical information and practical health guidance.
                             </p>
 
@@ -69,7 +69,7 @@ export default function AboutPage() {
 
                         {/* Right Image */}
                         <div className="relative">
-                            <div className="relative h-[500px] rounded-3xl overflow-hidden shadow-2xl">
+                            <div className="relative h-[300px] sm:h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
                                 <Image
                                     src="/dr-george.png"
                                     alt="Dr. George - Healthcare Professional"
@@ -84,18 +84,18 @@ export default function AboutPage() {
             </section>
 
             {/* Expertise Section */}
-            <section className="py-20 bg-gradient-to-br from-[#0052cc] via-[#0066ff] to-[#00bfa6]">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-linear-to-br from-[#0052cc] via-[#0066ff] to-[#00bfa6]">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-white mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
                             Areas of Expertise
                         </h2>
-                        <p className="text-lg text-white/90 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto">
                             Specialized knowledge and experience across multiple healthcare domains
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[
                             {
                                 icon: (
@@ -176,13 +176,13 @@ export default function AboutPage() {
             </section>
 
             {/* Professional Journey */}
-            <section className="py-20 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             Professional Journey
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                             Key milestones shaping a career dedicated to health excellence.
                         </p>
                     </div>
@@ -190,7 +190,7 @@ export default function AboutPage() {
                     <div className="max-w-4xl mx-auto">
                         <div className="relative">
                             {/* Timeline Line */}
-                            <div className="absolute left-6 top-0 bottom-0 w-px bg-gray-200"></div>
+                            <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-px bg-gray-200"></div>
 
                             <div className="space-y-8">
                                 {[
@@ -220,9 +220,9 @@ export default function AboutPage() {
                                         description: "Prominent presence at major health conferences"
                                     }
                                 ].map((item, index) => (
-                                    <div key={index} className="relative pl-16 group">
+                                    <div key={index} className="relative pl-12 sm:pl-16 group">
                                         {/* Timeline Dot */}
-                                        <div className="absolute left-0 top-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#0066ff] to-[#00bfa6] border-4 border-white shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <div className="absolute left-0 top-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-linear-to-br from-[#0066ff] to-[#00bfa6] border-4 border-white shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                             <span className="text-white text-sm font-bold">{index + 1}</span>
                                         </div>
 
@@ -243,12 +243,12 @@ export default function AboutPage() {
             </section>
 
             {/* Professional Affiliations */}
-            <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
-                    <h2 className="text-4xl font-bold text-center text-gray-900 mb-4">
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-4">
                         Professional <span className="text-[#0066ff]">Affiliations</span>
                     </h2>
-                    <p className="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-16">
+                    <p className="text-base sm:text-lg text-gray-600 text-center max-w-2xl mx-auto mb-16">
                         Active member and leader in leading healthcare organizations
                     </p>
 
@@ -276,18 +276,18 @@ export default function AboutPage() {
                                 description: "Advocates for community pharmacy practice"
                             }
                         ].map((item, index) => (
-                            <div key={index} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
-                                <div className="flex items-center gap-8">
+                            <div key={index} className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8">
                                     {/* Badge */}
-                                    <div className={`flex-shrink-0 w-24 h-24 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300`}>
-                                        <span className="text-2xl font-bold text-white">{item.badge}</span>
+                                    <div className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl bg-linear-to-br ${item.gradient} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300`}>
+                                        <span className="text-xl sm:text-2xl font-bold text-white">{item.badge}</span>
                                     </div>
 
                                     {/* Content */}
                                     <div className="flex-1">
-                                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{item.org}</h3>
+                                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{item.org}</h3>
                                         <p className="text-gray-600 mb-3">{item.description}</p>
-                                        <span className={`inline-block px-4 py-1.5 rounded-full bg-gradient-to-r ${item.gradient} text-white text-sm font-medium`}>
+                                        <span className={`inline-block px-4 py-1.5 rounded-full bg-linear-to-r ${item.gradient} text-white text-sm font-medium`}>
                                             {item.role}
                                         </span>
                                     </div>
@@ -299,18 +299,18 @@ export default function AboutPage() {
             </section>
 
             {/* Mission & Values */}
-            <section className="py-20 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             Mission & Values
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                             Guided by a commitment to improving lives through accessible, evidence-based health education.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
                         {[
                             {
                                 icon: (
@@ -359,12 +359,12 @@ export default function AboutPage() {
             </section>
 
             {/* Professional Credentials & Stats */}
-            <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid lg:grid-cols-2 gap-16 items-start">
                         {/* Left: Credentials */}
                         <div>
-                            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                                 Professional Credentials
                             </h2>
                             <p className="text-gray-600 mb-8">
@@ -380,7 +380,7 @@ export default function AboutPage() {
                                     "Public Health Educator"
                                 ].map((credential, index) => (
                                     <div key={index} className="flex items-start gap-3 group">
-                                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#00bfa6] flex items-center justify-center mt-0.5 group-hover:scale-110 transition-transform duration-200">
+                                        <div className="shrink-0 w-6 h-6 rounded-full bg-[#00bfa6] flex items-center justify-center mt-0.5 group-hover:scale-110 transition-transform duration-200">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                                                 <path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
@@ -441,10 +441,10 @@ export default function AboutPage() {
                                     }
                                 ].map((stat, index) => (
                                     <div key={index} className="bg-white rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group">
-                                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                                        <div className={`w-12 h-12 rounded-xl bg-linear-to-br ${stat.gradient} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
                                             {stat.icon}
                                         </div>
-                                        <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                                        <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
                                         <div className="text-sm text-gray-600">{stat.label}</div>
                                     </div>
                                 ))}
@@ -455,13 +455,13 @@ export default function AboutPage() {
             </section>
 
             {/* Let's Work Together CTA */}
-            <section className="py-20 bg-[#1a1f35]">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-[#1a1f35]">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center">
-                        <h2 className="text-4xl font-bold text-white mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
                             Let's Work Together
                         </h2>
-                        <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
+                        <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto mb-8">
                             Whether you need a consultation, speaking engagement, or health education partnership, I'm here to help.
                         </p>
 

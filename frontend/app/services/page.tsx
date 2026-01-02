@@ -14,8 +14,8 @@ export default function ServicesPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="py-20 lg:py-22 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-4xl mx-auto text-center">
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E0F2FE] text-[#0066ff] mb-6">
@@ -28,13 +28,13 @@ export default function ServicesPage() {
                         </div>
 
                         {/* Heading */}
-                        <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6">
                             Virtual Health{" "}
                             <span className="text-[#0066ff]">Consultations</span>
                         </h1>
 
                         {/* Description */}
-                        <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                        <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">
                             Professional pharmacy consultations from the comfort of your home. Get expert guidance on medications, supplements, and chronic disease management.
                         </p>
 
@@ -59,18 +59,18 @@ export default function ServicesPage() {
             </section>
 
             {/* Service Packages & Pricing */}
-            <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             Service Packages & <span className="text-[#0066ff]">Pricing</span>
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                             Comprehensive care packages designed to meet your specific health needs
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                         {[
                             {
                                 icon: (
@@ -196,18 +196,18 @@ export default function ServicesPage() {
             </section>
 
             {/* How it Works */}
-            <section className="py-20 bg-white">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             How it Works
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
                             Simple, convenient, and designed to fit easily into your lifestyle.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-5xl mx-auto">
                         {[
                             {
                                 step: "1",
@@ -253,21 +253,21 @@ export default function ServicesPage() {
             </section>
 
             {/* Book Your Consultation */}
-            <section className="py-20 bg-gray-50">
-                <div className="mx-auto max-w-[1400px] px-12">
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-2xl mx-auto">
                         {/* Header */}
                         <div className="text-center mb-12">
-                            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                                 Book Your Consultation
                             </h2>
-                            <p className="text-lg text-gray-600">
+                            <p className="text-base sm:text-lg text-gray-600">
                                 Select a date that works for you. We offer flexible scheduling to accommodate your needs.
                             </p>
                         </div>
 
                         {/* Scheduling Widget Card */}
-                        <div className="bg-gray-50 rounded-2xl p-12 border border-gray-200 text-center">
+                        <div className="bg-gray-50 rounded-2xl p-6 sm:p-8 lg:p-12 border border-gray-200 text-center">
                             {/* Calendar Icon */}
                             <div className="w-20 h-20 mx-auto mb-6 bg-[#E0F2FE] rounded-2xl flex items-center justify-center">
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
@@ -327,12 +327,12 @@ export default function ServicesPage() {
             </section>
 
             {/* CTA */}
-            <section className="py-24 bg-gradient-to-r from-[#0052cc] via-[#0066ff] to-[#00bfa6]">
-                <div className="mx-auto max-w-[1400px] px-12 text-center">
-                    <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+            <section className="py-12 sm:py-16 lg:py-20 bg-linear-to-r from-[#0052cc] via-[#0066ff] to-[#00bfa6]">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12 text-center">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
                         Ready to Get Started?
                     </h2>
-                    <p className="text-lg text-white/90 max-w-2xl mx-auto mb-10">
+                    <p className="text-base sm:text-lg text-white/90 max-w-2xl mx-auto mb-10">
                         Book your consultation today and take the first step toward optimized health and wellness.
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-4">
