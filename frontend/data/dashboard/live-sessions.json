@@ -1,0 +1,38 @@
+{
+  "sessions": [
+    {
+      "id": 1,
+      "title": "Weekly Q&A with Dr. George",
+      "date": "2026-01-10",
+      "time": "14:00",
+      "duration": "1 hour",
+      "description": "Open session to discuss general health questions and upcoming courses.",
+      "meetingLink": "https://meet.google.com/abc-defg-hij",
+      "status": "upcoming",
+      "attendees": 12
+    },
+    {
+      "id": 2,
+      "title": "Diabetes Management Workshop",
+      "date": "2026-01-15",
+      "time": "10:00",
+      "duration": "2 hours",
+      "description": "Deep dive into dietary planning and blood sugar monitoring.",
+      "meetingLink": "https://meet.google.com/xyz-uvw-rst",
+      "status": "upcoming",
+      "attendees": 45
+    },
+    {
+      "id": 3,
+      "title": "New Year Health Resolutions",
+      "date": "2025-12-28",
+      "time": "18:00",
+      "duration": "1 hour",
+      "description": "Planning for a healthy year ahead.",
+      "meetingLink": "",
+      "status": "completed",
+      "recordingLink": "https://youtube.com/watch?v=example",
+      "attendees": 89
+    }
+  ]
+}

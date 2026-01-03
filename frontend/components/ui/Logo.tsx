@@ -1,16 +1,17 @@
 import Link from "next/link";
+import Image from "next/image";
 
-export default function Logo() {
+export default function Logo({ className = "" }: { className?: string }) {
     return (
-        <Link href="/" className="flex items-center gap-2 group">
-            {/* Rx Icon Container */}
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#0052cc] to-[#0052cc] shadow-sm transition-transform duration-300 group-hover:scale-105">
-                <span className="text-lg font-bold text-white">Rx</span>
-            </div>
-
-            {/* Text Logo */}
-            <div className="flex items-baseline text-lg font-bold tracking-tight">
-                <span className="text-gray-900">RxWith</span><span className="text-[#0052cc]">DrGeorge</span>
+        <Link href="/" className={`flex items-center gap-2 ${className}`}>
+            <div className="relative w-64 h-20">
+                <Image 
+                    src="/rx-logo.png" 
+                    alt="RxWithDrGeorge" 
+                    fill
+                    className="object-contain object-left"
+                    priority
+                />
             </div>
         </Link>
     );

@@ -48,8 +48,13 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         <div className="p-4 md:p-8">
             {/* Header */}
             <div className="mb-6">
-                <Link href="/dashboard/browse-courses" className="text-[#0066ff] hover:underline mb-2 inline-block">
-                    ← Back to Browse Courses
+                <Link 
+                    href="/dashboard/browse-courses" 
+                    className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-[#0066ff] transition-colors"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 12H5m7 7l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                 </Link>
             </div>
 

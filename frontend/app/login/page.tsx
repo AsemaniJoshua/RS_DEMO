@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({
@@ -38,9 +39,14 @@ export default function LoginPage() {
                 <div className="max-w-md w-full">
                     {/* Logo/Brand */}
                     <div className="mb-8">
-                        <Link href="/" className="inline-block">
-                            <div className="text-3xl font-bold text-gray-900">
-                                Dr. <span className="text-[#0066ff]">George</span>
+                        <Link href="/" className="inline-block mb-4">
+                            <div className="relative w-72 h-24">
+                                <Image
+                                    src="/rx-logo.png"
+                                    alt="RxWithDrGeorge"
+                                    fill
+                                    className="object-contain object-left"
+                                />
                             </div>
                         </Link>
                         <h2 className="mt-6 text-3xl font-bold text-gray-900">

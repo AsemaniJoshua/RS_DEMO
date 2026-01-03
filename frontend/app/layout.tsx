@@ -27,7 +27,8 @@ export default function RootLayout({
   const isAuthPage = pathname?.startsWith("/login") || 
                      pathname?.startsWith("/forgot-password") || 
                      pathname?.startsWith("/verify-otp") ||
-                     pathname?.startsWith("/reset-password");
+                     pathname?.startsWith("/reset-password") ||
+                     pathname?.startsWith("/signup");
   const isDashboardPage = pathname?.startsWith("/dashboard");
   
   return (

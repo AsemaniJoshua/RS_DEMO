@@ -40,7 +40,7 @@ export default function AppointmentsPage() {
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">My Appointments</h1>
                     <p className="text-gray-600">Manage your consultations and appointments</p>
                 </div>
-                <Link href="/booking">
+                <Link href="/dashboard/appointments/new">
                     <button className="w-full sm:w-auto px-6 py-3 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors font-medium flex items-center justify-center gap-2">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="2"/>
