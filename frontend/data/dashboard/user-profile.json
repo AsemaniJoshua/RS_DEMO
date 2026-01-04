@@ -107,7 +107,9 @@
       "date": "2024-02-10",
       "time": "15:00",
       "status": "Completed",
-      "mode": "Virtual"
+      "mode": "Virtual",
+      "notes": "",
+      "meetingLink": ""
     },
     {
       "id": 4,
@@ -115,7 +117,9 @@
       "date": "2024-01-20",
       "time": "11:00",
       "status": "Completed",
-      "mode": "In-Person"
+      "mode": "In-Person",
+      "notes": "",
+      "meetingLink": ""
     }
   ],
   "bookmarks": {
