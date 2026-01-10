@@ -3,18 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import usersData from "@/data/admin/users.json";
+import { usersService } from "@/services/users-service";
+import { ApiError } from "@/lib/api";
+
+// Role and status options
+const roles = ["ADMIN", "PATIENT", "EDITOR"];
+const statuses = ["ACTIVE", "INACTIVE", "SUSPENDED"];
 
 export default function NewUserPage() {
     const router = useRouter();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState("");
     const [formData, setFormData] = useState({
-        name: "",
+        first_name: "",
+        last_name: "",
         email: "",
-        phone: "",
-        role: "Patient",
-        status: "Active",
+        phoneNumber: "",
+        role: "PATIENT",
+        account_status: "ACTIVE",
         password: "",
-        confirmPassword: ""
+        confirmedPassword: ""
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -22,18 +30,34 @@ export default function NewUserPage() {
             ...formData,
             [e.target.name]: e.target.value
         });
+        setError("");
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError("");
         
-        if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match!");
+        if (formData.password !== formData.confirmedPassword) {
+            setError("Passwords do not match!");
             return;
         }
 
-        console.log("New user:", formData);
-        router.push("/admin/users");
+        if (formData.password.length < 8) {
+            setError("Password must be at least 8 characters");
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            await usersService.createUser(formData);
+            router.push("/admin/users");
+        } catch (err) {
+            const apiError = err as ApiError;
+            setError(apiError.message || "Failed to create user");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -53,24 +77,47 @@ export default function NewUserPage() {
 
             <form onSubmit={handleSubmit} className="max-w-4xl">
                 <div className="bg-white rounded-xl p-6 border border-gray-100 space-y-6">
+                    {/* Error Message */}
+                    {error && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-sm text-red-800 font-medium">{error}</p>
+                        </div>
+                    )}
+
                     {/* Personal Information Section */}
                     <div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
                         
-                        {/* Full Name */}
-                        <div className="mb-4">
-                            <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Full Name <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                placeholder="e.g., John Doe"
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
-                            />
+                        {/* First and Last Name */}
+                        <div className="grid grid-cols-2 gap-6 mb-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                                    First Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="first_name"
+                                    value={formData.first_name}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="e.g., John"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                                    Last Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="last_name"
+                                    value={formData.last_name}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="e.g., Doe"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                                />
+                            </div>
                         </div>
 
                         {/* Email and Phone */}
@@ -95,11 +142,11 @@ export default function NewUserPage() {
                                 </label>
                                 <input
                                     type="tel"
-                                    name="phone"
-                                    value={formData.phone}
+                                    name="phoneNumber"
+                                    value={formData.phoneNumber}
                                     onChange={handleChange}
                                     required
-                                    placeholder="+1 (555) 123-4567"
+                                    placeholder="1234567890"
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 />
                             </div>
@@ -125,24 +172,24 @@ export default function NewUserPage() {
                                     required
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 >
-                                    {usersData.roles.filter(r => r !== "All Roles").map((role, idx) => (
+                                    {roles.map((role, idx) => (
                                         <option key={idx} value={role}>{role}</option>
                                     ))}
                                 </select>
-                                <p className="text-sm text-gray-500 mt-1">Select the user's permission level</p>
+                                <p className="text-sm text-gray-500 mt-1">Select the user&apos;s permission level</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                                     Account Status <span className="text-red-500">*</span>
                                 </label>
                                 <select
-                                    name="status"
-                                    value={formData.status}
+                                    name="account_status"
+                                    value={formData.account_status}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 >
-                                    {usersData.statuses.filter(s => s !== "All Statuses").map((status, idx) => (
+                                    {statuses.map((status, idx) => (
                                         <option key={idx} value={status}>{status}</option>
                                     ))}
                                 </select>
@@ -173,8 +220,8 @@ export default function NewUserPage() {
                                 </label>
                                 <input
                                     type="password"
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
+                                    name="confirmedPassword"
+                                    value={formData.confirmedPassword}
                                     onChange={handleChange}
                                     required
                                     placeholder="Confirm password"
@@ -195,10 +242,9 @@ export default function NewUserPage() {
                             <div className="text-sm text-blue-900">
                                 <div className="font-semibold mb-1">User Role Permissions:</div>
                                 <ul className="space-y-1 text-blue-700">
-                                    <li>• <strong>Admin:</strong> Full access to all features and settings</li>
-                                    <li>• <strong>Editor:</strong> Can create and manage content</li>
-                                    <li>• <strong>Subscriber:</strong> Access to premium content and courses</li>
-                                    <li>• <strong>Patient:</strong> Book appointments and view medical content</li>
+                                    <li>• <strong>ADMIN:</strong> Full access to all features and settings</li>
+                                    <li>• <strong>EDITOR:</strong> Can create and manage content</li>
+                                    <li>• <strong>PATIENT:</strong> Book appointments and view medical content</li>
                                 </ul>
                             </div>
                         </div>
@@ -208,9 +254,17 @@ export default function NewUserPage() {
                     <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
                         <button
                             type="submit"
-                            className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium"
+                            disabled={isSubmitting}
+                            className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
                         >
-                            Create User
+                            {isSubmitting ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    Creating...
+                                </>
+                            ) : (
+                                "Create User"
+                            )}
                         </button>
                         <Link href="/admin/users">
                             <button

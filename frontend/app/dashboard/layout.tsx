@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function DashboardLayout({
   children,
@@ -10,8 +11,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
+
+  // Get user initials for avatar
+  const initials = user ? `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase() : 'U';
 
   return (
+    <ProtectedRoute>
     <div className="flex min-h-screen bg-gray-50">
       <DashboardSidebar 
         isMobileMenuOpen={isMobileMenuOpen}
@@ -52,12 +58,12 @@ export default function DashboardLayout({
               {/* Profile */}
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="hidden sm:block text-right">
-                  <div className="text-sm font-semibold text-gray-900">John Doe</div>
-                  <div className="text-xs text-gray-500">Premium Member</div>
+                  <div className="text-sm font-semibold text-gray-900">{user?.first_name} {user?.last_name}</div>
+                  <div className="text-xs text-gray-500">{user?.role || 'Member'}</div>
                 </div>
                 <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-[#0066ff]/30">
                   <div className="w-full h-full bg-gradient-to-br from-[#0066ff] to-[#0052cc] flex items-center justify-center text-white font-bold">
-                    JD
+                    {initials}
                   </div>
                 </div>
               </div>
@@ -67,5 +73,6 @@ export default function DashboardLayout({
         {children}
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

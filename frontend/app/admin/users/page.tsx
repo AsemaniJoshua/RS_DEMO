@@ -1,44 +1,83 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import usersData from "@/data/admin/users.json";
+import { usersService, User } from "@/services/users-service";
 import DeleteCourseModal from "@/components/admin/DeleteCourseModal";
+import { ApiError } from "@/lib/api";
+
+// Role and status options for filters
+const roles = ["All Roles", "ADMIN", "PATIENT", "EDITOR"];
+const statuses = ["All Statuses", "ACTIVE", "INACTIVE", "SUSPENDED"];
 
 export default function UsersPage() {
+    const [users, setUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [roleFilter, setRoleFilter] = useState("All Roles");
     const [statusFilter, setStatusFilter] = useState("All Statuses");
-    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: number | null; name: string }>({
+    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: string | null; name: string }>({
         show: false,
         id: null,
         name: ""
     });
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    // Fetch users from API
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                setIsLoading(true);
+                const response = await usersService.getAllUsers();
+                setUsers(response.data || []);
+            } catch (err) {
+                const apiError = err as ApiError;
+                setError(apiError.message || "Failed to load users");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchUsers();
+    }, []);
 
     // Filter users
-    const filteredUsers = usersData.users.filter(user => {
-        const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const filteredUsers = users.filter(user => {
+        const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+        const matchesSearch = fullName.includes(searchQuery.toLowerCase()) ||
                             user.email.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesRole = roleFilter === "All Roles" || user.role === roleFilter;
-        const matchesStatus = statusFilter === "All Statuses" || user.status === statusFilter;
+        const matchesStatus = statusFilter === "All Statuses" || user.account_status === statusFilter;
         return matchesSearch && matchesRole && matchesStatus;
     });
 
     // Calculate stats
     const stats = {
-        total: usersData.users.length,
-        active: usersData.users.filter(u => u.status === "Active").length,
-        inactive: usersData.users.filter(u => u.status === "Inactive").length,
-        suspended: usersData.users.filter(u => u.status === "Suspended").length
+        total: users.length,
+        active: users.filter(u => u.account_status === "ACTIVE").length,
+        inactive: users.filter(u => u.account_status === "INACTIVE").length,
+        suspended: users.filter(u => u.account_status === "SUSPENDED").length
     };
 
-    const handleDeleteClick = (id: number, name: string) => {
-        setDeleteModal({ show: true, id, name });
+    const handleDeleteClick = (id: string, firstName: string, lastName: string) => {
+        setDeleteModal({ show: true, id, name: `${firstName} ${lastName}` });
     };
 
-    const handleDeleteConfirm = () => {
-        console.log("Deleting user:", deleteModal.id);
-        setDeleteModal({ show: false, id: null, name: "" });
+    const handleDeleteConfirm = async () => {
+        if (!deleteModal.id) return;
+        
+        setIsDeleting(true);
+        try {
+            await usersService.deleteUserById(deleteModal.id);
+            // Remove user from local state
+            setUsers(prev => prev.filter(u => u.id !== deleteModal.id));
+            setDeleteModal({ show: false, id: null, name: "" });
+        } catch (err) {
+            const apiError = err as ApiError;
+            setError(apiError.message || "Failed to delete user");
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const handleDeleteCancel = () => {
@@ -47,11 +86,11 @@ export default function UsersPage() {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case "Active":
+            case "ACTIVE":
                 return "bg-green-50 text-green-700";
-            case "Inactive":
+            case "INACTIVE":
                 return "bg-gray-100 text-gray-700";
-            case "Suspended":
+            case "SUSPENDED":
                 return "bg-red-50 text-red-700";
             default:
                 return "bg-gray-100 text-gray-700";
@@ -60,21 +99,19 @@ export default function UsersPage() {
 
     const getRoleBadgeColor = (role: string) => {
         switch (role) {
-            case "Admin":
+            case "ADMIN":
                 return "bg-purple-50 text-purple-700";
-            case "Editor":
+            case "EDITOR":
                 return "bg-blue-50 text-blue-700";
-            case "Subscriber":
-                return "bg-yellow-50 text-yellow-700";
-            case "Patient":
+            case "PATIENT":
                 return "bg-teal-50 text-teal-700";
             default:
                 return "bg-gray-100 text-gray-700";
         }
     };
 
-    const getInitials = (name: string) => {
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    const getInitials = (firstName: string, lastName: string) => {
+        return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
     };
 
     const formatDate = (dateString: string) => {
@@ -85,19 +122,34 @@ export default function UsersPage() {
         });
     };
 
-    const formatLastLogin = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMins / 60);
-        const diffDays = Math.floor(diffHours / 24);
+    // Loading state
+    if (isLoading) {
+        return (
+            <div className="p-4 md:p-8 flex items-center justify-center min-h-[400px]">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-600 font-medium">Loading users...</p>
+                </div>
+            </div>
+        );
+    }
 
-        if (diffMins < 60) return `${diffMins}m ago`;
-        if (diffHours < 24) return `${diffHours}h ago`;
-        if (diffDays < 7) return `${diffDays}d ago`;
-        return formatDate(dateString);
-    };
+    // Error state
+    if (error) {
+        return (
+            <div className="p-4 md:p-8">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                    <p className="text-red-800 font-medium">{error}</p>
+                    <button 
+                        onClick={() => window.location.reload()}
+                        className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 md:p-8">
@@ -199,7 +251,7 @@ export default function UsersPage() {
                         onChange={(e) => setRoleFilter(e.target.value)}
                         className="w-full md:w-auto px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
-                        {usersData.roles.map((role, idx) => (
+                        {roles.map((role, idx) => (
                             <option key={idx} value={role}>{role}</option>
                         ))}
                     </select>
@@ -208,7 +260,7 @@ export default function UsersPage() {
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="w-full md:w-auto px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
-                        {usersData.statuses.map((status, idx) => (
+                        {statuses.map((status, idx) => (
                             <option key={idx} value={status}>{status}</option>
                         ))}
                     </select>
@@ -224,9 +276,8 @@ export default function UsersPage() {
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">User</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Role</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Activity</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Joined</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Last Login</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Phone</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Created</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
                             </tr>
                         </thead>
@@ -236,10 +287,10 @@ export default function UsersPage() {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] flex items-center justify-center text-white font-semibold">
-                                                {getInitials(user.name)}
+                                                {getInitials(user.first_name, user.last_name)}
                                             </div>
                                             <div>
-                                                <div className="font-semibold text-gray-900">{user.name}</div>
+                                                <div className="font-semibold text-gray-900">{user.first_name} {user.last_name}</div>
                                                 <div className="text-sm text-gray-600">{user.email}</div>
                                             </div>
                                         </div>
@@ -250,18 +301,12 @@ export default function UsersPage() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(user.status)}`}>
-                                            {user.status}
+                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(user.account_status)}`}>
+                                            {user.account_status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <div className="text-sm">
-                                            <div className="text-gray-900">{user.coursesEnrolled} Courses</div>
-                                            <div className="text-gray-600">{user.appointmentsBooked} Appointments</div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900">{formatDate(user.joinedDate)}</td>
-                                    <td className="px-6 py-4 text-gray-600">{formatLastLogin(user.lastLogin)}</td>
+                                    <td className="px-6 py-4 text-gray-600">{user.phoneNumber}</td>
+                                    <td className="px-6 py-4 text-gray-900">{formatDate(user.created_at)}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
                                             <Link href={`/admin/users/${user.id}/edit`}>
@@ -273,7 +318,7 @@ export default function UsersPage() {
                                                 </button>
                                             </Link>
                                             <button 
-                                                onClick={() => handleDeleteClick(user.id, user.name)}
+                                                onClick={() => handleDeleteClick(user.id, user.first_name, user.last_name)}
                                                 className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
                                             >
                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

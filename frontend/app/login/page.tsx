@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { ApiError } from "@/lib/api";
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({
@@ -12,6 +15,17 @@ export default function LoginPage() {
     const [rememberMe, setRememberMe] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const router = useRouter();
+    const { login, isAuthenticated, isAdmin } = useAuth();
+
+    // Redirect if already authenticated
+    if (isAuthenticated) {
+        if (isAdmin()) {
+            router.push('/admin');
+        } else {
+            router.push('/dashboard');
+        }
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -26,10 +40,16 @@ export default function LoginPage() {
         setError("");
         setIsLoading(true);
 
-        setTimeout(() => {
+        try {
+            await login(formData);
+            // Redirect based on role after successful login
+            // The useAuth hook will update, triggering the redirect above
+        } catch (err) {
+            const apiError = err as ApiError;
+            setError(apiError.message || "Login failed. Please try again.");
+        } finally {
             setIsLoading(false);
-            console.log("Login submitted:", { ...formData, rememberMe });
-        }, 1500);
+        }
     };
 
     return (

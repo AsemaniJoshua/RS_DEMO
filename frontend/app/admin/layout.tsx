@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function AdminLayout({
   children,
@@ -12,8 +14,10 @@ export default function AdminLayout({
 }) {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
+    <ProtectedRoute requireAdmin>
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar 
         isMobileMenuOpen={isMobileMenuOpen}
@@ -73,8 +77,8 @@ export default function AdminLayout({
                 {showProfileDropdown && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
                     <div className="px-4 py-2 border-b border-gray-100">
-                      <div className="font-semibold text-gray-900">Dr. George</div>
-                      <div className="text-xs text-gray-500">Pharmacist</div>
+                      <div className="font-semibold text-gray-900">{user?.first_name} {user?.last_name}</div>
+                      <div className="text-xs text-gray-500">{user?.role}</div>
                     </div>
                     <Link href="/admin/brand" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       Profile
@@ -82,7 +86,10 @@ export default function AdminLayout({
                     <Link href="/admin/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       Settings
                     </Link>
-                    <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50">
+                    <button 
+                      onClick={logout}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                    >
                       Logout
                     </button>
                   </div>
@@ -94,5 +101,6 @@ export default function AdminLayout({
         {children}
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

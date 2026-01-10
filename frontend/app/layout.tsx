@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { ScrollAnimations } from "@/components/ui/ScrollAnimations";
+import { AuthProvider } from "@/contexts/auth-context";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -36,11 +37,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {!isAdminPage && !isAuthPage && !isDashboardPage && <Navbar />}
-        <ScrollAnimations>
-          {children}
-        </ScrollAnimations>
-        {!isAdminPage && !isAuthPage && !isDashboardPage && <Footer />}
+        <AuthProvider>
+          {!isAdminPage && !isAuthPage && !isDashboardPage && <Navbar />}
+          <ScrollAnimations>
+            {children}
+          </ScrollAnimations>
+          {!isAdminPage && !isAuthPage && !isDashboardPage && <Footer />}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { ApiError } from "@/lib/api";
 
 export default function SignupPage() {
     const [formData, setFormData] = useState({
@@ -16,6 +19,9 @@ export default function SignupPage() {
     const [agreeTerms, setAgreeTerms] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+    const router = useRouter();
+    const { signup } = useAuth();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -41,11 +47,28 @@ export default function SignupPage() {
 
         setIsLoading(true);
 
-        setTimeout(() => {
+        try {
+            // Map form data to API expected format
+            await signup({
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                email: formData.email,
+                phoneNumber: formData.phone,
+                password: formData.password,
+                confirmPassword: formData.confirmPassword,
+            });
+            
+            setSuccess(true);
+            // Redirect to login after successful signup
+            setTimeout(() => {
+                router.push('/login');
+            }, 2000);
+        } catch (err) {
+            const apiError = err as ApiError;
+            setError(apiError.message || "Signup failed. Please try again.");
+        } finally {
             setIsLoading(false);
-            console.log("Signup submitted:", formData);
-            // Handle registration logic here
-        }, 1500);
+        }
     };
 
     return (
@@ -72,6 +95,19 @@ export default function SignupPage() {
                             Join us to start your health journey
                         </p>
                     </div>
+
+                    {/* Success Message */}
+                    {success && (
+                        <div className="mb-6 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-green-600">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                                    <path d="M8 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                <p className="text-sm text-green-800 font-medium">Account created successfully! Redirecting to login...</p>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Error Message */}
                     {error && (
