@@ -1,13 +1,13 @@
 // API Client Configuration
-// Change this to your actual backend URL (e.g., http://localhost:5000/api/v1)
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dr-george-backend.onrender.com/api/v1';
 
 export interface ApiResponse<T = unknown> {
     status: 'success' | 'error';
     message: string;
     data?: T;
     token?: string;
-    statusCode?: number;
+    statusCode?: number; 
 }
 
 export interface ApiError {

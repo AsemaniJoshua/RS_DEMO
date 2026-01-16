@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -16,15 +16,26 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
-    const { login, isAuthenticated, isAdmin } = useAuth();
+    const { login, isAuthenticated, isAdmin, isLoading: isAuthLoading } = useAuth();
 
-    // Redirect if already authenticated
-    if (isAuthenticated) {
-        if (isAdmin()) {
-            router.push('/admin');
-        } else {
-            router.push('/dashboard');
+    // Redirect if already authenticated (only after auth loading is complete)
+    useEffect(() => {
+        if (!isAuthLoading && isAuthenticated) {
+            if (isAdmin()) {
+                router.push('/admin');
+            } else {
+                router.push('/dashboard');
+            }
         }
+    }, [isAuthLoading, isAuthenticated, isAdmin, router]);
+
+    // Show nothing while auth is loading or if authenticated (redirecting)
+    if (isAuthLoading || isAuthenticated) {
+        return (
+            <div className="h-screen flex items-center justify-center bg-white">
+                <div className="w-10 h-10 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

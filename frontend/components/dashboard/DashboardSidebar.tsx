@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/contexts/auth-context";
 
 const menuItems = [
     {
@@ -96,6 +97,7 @@ interface DashboardSidebarProps {
 
 export default function DashboardSidebar({ isMobileMenuOpen = false, onMobileMenuClose }: DashboardSidebarProps) {
     const pathname = usePathname();
+    const { logout } = useAuth();
 
     return (
         <>
@@ -151,8 +153,8 @@ export default function DashboardSidebar({ isMobileMenuOpen = false, onMobileMen
 
                 {/* Logout */}
                 <div className="p-3 border-t border-gray-200">
-                    <Link
-                        href="/login"
+                    <button
+                        onClick={logout}
                         className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 w-full"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -161,7 +163,7 @@ export default function DashboardSidebar({ isMobileMenuOpen = false, onMobileMen
                             <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         <span className="text-sm font-medium">Logout</span>
-                    </Link>
+                    </button>
                 </div>
             </aside>
         </>

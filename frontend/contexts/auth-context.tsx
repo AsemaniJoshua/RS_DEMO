@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push('/login');
     };
 
-    const isAdmin = () => authService.isAdmin();
+    const isAdmin = () => user?.role?.toUpperCase() === 'ADMIN';
 
     const value: AuthContextType = {
         user,

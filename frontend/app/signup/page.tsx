@@ -74,21 +74,11 @@ export default function SignupPage() {
     return (
         <div className="min-h-screen flex flex-col lg:flex-row">
             {/* Left Side - Form Section */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center bg-white p-4 sm:p-8 lg:p-12">
-                <div className="max-w-md w-full py-8">
+            <div className="w-full lg:w-1/2 flex items-center justify-center bg-white p-4 sm:p-8">
+                <div className="max-w-md w-full py-4">
                     {/* Logo/Brand */}
-                    <div className="mb-6">
-                        <Link href="/" className="inline-block mb-4">
-                            <div className="relative w-72 h-24">
-                                <Image
-                                    src="/rx-logo.png"
-                                    alt="RxWithDrGeorge"
-                                    fill
-                                    className="object-contain object-left"
-                                />
-                            </div>
-                        </Link>
-                        <h2 className="mt-6 text-3xl font-bold text-gray-900">
+                    <div className="mb-3">
+                        <h2 className=" text-3xl font-bold text-gray-900">
                             Create Account
                         </h2>
                         <p className="mt-2 text-sm text-gray-600">

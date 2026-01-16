@@ -1,24 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import usersData from "@/data/admin/users.json";
+import { usersService, User } from "@/services/users-service";
+import { ApiError } from "@/lib/api";
+
+// Role and status options
+const roles = ["ADMIN", "PATIENT", "EDITOR"];
+const statuses = ["ACTIVE", "INACTIVE", "SUSPENDED"];
 
 export default function EditUserPage() {
     const router = useRouter();
     const params = useParams();
-    const userId = parseInt(params.id as string);
+    const userId = params.id as string;
 
-    const user = usersData.users.find(u => u.id === userId);
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState("");
 
     const [formData, setFormData] = useState({
-        name: user?.name || "",
-        email: user?.email || "",
-        phone: user?.phone || "",
-        role: user?.role || "Patient",
-        status: user?.status || "Active"
+        first_name: "",
+        last_name: "",
+        email: "",
+        phoneNumber: "",
+        role: "PATIENT",
+        account_status: "ACTIVE"
     });
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                setIsLoading(true);
+                // Note: Since we don't have a get-user-by-id endpoint yet, we fetch all and find
+                const response = await usersService.getAllUsers();
+                const foundUser = response.data?.find(u => u.id === userId);
+                
+                if (foundUser) {
+                    setUser(foundUser);
+                    setFormData({
+                        first_name: foundUser.first_name,
+                        last_name: foundUser.last_name,
+                        email: foundUser.email,
+                        phoneNumber: foundUser.phoneNumber,
+                        role: foundUser.role,
+                        account_status: foundUser.account_status
+                    });
+                } else {
+                    setError("User not found");
+                }
+            } catch (err) {
+                const apiError = err as ApiError;
+                setError(apiError.message || "Failed to load user");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (userId) {
+            fetchUser();
+        }
+    }, [userId]);
 
     const [changePassword, setChangePassword] = useState(false);
     const [passwordData, setPasswordData] = useState({
@@ -31,6 +74,7 @@ export default function EditUserPage() {
             ...formData,
             [e.target.name]: e.target.value
         });
+        setError("");
     };
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,23 +84,39 @@ export default function EditUserPage() {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError("");
         
         if (changePassword && passwordData.newPassword !== passwordData.confirmPassword) {
-            alert("Passwords do not match!");
+            setError("Passwords do not match!");
             return;
         }
 
-        console.log("Updated user:", formData);
-        if (changePassword) {
-            console.log("New password set");
+        if (changePassword && passwordData.newPassword.length < 8) {
+            setError("Password must be at least 8 characters");
+            return;
         }
-        router.push("/admin/users");
+
+        setIsSubmitting(true);
+
+        try {
+            // Update user details
+            await usersService.updateUserById(userId, formData);
+
+            // TODO: Handle password update if API supports it in a separate call or same call
+            // Currently assuming updateUserById handles basic details
+            
+            router.push("/admin/users");
+        } catch (err) {
+            const apiError = err as ApiError;
+            setError(apiError.message || "Failed to update user");
+            setIsSubmitting(false);
+        }
     };
 
-    const getInitials = (name: string) => {
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    const getInitials = (firstName: string, lastName: string) => {
+        return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
     };
 
     const formatDate = (dateString: string) => {
@@ -67,12 +127,23 @@ export default function EditUserPage() {
         });
     };
 
-    if (!user) {
+    if (isLoading) {
+        return (
+            <div className="p-4 md:p-8 flex items-center justify-center min-h-[400px]">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-600 font-medium">Loading user details...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error && !user) {
         return (
             <div className="p-8">
                 <div className="bg-white rounded-xl p-12 border border-gray-100 text-center">
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">User Not Found</h2>
-                    <p className="text-gray-600 mb-4">The user you're looking for doesn't exist.</p>
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Error</h2>
+                    <p className="text-gray-600 mb-4">{error}</p>
                     <Link href="/admin/users">
                         <button className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors">
                             Back to Users
@@ -99,45 +170,61 @@ export default function EditUserPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="max-w-4xl">
-                {/* User Summary Card */}
-                <div className="bg-white rounded-xl p-6 border border-gray-100 mb-6">
-                    <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] flex items-center justify-center text-white text-2xl font-bold">
-                            {getInitials(user.name)}
-                        </div>
-                        <div className="flex-1">
-                            <h3 className="text-xl font-bold text-gray-900">{user.name}</h3>
-                            <p className="text-gray-600">{user.email}</p>
-                            <div className="flex gap-4 mt-2 text-sm">
-                                <span className="text-gray-600">Joined: {formatDate(user.joinedDate)}</span>
-                                <span className="text-gray-600">•</span>
-                                <span className="text-gray-600">{user.coursesEnrolled} Courses</span>
-                                <span className="text-gray-600">•</span>
-                                <span className="text-gray-600">{user.appointmentsBooked} Appointments</span>
+                    {/* User Summary Card */}
+                    <div className="bg-white rounded-xl p-6 border border-gray-100 mb-6">
+                        <div className="flex items-center gap-6">
+                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] flex items-center justify-center text-white text-2xl font-bold">
+                                {getInitials(user!.first_name, user!.last_name)}
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-xl font-bold text-gray-900">{user!.first_name} {user!.last_name}</h3>
+                                <p className="text-gray-600">{user!.email}</p>
+                                <div className="flex gap-4 mt-2 text-sm">
+                                    <span className="text-gray-600">Created: {formatDate(user!.created_at)}</span>
+                                    <span className="text-gray-600">•</span>
+                                    <span className="text-gray-600">Role: {user!.role}</span>
+                                    <span className="text-gray-600">•</span>
+                                    <span className="text-gray-600">Status: {user!.account_status}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
                 <div className="bg-white rounded-xl p-6 border border-gray-100 space-y-6">
                     {/* Personal Information Section */}
                     <div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
                         
-                        {/* Full Name */}
-                        <div className="mb-4">
-                            <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Full Name <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                placeholder="e.g., John Doe"
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
-                            />
+                        {/* First and Last Name */}
+                        <div className="grid grid-cols-2 gap-6 mb-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                                    First Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="first_name"
+                                    value={formData.first_name}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="e.g., John"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                                    Last Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="last_name"
+                                    value={formData.last_name}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="e.g., Doe"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                                />
+                            </div>
                         </div>
 
                         {/* Email and Phone */}
@@ -162,11 +249,11 @@ export default function EditUserPage() {
                                 </label>
                                 <input
                                     type="tel"
-                                    name="phone"
-                                    value={formData.phone}
+                                    name="phoneNumber"
+                                    value={formData.phoneNumber}
                                     onChange={handleChange}
                                     required
-                                    placeholder="+1 (555) 123-4567"
+                                    placeholder="1234567890"
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 />
                             </div>
@@ -192,24 +279,24 @@ export default function EditUserPage() {
                                     required
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 >
-                                    {usersData.roles.filter(r => r !== "All Roles").map((role, idx) => (
+                                    {roles.map((role, idx) => (
                                         <option key={idx} value={role}>{role}</option>
                                     ))}
                                 </select>
-                                <p className="text-sm text-gray-500 mt-1">Select the user's permission level</p>
+                                <p className="text-sm text-gray-500 mt-1">Select the user&apos;s permission level</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                                     Account Status <span className="text-red-500">*</span>
                                 </label>
                                 <select
-                                    name="status"
-                                    value={formData.status}
+                                    name="account_status"
+                                    value={formData.account_status}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 >
-                                    {usersData.statuses.filter(s => s !== "All Statuses").map((status, idx) => (
+                                    {statuses.map((status, idx) => (
                                         <option key={idx} value={status}>{status}</option>
                                     ))}
                                 </select>
@@ -282,10 +369,9 @@ export default function EditUserPage() {
                             <div className="text-sm text-blue-900">
                                 <div className="font-semibold mb-1">User Role Permissions:</div>
                                 <ul className="space-y-1 text-blue-700">
-                                    <li>• <strong>Admin:</strong> Full access to all features and settings</li>
-                                    <li>• <strong>Editor:</strong> Can create and manage content</li>
-                                    <li>• <strong>Subscriber:</strong> Access to premium content and courses</li>
-                                    <li>• <strong>Patient:</strong> Book appointments and view medical content</li>
+                                    <li>• <strong>ADMIN:</strong> Full access to all features and settings</li>
+                                    <li>• <strong>EDITOR:</strong> Can create and manage content</li>
+                                    <li>• <strong>PATIENT:</strong> Book appointments and view medical content</li>
                                 </ul>
                             </div>
                         </div>
@@ -295,9 +381,17 @@ export default function EditUserPage() {
                     <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
                         <button
                             type="submit"
-                            className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium"
+                            disabled={isSubmitting}
+                            className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
                         >
-                            Update User
+                            {isSubmitting ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    Updating...
+                                </>
+                            ) : (
+                                "Update User"
+                            )}
                         </button>
                         <Link href="/admin/users">
                             <button
