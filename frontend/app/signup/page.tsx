@@ -127,7 +127,7 @@ export default function SignupPage() {
                                     required
                                     value={formData.firstName}
                                     onChange={handleChange}
-                                    className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                    className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                     placeholder="John"
                                 />
                             </div>
@@ -144,7 +144,7 @@ export default function SignupPage() {
                                     required
                                     value={formData.lastName}
                                     onChange={handleChange}
-                                    className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                    className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                     placeholder="Doe"
                                 />
                             </div>
@@ -163,7 +163,7 @@ export default function SignupPage() {
                                 autoComplete="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                 placeholder="john@example.com"
                             />
                         </div>
@@ -181,7 +181,7 @@ export default function SignupPage() {
                                 autoComplete="tel"
                                 value={formData.phone}
                                 onChange={handleChange}
-                                className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                 placeholder="+1 (555) 000-0000"
                             />
                         </div>
@@ -199,7 +199,7 @@ export default function SignupPage() {
                                 autoComplete="new-password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                 placeholder="Min 8 characters"
                             />
                         </div>
@@ -217,7 +217,7 @@ export default function SignupPage() {
                                 autoComplete="new-password"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
-                                className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                className="w-full h-11 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                 placeholder="Confirm password"
                             />
                         </div>

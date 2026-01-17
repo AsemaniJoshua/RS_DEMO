@@ -117,7 +117,7 @@ export default function LoginPage() {
                                 autoComplete="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                 placeholder="john@example.com"
                             />
                         </div>
@@ -136,7 +136,7 @@ export default function LoginPage() {
                                     autoComplete="current-password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className="w-full h-12 px-4 pr-12 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                    className="w-full h-12 px-4 pr-12 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                     placeholder="••••••••"
                                 />
                                 <button
