@@ -12,6 +12,7 @@ interface AuthContextType {
     signup: (data: SignupData) => Promise<void>;
     logout: () => void;
     isAdmin: () => boolean;
+    isAdminOrEditor: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,6 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const isAdmin = () => user?.role?.toUpperCase() === 'ADMIN';
+    
+    const isAdminOrEditor = () => {
+        const role = user?.role?.toUpperCase();
+        return role === 'ADMIN' || role === 'EDITOR';
+    };
 
     const value: AuthContextType = {
         user,
@@ -56,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signup,
         logout,
         isAdmin,
+        isAdminOrEditor,
     };
 
     return (

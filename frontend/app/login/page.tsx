@@ -17,18 +17,18 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
-    const { login, isAuthenticated, isAdmin, isLoading: isAuthLoading } = useAuth();
+    const { login, isAuthenticated, isAdminOrEditor, isLoading: isAuthLoading } = useAuth();
 
     // Redirect if already authenticated (only after auth loading is complete)
     useEffect(() => {
         if (!isAuthLoading && isAuthenticated) {
-            if (isAdmin()) {
+            if (isAdminOrEditor()) {
                 router.push('/admin');
             } else {
                 router.push('/dashboard');
             }
         }
-    }, [isAuthLoading, isAuthenticated, isAdmin, router]);
+    }, [isAuthLoading, isAuthenticated, isAdminOrEditor, router]);
 
     // Show nothing while auth is loading or if authenticated (redirecting)
     if (isAuthLoading || isAuthenticated) {
