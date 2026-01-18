@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService, User, LoginCredentials, SignupData } from '@/services/auth-service';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface AuthContextType {
     user: User | null;
@@ -35,15 +36,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = async (credentials: LoginCredentials) => {
         const response = await authService.login(credentials);
         setUser(response.data);
+        toast.success('Welcome back!');
     };
 
     const signup = async (data: SignupData) => {
         await authService.signup(data);
+        toast.success('Account created successfully!');
     };
 
     const logout = () => {
         authService.logout();
         setUser(null);
+        toast.success('Logged out successfully');
         router.push('/login');
     };
 

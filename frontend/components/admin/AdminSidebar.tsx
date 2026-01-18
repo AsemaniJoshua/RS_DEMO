@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/contexts/auth-context";
 
 const menuItems = [
     {
@@ -136,10 +137,10 @@ export default function AdminSidebar({ isMobileMenuOpen = false, onMobileMenuClo
     const pathname = usePathname();
     const router = useRouter();
 
+    const { logout } = useAuth();
+
     const handleLogout = () => {
-        // Add your logout logic here
-        console.log("Logging out...");
-        router.push("/login");
+        logout();
     };
 
     return (

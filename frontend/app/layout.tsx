@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { ScrollAnimations } from "@/components/ui/ScrollAnimations";
 import { AuthProvider } from "@/contexts/auth-context";
+import ToastProvider from "@/components/providers/ToastProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,6 +39,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
+          <ToastProvider />
           {!isAdminPage && !isAuthPage && !isDashboardPage && <Navbar />}
           <ScrollAnimations>
             {children}

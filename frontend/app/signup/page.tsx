@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ApiError } from "@/lib/api";
+import toast from 'react-hot-toast';
 
 export default function SignupPage() {
     const [formData, setFormData] = useState({
@@ -65,7 +66,9 @@ export default function SignupPage() {
             }, 2000);
         } catch (err) {
             const apiError = err as ApiError;
-            setError(apiError.message || "Signup failed. Please try again.");
+            const errorMessage = apiError.message || "Signup failed. Please try again.";
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
