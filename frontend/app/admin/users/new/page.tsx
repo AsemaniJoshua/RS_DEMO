@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usersService } from "@/services/users-service";
 import { ApiError } from "@/lib/api";
+import toast from 'react-hot-toast';
 
 // Role and status options
 const roles = ["ADMIN", "PATIENT", "EDITOR"];
-const statuses = ["ACTIVE", "INACTIVE", "SUSPENDED"];
+const statuses = ["ACTIVE", "SUSPENDED"];
 
 export default function NewUserPage() {
     const router = useRouter();
@@ -50,11 +51,20 @@ export default function NewUserPage() {
         setIsSubmitting(true);
 
         try {
-            await usersService.createUser(formData);
+            const response = await usersService.createUser(formData);
+            
+            // Validate response status
+            if (response.status !== 'success') {
+                throw new Error(response.message || 'Failed to create user');
+            }
+            
+            toast.success('User created successfully!');
             router.push("/admin/users");
         } catch (err) {
             const apiError = err as ApiError;
-            setError(apiError.message || "Failed to create user");
+            const errorMessage = apiError.message || "Failed to create user";
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -209,6 +219,7 @@ export default function NewUserPage() {
                                     value={formData.password}
                                     onChange={handleChange}
                                     required
+                                    minLength={8}
                                     placeholder="Enter password"
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 />
@@ -224,6 +235,7 @@ export default function NewUserPage() {
                                     value={formData.confirmedPassword}
                                     onChange={handleChange}
                                     required
+                                    minLength={8}
                                     placeholder="Confirm password"
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 />

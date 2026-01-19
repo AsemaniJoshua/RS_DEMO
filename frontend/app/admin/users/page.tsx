@@ -2,16 +2,18 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usersService, User } from "@/services/users-service";
+import { usersService, User, UserStats } from "@/services/users-service";
 import DeleteCourseModal from "@/components/admin/DeleteCourseModal";
 import { ApiError } from "@/lib/api";
+import toast from 'react-hot-toast';
 
 // Role and status options for filters
 const roles = ["All Roles", "ADMIN", "PATIENT", "EDITOR"];
-const statuses = ["All Statuses", "ACTIVE", "INACTIVE", "SUSPENDED"];
+const statuses = ["All Statuses", "ACTIVE", "SUSPENDED"];
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
+    const [stats, setStats] = useState<UserStats | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
@@ -26,19 +28,33 @@ export default function UsersPage() {
 
     // Fetch users from API
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchData = async () => {
             try {
                 setIsLoading(true);
-                const response = await usersService.getAllUsers();
-                setUsers(response.data || []);
+                // Fetch both users and stats in parallel
+                const [usersResponse, statsResponse] = await Promise.all([
+                    usersService.getAllUsers(),
+                    usersService.getUserStats()
+                ]);
+                
+                // Validate responses
+                if (usersResponse.status !== 'success') {
+                    throw new Error(usersResponse.message || 'Failed to load users');
+                }
+                if (statsResponse.status !== 'success') {
+                    throw new Error(statsResponse.message || 'Failed to load statistics');
+                }
+                
+                setUsers(usersResponse.data || []);
+                setStats(statsResponse.data || null);
             } catch (err) {
                 const apiError = err as ApiError;
-                setError(apiError.message || "Failed to load users");
+                setError(apiError.message || "Failed to load data");
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchUsers();
+        fetchData();
     }, []);
 
     // Filter users
@@ -51,12 +67,11 @@ export default function UsersPage() {
         return matchesSearch && matchesRole && matchesStatus;
     });
 
-    // Calculate stats
-    const stats = {
-        total: users.length,
-        active: users.filter(u => u.account_status === "ACTIVE").length,
-        inactive: users.filter(u => u.account_status === "INACTIVE").length,
-        suspended: users.filter(u => u.account_status === "SUSPENDED").length
+    // Calculate stats from API data or use empty object
+    const displayStats = stats || {
+        total: 0,
+        byStatus: { active: 0, suspended: 0 },
+        byRole: { admin: 0, editor: 0, patient: 0 }
     };
 
     const handleDeleteClick = (id: string, firstName: string, lastName: string) => {
@@ -68,13 +83,22 @@ export default function UsersPage() {
         
         setIsDeleting(true);
         try {
-            await usersService.deleteUserById(deleteModal.id);
+            const response = await usersService.deleteUserById(deleteModal.id);
+            
+            // Validate response
+            if (response.status !== 'success') {
+                throw new Error(response.message || 'Failed to delete user');
+            }
+            
             // Remove user from local state
             setUsers(prev => prev.filter(u => u.id !== deleteModal.id));
             setDeleteModal({ show: false, id: null, name: "" });
+            toast.success('User deleted successfully');
         } catch (err) {
             const apiError = err as ApiError;
-            setError(apiError.message || "Failed to delete user");
+            const errorMessage = apiError.message || "Failed to delete user";
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setIsDeleting(false);
         }
@@ -178,7 +202,7 @@ export default function UsersPage() {
                             </svg>
                         </div>
                         <div>
-                            <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+                            <div className="text-2xl font-bold text-gray-900">{displayStats.total}</div>
                             <div className="text-sm text-gray-600">Total Users</div>
                         </div>
                     </div>
@@ -192,23 +216,8 @@ export default function UsersPage() {
                             </svg>
                         </div>
                         <div>
-                            <div className="text-2xl font-bold text-gray-900">{stats.active}</div>
+                            <div className="text-2xl font-bold text-gray-900">{displayStats.byStatus.active}</div>
                             <div className="text-sm text-gray-600">Active Users</div>
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-500">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                                <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <div className="text-2xl font-bold text-gray-900">{stats.inactive}</div>
-                            <div className="text-sm text-gray-600">Inactive Users</div>
                         </div>
                     </div>
                 </div>
@@ -221,7 +230,7 @@ export default function UsersPage() {
                             </svg>
                         </div>
                         <div>
-                            <div className="text-2xl font-bold text-gray-900">{stats.suspended}</div>
+                            <div className="text-2xl font-bold text-gray-900">{displayStats.byStatus.suspended}</div>
                             <div className="text-sm text-gray-600">Suspended</div>
                         </div>
                     </div>
@@ -283,7 +292,14 @@ export default function UsersPage() {
                         </thead>
                         <tbody>
                             {filteredUsers.map((user, idx) => (
-                                <tr key={user.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                <tr 
+                                    key={user.id} 
+                                    className={`border-b border-gray-100 ${
+                                        user.account_status === 'SUSPENDED' 
+                                            ? 'bg-red-50/50 hover:bg-red-50' 
+                                            : idx % 2 === 0 ? 'bg-white hover:bg-gray-50/30' : 'bg-gray-50/50 hover:bg-gray-50'
+                                    }`}
+                                >
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] flex items-center justify-center text-white font-semibold">

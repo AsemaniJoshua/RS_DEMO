@@ -13,6 +13,18 @@ export interface User {
     updated_at: string;
 }
 
+export interface UserStats {
+    total: number;
+    byStatus: {
+        active: number;
+        suspended: number;
+    };
+    byRole: {
+        admin: number;
+        editor: number;
+        patient: number;
+    };
+}
 export interface CreateUserData {
     first_name: string;
     last_name: string;
@@ -42,6 +54,13 @@ export const usersService = {
      */
     async getAllUsers(): Promise<ApiResponse<User[]>> {
         return api.get<User[]>('/admin/users/get-all-users');
+    },
+
+    /**
+     * Get user statistics
+     */
+    async getUserStats(): Promise<ApiResponse<UserStats>> {
+        return api.get<UserStats>('/admin/users/stats');
     },
 
     /**

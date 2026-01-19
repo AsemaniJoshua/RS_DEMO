@@ -1,16 +1,7 @@
 // API Client Configuration
 
-// Try localhost first, fallback to Render if not available
-const LOCALHOST_API = 'http://localhost:3000/api/v1';
-const PRODUCTION_API = 'https://dr-george-backend.onrender.com/api/v1';
-
-// Check if we should use localhost (development environment)
-const isDevelopment = process.env.NODE_ENV === 'development' || 
-                      process.env.NEXT_PUBLIC_USE_LOCALHOST === 'true';
-
-// Use environment variable if set, otherwise use smart fallback
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
-                     (isDevelopment ? LOCALHOST_API : PRODUCTION_API);
+// Use localhost for API base URL
+const API_BASE_URL = 'http://localhost:3000/api/v1';
 
 export interface ApiResponse<T = unknown> {
     status: 'success' | 'error';
@@ -62,58 +53,22 @@ export async function apiFetch<T>(
         (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
 
-    // Helper function to make the actual fetch
-    const makeRequest = async (baseUrl: string): Promise<ApiResponse<T>> => {
-        const response = await fetch(`${baseUrl}${endpoint}`, {
-            ...options,
-            headers,
-        });
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers,
+    });
 
-        const data: ApiResponse<T> = await response.json();
+    const data: ApiResponse<T> = await response.json();
 
-        if (!response.ok) {
-            throw {
-                status: 'error',
-                message: data.message || 'An error occurred',
-                statusCode: response.status,
-            } as ApiError;
-        }
-
-        return data;
-    };
-
-    try {
-        // Try primary URL (localhost in dev, production otherwise)
-        return await makeRequest(API_BASE_URL);
-    } catch (error) {
-        // If using localhost and it fails, automatically try production as fallback
-        if (isDevelopment && API_BASE_URL === LOCALHOST_API) {
-            console.warn('Localhost API failed, falling back to production:', error);
-            try {
-                return await makeRequest(PRODUCTION_API);
-            } catch (fallbackError) {
-                // Both failed, throw the fallback error
-                if ((fallbackError as ApiError).status === 'error') {
-                    throw fallbackError;
-                }
-                throw {
-                    status: 'error',
-                    message: 'Network error. Please try again.',
-                    statusCode: 500,
-                } as ApiError;
-            }
-        }
-        
-        // Not using localhost or other error, handle normally
-        if ((error as ApiError).status === 'error') {
-            throw error;
-        }
+    if (!response.ok) {
         throw {
             status: 'error',
-            message: 'Network error. Please try again.',
-            statusCode: 500,
+            message: data.message || 'An error occurred',
+            statusCode: response.status,
         } as ApiError;
     }
+
+    return data;
 }
 
 // Convenience methods

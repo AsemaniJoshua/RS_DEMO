@@ -5,10 +5,11 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { usersService, User } from "@/services/users-service";
 import { ApiError } from "@/lib/api";
+import toast from 'react-hot-toast';
 
 // Role and status options
 const roles = ["ADMIN", "PATIENT", "EDITOR"];
-const statuses = ["ACTIVE", "INACTIVE", "SUSPENDED"];
+const statuses = ["ACTIVE", "SUSPENDED"];
 
 export default function EditUserPage() {
     const router = useRouter();
@@ -88,6 +89,8 @@ export default function EditUserPage() {
         e.preventDefault();
         setError("");
         
+        // console.log('Form submitted', { userId, formData, changePassword });
+        
         if (changePassword && passwordData.newPassword !== passwordData.confirmPassword) {
             setError("Passwords do not match!");
             return;
@@ -99,18 +102,37 @@ export default function EditUserPage() {
         }
 
         setIsSubmitting(true);
+        // console.log('Calling updateUserById with:', userId, formData);
 
         try {
-            // Update user details
-            await usersService.updateUserById(userId, formData);
+            // Prepare update data
+            const updateData = {
+                ...formData,
+                // Include password fields only if changing password
+                ...(changePassword && {
+                    password: passwordData.newPassword,
+                    confirmPassword: passwordData.confirmPassword
+                })
+            };
 
-            // TODO: Handle password update if API supports it in a separate call or same call
-            // Currently assuming updateUserById handles basic details
+            // Update user details
+            const response = await usersService.updateUserById(userId, updateData);
             
+            // Check response status
+            if (response.status !== 'success') {
+                throw new Error(response.message || 'Failed to update user');
+            }
+            
+            console.log('Update response:', response);
+            
+            toast.success('User updated successfully!');
             router.push("/admin/users");
         } catch (err) {
+            console.error('Update error:', err);
             const apiError = err as ApiError;
-            setError(apiError.message || "Failed to update user");
+            const errorMessage = apiError.message || "Failed to update user";
+            setError(errorMessage);
+            toast.error(errorMessage);
             setIsSubmitting(false);
         }
     };
@@ -335,6 +357,7 @@ export default function EditUserPage() {
                                         value={passwordData.newPassword}
                                         onChange={handlePasswordChange}
                                         required={changePassword}
+                                        minLength={8}
                                         placeholder="Enter new password"
                                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                     />
@@ -350,6 +373,7 @@ export default function EditUserPage() {
                                         value={passwordData.confirmPassword}
                                         onChange={handlePasswordChange}
                                         required={changePassword}
+                                        minLength={8}
                                         placeholder="Confirm new password"
                                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                     />
