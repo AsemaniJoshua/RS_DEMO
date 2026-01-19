@@ -92,12 +92,16 @@ export default function EditUserPage() {
         // console.log('Form submitted', { userId, formData, changePassword });
         
         if (changePassword && passwordData.newPassword !== passwordData.confirmPassword) {
-            setError("Passwords do not match!");
+            const errorMsg = "Passwords do not match!";
+            setError(errorMsg);
+            toast.error(errorMsg);
             return;
         }
 
         if (changePassword && passwordData.newPassword.length < 8) {
-            setError("Password must be at least 8 characters");
+            const errorMsg = "Password must be at least 8 characters";
+            setError(errorMsg);
+            toast.error(errorMsg);
             return;
         }
 

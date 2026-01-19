@@ -32,7 +32,7 @@ export interface CreateUserData {
     phoneNumber: string;
     role: string;
     password: string;
-    confirmedPassword: string;
+    confirmPassword: string;
     account_status: string;
 }
 

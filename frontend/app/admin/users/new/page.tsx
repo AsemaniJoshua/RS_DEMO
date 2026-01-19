@@ -23,7 +23,7 @@ export default function NewUserPage() {
         role: "PATIENT",
         account_status: "ACTIVE",
         password: "",
-        confirmedPassword: ""
+        confirmPassword: ""
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -38,7 +38,7 @@ export default function NewUserPage() {
         e.preventDefault();
         setError("");
         
-        if (formData.password !== formData.confirmedPassword) {
+        if (formData.password !== formData.confirmPassword) {
             setError("Passwords do not match!");
             return;
         }
@@ -231,8 +231,8 @@ export default function NewUserPage() {
                                 </label>
                                 <input
                                     type="password"
-                                    name="confirmedPassword"
-                                    value={formData.confirmedPassword}
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
                                     onChange={handleChange}
                                     required
                                     minLength={8}

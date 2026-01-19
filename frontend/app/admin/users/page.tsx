@@ -19,10 +19,11 @@ export default function UsersPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [roleFilter, setRoleFilter] = useState("All Roles");
     const [statusFilter, setStatusFilter] = useState("All Statuses");
-    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: string | null; name: string }>({
+    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: string | null; name: string; role: string }>({
         show: false,
         id: null,
-        name: ""
+        name: "",
+        role: ""
     });
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -74,8 +75,8 @@ export default function UsersPage() {
         byRole: { admin: 0, editor: 0, patient: 0 }
     };
 
-    const handleDeleteClick = (id: string, firstName: string, lastName: string) => {
-        setDeleteModal({ show: true, id, name: `${firstName} ${lastName}` });
+    const handleDeleteClick = (id: string, firstName: string, lastName: string, role: string) => {
+        setDeleteModal({ show: true, id, name: `${firstName} ${lastName}`, role });
     };
 
     const handleDeleteConfirm = async () => {
@@ -92,20 +93,39 @@ export default function UsersPage() {
             
             // Remove user from local state
             setUsers(prev => prev.filter(u => u.id !== deleteModal.id));
-            setDeleteModal({ show: false, id: null, name: "" });
-            toast.success('User deleted successfully');
+            
+            // Refresh stats after deletion
+            try {
+                const statsResponse = await usersService.getUserStats();
+                if (statsResponse.status === 'success') {
+                    setStats(statsResponse.data || null);
+                }
+            } catch (statsErr) {
+                // Stats refresh failed, but user was deleted successfully
+                console.error('Failed to refresh stats:', statsErr);
+            }
+            
+            // Close modal and show success
+            setDeleteModal({ show: false, id: null, name: "", role: "" });
+            toast.success(`${deleteModal.role === 'ADMIN' ? 'Administrator' : deleteModal.role === 'EDITOR' ? 'Editor' : 'User'} deleted successfully`);
         } catch (err) {
             const apiError = err as ApiError;
             const errorMessage = apiError.message || "Failed to delete user";
+            
+            // Show error toast with custom styling
+            toast.error(errorMessage, {
+                duration: 5000, // Longer duration for errors
+            });
+            
+            // Keep modal open so user can retry
             setError(errorMessage);
-            toast.error(errorMessage);
         } finally {
             setIsDeleting(false);
         }
     };
 
     const handleDeleteCancel = () => {
-        setDeleteModal({ show: false, id: null, name: "" });
+        setDeleteModal({ show: false, id: null, name: "", role: "" });
     };
 
     const getStatusColor = (status: string) => {
@@ -334,7 +354,7 @@ export default function UsersPage() {
                                                 </button>
                                             </Link>
                                             <button 
-                                                onClick={() => handleDeleteClick(user.id, user.first_name, user.last_name)}
+                                                onClick={() => handleDeleteClick(user.id, user.first_name, user.last_name, user.role)}
                                                 className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
                                             >
                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -350,12 +370,15 @@ export default function UsersPage() {
                 </div>
             </div>
 
-            {/* Delete Modal */}
+            {/* Delete Confirmation Modal */}
             <DeleteCourseModal
                 isOpen={deleteModal.show}
-                onCancel={handleDeleteCancel}
-                onConfirm={handleDeleteConfirm}
                 courseName={deleteModal.name}
+                userRole={deleteModal.role}
+                isDeleting={isDeleting}
+                error={error}
+                onConfirm={handleDeleteConfirm}
+                onCancel={handleDeleteCancel}
             />
         </div>
     );
