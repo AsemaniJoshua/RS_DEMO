@@ -116,15 +116,14 @@ const menuItems = [
         href: "/admin/users"
     },
     {
-        label: "Settings",
+        label: "Profile",
         icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                <path d="M12 1v6m0 6v6M1 12h6m6 0h6" stroke="currentColor" strokeWidth="2"/>
-                <path d="M4.22 4.22l4.24 4.24m5.07 5.07l4.24 4.24M4.22 19.78l4.24-4.24m5.07-5.07l4.24-4.24" stroke="currentColor" strokeWidth="2"/>
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
             </svg>
         ),
-        href: "/admin/settings"
+        href: "/admin/profile"
     }
 ];
 

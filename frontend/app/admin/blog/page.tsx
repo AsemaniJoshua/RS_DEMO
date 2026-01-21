@@ -1,229 +1,217 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import blogData from "@/data/admin/blog.json";
-import DeleteCourseModal from "@/components/admin/DeleteCourseModal";
+import { blogService, Blog } from "@/services/blog-service";
+import toast from "react-hot-toast";
 
-export default function BlogPage() {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("All Categories");
-    const [selectedStatus, setSelectedStatus] = useState("All");
-    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; postId: number | null; postTitle: string }>({
-        isOpen: false,
-        postId: null,
-        postTitle: ""
-    });
+export default function BlogManagerPage() {
+    const router = useRouter();
+    const [blogs, setBlogs] = useState<Blog[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [deleting, setDeleting] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [statusFilter, setStatusFilter] = useState<string>("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
 
-    const { posts, categories } = blogData;
+    useEffect(() => {
+        fetchBlogs();
+    }, [page, statusFilter]);
 
-    // Filter posts
-    const filteredPosts = posts.filter(post => {
-        const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesCategory = selectedCategory === "All Categories" || post.category === selectedCategory;
-        const matchesStatus = selectedStatus === "All" || post.status === selectedStatus;
-        return matchesSearch && matchesCategory && matchesStatus;
-    });
-
-    const handleDeleteClick = (postId: number, postTitle: string) => {
-        setDeleteModal({ isOpen: true, postId, postTitle });
+    const fetchBlogs = async () => {
+        try {
+            setLoading(true);
+            const response = await blogService.getAllBlogs({
+                page,
+                limit: 10,
+                status: statusFilter || undefined,
+                search: searchTerm || undefined
+            });
+            
+            const data = (response.data as any);
+            setBlogs(data.blogs || []);
+            setTotalPages(data.pagination?.pages || 1);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to load blogs");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleDeleteConfirm = () => {
-        console.log("Deleting post:", deleteModal.postId);
-        setDeleteModal({ isOpen: false, postId: null, postTitle: "" });
+    const handleSearch = () => {
+        setPage(1);
+        fetchBlogs();
     };
 
-    const handleDeleteCancel = () => {
-        setDeleteModal({ isOpen: false, postId: null, postTitle: "" });
+    const handleDeleteClick = (blog: Blog) => {
+        setBlogToDelete(blog);
+        setShowDeleteModal(true);
     };
+
+    const handleDeleteConfirm = async () => {
+        if (!blogToDelete) return;
+
+        try {
+            setDeleting(true);
+            await blogService.deleteBlog(blogToDelete.id);
+            toast.success("Blog deleted successfully!");
+            setShowDeleteModal(false);
+            setBlogToDelete(null);
+            fetchBlogs();
+        } catch (error: any) {
+            toast.error(error.message || "Failed to delete blog");
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const handlePublishToggle = async (blog: Blog) => {
+        try {
+            if (blog.status === 'PUBLISHED') {
+                await blogService.unpublishBlog(blog.id);
+                toast.success("Blog unpublished!");
+            } else {
+                await blogService.publishBlog(blog.id);
+                toast.success("Blog published!");
+            }
+            fetchBlogs();
+        } catch (error: any) {
+            toast.error(error.message || "Failed to update blog status");
+        }
+    };
+
+    const getStatusBadge = (status: string) => {
+        const styles = {
+            PUBLISHED: "bg-green-100 text-green-800",
+            DRAFT: "bg-yellow-100 text-yellow-800",
+            ARCHIVED: "bg-gray-100 text-gray-800"
+        };
+        return styles[status as keyof typeof styles] || styles.DRAFT;
+    };
+
+    if (loading && page === 1) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff]"></div>
+            </div>
+        );
+    }
 
     return (
-        <div className="p-4 md:p-8">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="p-8">
+            <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Blog Management</h1>
-                    <p className="text-sm md:text-base text-gray-600">Manage your articles and blog posts</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Blog Manager</h1>
+                    <p className="text-gray-600 mt-1">Create and manage blog posts</p>
                 </div>
-                <Link href="/admin/blog/new">
-                    <button className="w-full sm:w-auto px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center justify-center gap-2 font-medium">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="2"/>
-                        </svg>
-                        New Post
-                    </button>
+                <Link
+                    href="/admin/blog/create"
+                    className="px-4 py-2 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors"
+                >
+                    + Create Blog Post
                 </Link>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Total Posts</span>
-                        <div className="w-10 h-10 bg-[#00d4aa]/10 rounded-lg flex items-center justify-center">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#00d4aa]">
-                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">{posts.length}</div>
-                </div>
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Published</span>
-                        <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-green-500">
-                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" strokeWidth="2"/>
-                                <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">{posts.filter(p => p.status === "Published").length}</div>
-                </div>
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Total Views</span>
-                        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-blue-500">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
-                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">{posts.reduce((sum, p) => sum + p.views, 0).toLocaleString()}</div>
-                </div>
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Drafts</span>
-                        <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-orange-500">
-                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">{posts.filter(p => p.status === "Draft").length}</div>
-                </div>
-            </div>
-
             {/* Filters */}
-            <div className="bg-white rounded-xl p-4 mb-6 border border-gray-100">
-                <div className="flex flex-col md:flex-row gap-4">
-                    {/* Search */}
-                    <div className="flex-1 relative">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                            <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
-                            <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2"/>
-                        </svg>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+                <div className="flex gap-4">
+                    <div className="flex-1">
                         <input
                             type="text"
-                            placeholder="Search posts..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                            placeholder="Search blogs..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent text-gray-900 placeholder-gray-500"
                         />
                     </div>
-
-                    {/* Category Filter */}
                     <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent text-gray-900"
                     >
-                        {categories.map((cat, idx) => (
-                            <option key={idx} value={cat}>{cat}</option>
-                        ))}
+                        <option value="">All Status</option>
+                        <option value="PUBLISHED">Published</option>
+                        <option value="DRAFT">Draft</option>
+                        <option value="ARCHIVED">Archived</option>
                     </select>
-
-                    {/* Status Filter */}
-                    <select
-                        value={selectedStatus}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                    <button
+                        onClick={handleSearch}
+                        className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                     >
-                        <option value="All">All Status</option>
-                        <option value="Published">Published</option>
-                        <option value="Draft">Draft</option>
-                    </select>
+                        Search
+                    </button>
                 </div>
             </div>
 
-            {/* Posts Table */}
-            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[768px]">
-                    <thead className="bg-gray-50 border-b border-gray-100">
+            {/* Blogs Table */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Post</th>
-                            <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Category</th>
-                            <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Views</th>
-                            <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Date</th>
-                            <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Status</th>
-                            <th className="text-right px-6 py-4 text-sm font-semibold text-gray-900">Actions</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Published</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {filteredPosts.length === 0 ? (
+                    <tbody className="divide-y divide-gray-200">
+                        {blogs.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                                    No posts found
+                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                    No blogs found. Create your first blog post!
                                 </td>
                             </tr>
                         ) : (
-                            filteredPosts.map((post) => (
-                                <tr key={post.id} className="hover:bg-gray-50 transition-colors">
+                            blogs.map((blog) => (
+                                <tr key={blog.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4">
-                                        <div>
-                                            <div className="font-semibold text-gray-900 mb-1">{post.title}</div>
-                                            <div className="text-sm text-gray-500 line-clamp-1">{post.excerpt}</div>
-                                            <div className="flex gap-2 mt-2">
-                                                {post.tags.map((tag, idx) => (
-                                                    <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
+                                        <Link href={`/admin/blog/${blog.id}`} className="block group">
+                                            <div className="text-sm font-medium text-gray-900 group-hover:text-[#0066ff] transition-colors">{blog.title}</div>
+                                            {blog.excerpt && (
+                                                <div className="text-sm text-gray-500 truncate max-w-md mt-1">{blog.excerpt}</div>
+                                            )}
+                                        </Link>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-900">
+                                        {blog.author ? `${blog.author.first_name} ${blog.author.last_name}` : 'Unknown'}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="text-sm text-gray-700">{post.category}</span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className="text-sm text-gray-900 font-medium">{post.views.toLocaleString()}</span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className="text-sm text-gray-600">{post.publishDate || "Not published"}</span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                            post.status === "Published" 
-                                                ? "bg-green-100 text-green-700" 
-                                                : "bg-gray-100 text-gray-700"
-                                        }`}>
-                                            {post.status}
+                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(blog.status)}`}>
+                                            {blog.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <Link href={`/admin/blog/${post.id}/edit`}>
-                                                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-600">
-                                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2"/>
-                                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2"/>
-                                                    </svg>
-                                                </button>
-                                            </Link>
-                                            <button 
-                                                onClick={() => handleDeleteClick(post.id, post.title)}
-                                                className="p-2 hover:bg-red-50 rounded-lg transition-colors" 
-                                                title="Delete"
+                                    <td className="px-6 py-4 text-sm text-gray-500">
+                                        {blog.published_at ? new Date(blog.published_at).toLocaleDateString() : '-'}
+                                    </td>
+                                    <td className="px-6 py-4 text-right text-sm font-medium">
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handlePublishToggle(blog)}
+                                                className={`px-3 py-1 rounded-lg transition-colors ${
+                                                    blog.status === 'PUBLISHED'
+                                                        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                                                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                }`}
                                             >
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-600">
-                                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2"/>
-                                                </svg>
+                                                {blog.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
+                                            </button>
+                                            <Link
+                                                href={`/admin/blog/${blog.id}/edit`}
+                                                className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDeleteClick(blog)}
+                                                className="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                                            >
+                                                Delete
                                             </button>
                                         </div>
                                     </td>
@@ -232,16 +220,67 @@ export default function BlogPage() {
                         )}
                     </tbody>
                 </table>
-                </div>
             </div>
 
-            {/* Delete Modal */}
-            <DeleteCourseModal
-                isOpen={deleteModal.isOpen}
-                courseName={deleteModal.postTitle}
-                onConfirm={handleDeleteConfirm}
-                onCancel={handleDeleteCancel}
-            />
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-6">
+                    <button
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900"
+                    >
+                        Previous
+                    </button>
+                    <span className="px-4 py-2 text-gray-900">
+                        Page {page} of {totalPages}
+                    </span>
+                    <button
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                        className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Blog Post</h3>
+                        <p className="text-gray-600 mb-6">
+                            Are you sure you want to delete "{blogToDelete?.title}"? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setBlogToDelete(null);
+                                }}
+                                disabled={deleting}
+                                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteConfirm}
+                                disabled={deleting}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                            >
+                                {deleting && (
+                                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                    </svg>
+                                )}
+                                {deleting ? "Deleting..." : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

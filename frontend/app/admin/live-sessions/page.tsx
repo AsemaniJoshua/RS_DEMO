@@ -1,68 +1,92 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { liveSessionsService, type LiveSession } from "@/services/live-sessions-service";
+import toast from "react-hot-toast";
 import Link from "next/link";
 
 export default function AdminLiveSessionsPage() {
-    const [sessions, setSessions] = useState([
-        {
-            id: 1,
-            title: "Weekly Q&A with Dr. George",
-            date: "2026-01-10",
-            time: "14:00",
-            duration: "1 hour",
-            description: "Open session to discuss general health questions and upcoming courses.",
-            meetingLink: "https://meet.google.com/abc-defg-hij",
-            status: "upcoming",
-            attendees: 12
-        },
-        {
-            id: 2,
-            title: "Diabetes Management Workshop",
-            date: "2026-01-15",
-            time: "10:00",
-            duration: "2 hours",
-            description: "Deep dive into dietary planning and blood sugar monitoring.",
-            meetingLink: "https://meet.google.com/xyz-uvw-rst",
-            "status": "upcoming",
-            attendees: 45
-        },
-        {
-            id: 3,
-            title: "New Year Health Resolutions",
-            date: "2025-12-28",
-            time: "18:00",
-            duration: "1 hour",
-            description: "Planning for a healthy year ahead.",
-            meetingLink: "",
-            status: "completed",
-            recordingLink: "https://youtube.com/watch?v=example",
-            attendees: 89
+    const [sessions, setSessions] = useState<LiveSession[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [sessionToDelete, setSessionToDelete] = useState<LiveSession | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    useEffect(() => {
+        fetchSessions();
+    }, []);
+
+    const fetchSessions = async () => {
+        try {
+            setLoading(true);
+            const response = await liveSessionsService.getAllSessions();
+            setSessions(response.data?.sessions || []);
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to load sessions');
+        } finally {
+            setLoading(false);
         }
-    ]);
-
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [newSession, setNewSession] = useState({
-        title: "",
-        date: "",
-        time: "",
-        duration: "",
-        meetingLink: "",
-        description: ""
-    });
-
-    const handleCreateSession = (e: React.FormEvent) => {
-        e.preventDefault();
-        const session = {
-            id: sessions.length + 1,
-            ...newSession,
-            status: "upcoming",
-            attendees: 0
-        };
-        setSessions([session, ...sessions]);
-        setShowCreateModal(false);
-        setNewSession({ title: "", date: "", time: "", duration: "", meetingLink: "", description: "" });
     };
+
+    const handleDeleteSession = async () => {
+        if (!sessionToDelete) return;
+
+        try {
+            setDeleting(true);
+            await liveSessionsService.deleteSession(sessionToDelete.id);
+            toast.success('Session deleted successfully!');
+            setShowDeleteModal(false);
+            setSessionToDelete(null);
+            fetchSessions();
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to delete session');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+    };
+
+    const formatTime = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status?.toUpperCase()) {
+            case 'UPCOMING':
+                return 'bg-green-100 text-green-800';
+            case 'LIVE':
+                return 'bg-blue-100 text-blue-800';
+            case 'COMPLETED':
+                return 'bg-gray-100 text-gray-800';
+            case 'CANCELLED':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="p-8 flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff] mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading sessions...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-8">
@@ -71,8 +95,8 @@ export default function AdminLiveSessionsPage() {
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Live Sessions</h1>
                     <p className="text-gray-600">Manage upcoming and past live sessions</p>
                 </div>
-                <button
-                    onClick={() => setShowCreateModal(true)}
+                <Link
+                    href="/admin/live-sessions/create"
                     className="px-4 py-2 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors flex items-center gap-2"
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -80,7 +104,7 @@ export default function AdminLiveSessionsPage() {
                         <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
                     Create Live Session
-                </button>
+                </Link>
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -91,150 +115,120 @@ export default function AdminLiveSessionsPage() {
                                 <th className="px-6 py-4">Title</th>
                                 <th className="px-6 py-4">Date & Time</th>
                                 <th className="px-6 py-4">Duration</th>
-                                <th className="px-6 py-4">Meeting Link</th>
                                 <th className="px-6 py-4">Status</th>
-                                <th className="px-6 py-4">Attendees</th>
+                                <th className="px-6 py-4">Registrations</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {sessions.map((session) => (
-                                <tr key={session.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4">
-                                        <div className="font-medium text-gray-900">{session.title}</div>
-                                        <div className="text-xs text-gray-500 mt-0.5 truncate max-w-xs">{session.description}</div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        <div>{session.date}</div>
-                                        <div className="text-xs text-gray-500">{session.time}</div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">{session.duration}</td>
-                                    <td className="px-6 py-4 text-sm">
-                                        {session.meetingLink ? (
-                                            <a href={session.meetingLink} target="_blank" rel="noreferrer" className="text-[#0066ff] hover:underline flex items-center gap-1">
-                                                Join
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                </svg>
-                                            </a>
-                                        ) : (
-                                            <span className="text-gray-400">-</span>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                            session.status === 'upcoming' 
-                                                ? 'bg-green-100 text-green-800' 
-                                                : 'bg-gray-100 text-gray-800'
-                                        }`}>
-                                            {session.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">{session.attendees}</td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="text-gray-400 hover:text-red-600 transition-colors">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            {sessions.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <svg className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                             </svg>
-                                        </button>
+                                            <p>No live sessions found</p>
+                                        </div>
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                sessions.map((session) => (
+                                    <tr 
+                                        key={session.id} 
+                                        onClick={() => window.location.href = `/admin/live-sessions/${session.id}`}
+                                        className="hover:bg-gray-50 cursor-pointer"
+                                    >
+                                        <td className="px-6 py-4">
+                                            <Link 
+                                                href={`/admin/live-sessions/${session.id}`}
+                                                className="font-medium text-gray-900 hover:text-[#0066ff]"
+                                            >
+                                                {session.title}
+                                            </Link>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                            {formatDate(session.scheduled_date)}<br/>
+                                            {formatTime(session.scheduled_date)}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                            {session.duration_minutes} min
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(session.status)}`}>
+                                                {session.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <Link 
+                                                href={`/admin/live-sessions/${session.id}`}
+                                                className="text-sm text-[#0066ff] hover:underline"
+                                            >
+                                                {session._count?.registrations || 0} registered
+                                            </Link>
+                                        </td>
+                                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Link
+                                                    href={`/admin/live-sessions/${session.id}/edit`}
+                                                    className="px-3 py-1 text-sm text-[#0066ff] hover:bg-blue-50 rounded transition-colors"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    onClick={() => {
+                                                        setSessionToDelete(session);
+                                                        setShowDeleteModal(true);
+                                                    }}
+                                                    className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            {/* Create Modal */}
-            {showCreateModal && (
-                <>
-                    <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowCreateModal(false)} />
-                    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-xl p-6 max-w-lg w-full">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Create New Live Session</h3>
-                            <form onSubmit={handleCreateSession} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                    <input 
-                                        type="text" 
-                                        required
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none"
-                                        value={newSession.title}
-                                        onChange={e => setNewSession({...newSession, title: e.target.value})}
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                                        <input 
-                                            type="date" 
-                                            required
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none"
-                                            value={newSession.date}
-                                            onChange={e => setNewSession({...newSession, date: e.target.value})}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
-                                        <input 
-                                            type="time" 
-                                            required
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none"
-                                            value={newSession.time}
-                                            onChange={e => setNewSession({...newSession, time: e.target.value})}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-                                        <input 
-                                            type="text" 
-                                            placeholder="e.g. 1 hour"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none"
-                                            value={newSession.duration}
-                                            onChange={e => setNewSession({...newSession, duration: e.target.value})}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Meeting Link</label>
-                                        <input 
-                                            type="url" 
-                                            placeholder="https://meet.google.com/..."
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none"
-                                            value={newSession.meetingLink}
-                                            onChange={e => setNewSession({...newSession, meetingLink: e.target.value})}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                    <textarea 
-                                        rows={3}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none resize-none"
-                                        value={newSession.description}
-                                        onChange={e => setNewSession({...newSession, description: e.target.value})}
-                                    />
-                                </div>
-                                <div className="flex gap-3 pt-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowCreateModal(false)}
-                                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="flex-1 px-4 py-2 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors"
-                                    >
-                                        Create Session
-                                    </button>
-                                </div>
-                            </form>
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Live Session</h3>
+                        <p className="text-gray-600 mb-6">
+                            Are you sure you want to delete "{sessionToDelete?.title}"? This action cannot be undone and will also remove all registrations.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setSessionToDelete(null);
+                                }}
+                                disabled={deleting}
+                                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteSession}
+                                disabled={deleting}
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {deleting && (
+                                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                    </svg>
+                                )}
+                                {deleting ? 'Deleting...' : 'Delete'}
+                            </button>
                         </div>
                     </div>
-                </>
+                </div>
             )}
         </div>
     );

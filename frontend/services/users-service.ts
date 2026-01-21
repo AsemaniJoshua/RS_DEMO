@@ -94,4 +94,28 @@ export const usersService = {
     async deleteUserById(id: string): Promise<ApiResponse<User>> {
         return api.delete<User>(`/admin/users/delete-user-by-id/${id}`);
     },
+
+    /**
+     * Get current user's profile
+     * GET /api/v1/admin/profile
+     */
+    async getCurrentProfile(): Promise<ApiResponse<User>> {
+        return api.get<User>('/admin/profile');
+    },
+
+    /**
+     * Update current user's profile
+     * PUT /api/v1/admin/profile
+     */
+    async updateCurrentProfile(data: UpdateUserData): Promise<ApiResponse<User>> {
+        return api.patch<User>('/admin/profile', data);
+    },
+
+    /**
+     * Change current user's password
+     * POST /api/v1/admin/profile/change-password
+     */
+    async changePassword(data: { old_password: string; new_password: string; confirm_password: string }): Promise<ApiResponse<any>> {
+        return api.post<any>('/admin/profile/change-password', data);
+    },
 };
