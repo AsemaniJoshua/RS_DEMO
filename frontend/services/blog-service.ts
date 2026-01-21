@@ -28,7 +28,7 @@ export interface Blog {
     excerpt?: string;
     content: string;
     featured_image?: string;
-    status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+    status: 'DRAFT' | 'PUBLISHED';
     published_at?: string;
     author_id: string;
     created_at: string;
@@ -53,7 +53,7 @@ export interface CreateBlogData {
     excerpt?: string;
     content: string;
     featured_image?: string;
-    status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+    status?: 'DRAFT' | 'PUBLISHED';
     meta_title?: string;
     meta_description?: string;
     categories?: { name: string; slug: string }[];
@@ -98,16 +98,38 @@ export const blogService = {
      * Create new blog
      * POST /api/v1/admin/blog
      */
-    async createBlog(data: CreateBlogData): Promise<ApiResponse<Blog>> {
-        return api.post<Blog>('/admin/blog', data);
+    async createBlog(data: CreateBlogData & { imageFile?: File }): Promise<ApiResponse<Blog>> {
+        const formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (key === 'imageFile' && data.imageFile) {
+                formData.append('image', data.imageFile);
+            } else if (key === 'categories' || key === 'tags') {
+                formData.append(key, JSON.stringify((data as any)[key]));
+            } else if (data[key as keyof CreateBlogData] !== undefined && data[key as keyof CreateBlogData] !== null) {
+                formData.append(key, String(data[key as keyof CreateBlogData]));
+            }
+        });
+
+        return api.post<Blog>('/admin/blog', formData);
     },
 
     /**
      * Update blog
      * PUT /api/v1/admin/blog/:id
      */
-    async updateBlog(id: string, data: UpdateBlogData): Promise<ApiResponse<Blog>> {
-        return api.patch<Blog>(`/admin/blog/${id}`, data);
+    async updateBlog(id: string, data: UpdateBlogData & { imageFile?: File }): Promise<ApiResponse<Blog>> {
+        const formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (key === 'imageFile' && data.imageFile) {
+                formData.append('image', data.imageFile);
+            } else if (key === 'categories' || key === 'tags') {
+                formData.append(key, JSON.stringify((data as any)[key]));
+            } else if (data[key as keyof UpdateBlogData] !== undefined && data[key as keyof UpdateBlogData] !== null) {
+                formData.append(key, String(data[key as keyof UpdateBlogData]));
+            }
+        });
+
+        return api.put<Blog>(`/admin/blog/${id}`, formData);
     },
 
     /**
@@ -132,5 +154,35 @@ export const blogService = {
      */
     async unpublishBlog(id: string): Promise<ApiResponse<Blog>> {
         return api.patch<Blog>(`/admin/blog/${id}/unpublish`, {});
+    },
+
+    /**
+     * Get all categories
+     * GET /api/v1/admin/blog/categories
+     */
+    async getAllCategories(): Promise<ApiResponse<string[]>> {
+        return api.get<string[]>('/admin/blog/categories');
+    },
+
+    /**
+     * Get all tags
+     * GET /api/v1/admin/blog/tags
+     */
+    async getAllTags(): Promise<ApiResponse<string[]>> {
+        return api.get<string[]>('/admin/blog/tags');
+    },
+
+    /**
+     * Upload blog image
+     * POST /api/v1/admin/blog/upload-image
+     */
+    async uploadImage(file: File): Promise<ApiResponse<{ url: string }>> {
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        // We need to handle multipart/form-data manually if api wrapper doesn't support it directly
+        // Assuming api wrapper handles headers correctly or we might need a specific call
+        // For now using api.post but looking at how axios handles FormData
+        return api.post<{ url: string }>('/admin/blog/upload-image', formData);
     },
 };

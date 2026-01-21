@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { blogService, CreateBlogData, Blog } from "@/services/blog-service";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import BlogCategorySelect from "@/components/admin/BlogCategorySelect";
+import BlogTagInput from "@/components/admin/BlogTagInput";
+import ImageUpload from "@/components/admin/ImageUpload";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 
@@ -16,6 +19,7 @@ interface BlogFormProps {
 export default function BlogForm({ initialData, isEditing = false }: BlogFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const [formData, setFormData] = useState<CreateBlogData>({
         title: "",
         slug: "",
@@ -28,9 +32,6 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
         categories: [],
         tags: []
     });
-
-    const [tagInput, setTagInput] = useState("");
-    const [categoryInput, setCategoryInput] = useState({ name: "", slug: "" });
 
     useEffect(() => {
         if (initialData) {
@@ -51,10 +52,39 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => {
+            const updates: Partial<CreateBlogData> = { [name]: value };
+            
+            // Auto-update meta fields if they're empty or match the previous source value
+            // For simplicity and user expectation, we'll sync them while typing
+            if (name === 'title') {
+                updates.meta_title = value;
+            }
+            if (name === 'excerpt') {
+                updates.meta_description = value;
+            }
+            
+            return {
+                ...prev,
+                ...updates
+            };
+        });
+    };
+
+    const handleCategoriesChange = (categories: { name: string; slug: string }[]) => {
+        setFormData(prev => ({ ...prev, categories }));
+    };
+
+    const handleTagsChange = (tags: { name: string }[]) => {
+        setFormData(prev => ({ ...prev, tags }));
+    };
+
+    const handleImageChange = (url: string) => {
+        setFormData(prev => ({ ...prev, featured_image: url }));
+    };
+
+    const handleFileSelect = (file: File | null) => {
+        setImageFile(file);
     };
 
     const handleGenerateSlug = () => {
@@ -68,55 +98,21 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
         setFormData(prev => ({ ...prev, slug }));
     };
 
-    const handleAddTag = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && tagInput.trim()) {
-            e.preventDefault();
-            if (!formData.tags?.some(tag => tag.name === tagInput.trim())) {
-                setFormData(prev => ({
-                    ...prev,
-                    tags: [...(prev.tags || []), { name: tagInput.trim() }]
-                }));
-            }
-            setTagInput("");
-        }
-    };
-
-    const removeTag = (indexToRemove: number) => {
-        setFormData(prev => ({
-            ...prev,
-            tags: prev.tags?.filter((_, index) => index !== indexToRemove)
-        }));
-    };
-
-    const handleAddCategory = () => {
-        if (categoryInput.name && categoryInput.slug) {
-            if (!formData.categories?.some(cat => cat.slug === categoryInput.slug)) {
-                setFormData(prev => ({
-                    ...prev,
-                    categories: [...(prev.categories || []), categoryInput]
-                }));
-            }
-            setCategoryInput({ name: "", slug: "" });
-        }
-    };
-
-    const removeCategory = (indexToRemove: number) => {
-        setFormData(prev => ({
-            ...prev,
-            categories: prev.categories?.filter((_, index) => index !== indexToRemove)
-        }));
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
+            const dataToSubmit = {
+                ...formData,
+                imageFile: imageFile || undefined
+            };
+
             if (isEditing && initialData) {
-                await blogService.updateBlog(initialData.id, formData);
+                await blogService.updateBlog(initialData.id, dataToSubmit);
                 toast.success("Blog updated successfully!");
             } else {
-                await blogService.createBlog(formData);
+                await blogService.createBlog(dataToSubmit);
                 toast.success("Blog created successfully!");
             }
             router.push("/admin/blog");
@@ -182,7 +178,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                             onChange={handleChange}
                             required
                             placeholder="Enter post title"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent text-lg font-medium"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent text-lg font-medium text-gray-900"
                         />
                     </div>
 
@@ -199,7 +195,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                                 onChange={handleChange}
                                 required
                                 placeholder="post-url-slug"
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent bg-gray-50"
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent bg-gray-50 text-gray-900"
                             />
                             <button
                                 type="button"
@@ -235,7 +231,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                             onChange={handleChange}
                             rows={3}
                             placeholder="Brief summary of the post..."
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent resize-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent resize-none text-gray-900"
                         />
                         <p className="text-sm text-gray-500 mt-1">Appears in blog listings and search results.</p>
                     </div>
@@ -251,7 +247,8 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                                     name="meta_title"
                                     value={formData.meta_title}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent"
+                                    placeholder="SEO Title"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent text-gray-900"
                                 />
                             </div>
                             <div>
@@ -261,7 +258,8 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                                     value={formData.meta_description}
                                     onChange={handleChange}
                                     rows={2}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent resize-none"
+                                    placeholder="SEO Description"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent resize-none text-gray-900"
                                 />
                             </div>
                         </div>
@@ -280,85 +278,11 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                                     name="status"
                                     value={formData.status}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent text-gray-900"
                                 >
                                     <option value="DRAFT">Draft</option>
                                     <option value="PUBLISHED">Published</option>
-                                    <option value="ARCHIVED">Archived</option>
                                 </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Categories */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
-                        <div className="space-y-3">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Category Name"
-                                    value={categoryInput.name}
-                                    onChange={(e) => {
-                                        const name = e.target.value;
-                                        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                                        setCategoryInput({ name, slug });
-                                    }}
-                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handleAddCategory}
-                                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
-                                >
-                                    Add
-                                </button>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {formData.categories?.map((cat, idx) => (
-                                    <span key={idx} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {cat.name}
-                                        <button
-                                            type="button"
-                                            onClick={() => removeCategory(idx)}
-                                            className="ml-1.5 text-blue-600 hover:text-blue-800 focus:outline-none"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
-                                {(!formData.categories || formData.categories.length === 0) && (
-                                    <p className="text-sm text-gray-500 italic">No categories added</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Tags */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
-                        <div className="space-y-3">
-                            <input
-                                type="text"
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                onKeyDown={handleAddTag}
-                                placeholder="Type and press Enter"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                            />
-                            <div className="flex flex-wrap gap-2">
-                                {formData.tags?.map((tag, idx) => (
-                                    <span key={idx} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                        {tag.name}
-                                        <button
-                                            type="button"
-                                            onClick={() => removeTag(idx)}
-                                            className="ml-1.5 text-gray-600 hover:text-gray-800 focus:outline-none"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
                             </div>
                         </div>
                     </div>
@@ -366,29 +290,29 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                     {/* Featured Image */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Featured Image</h3>
-                        <input
-                            type="text"
-                            name="featured_image"
-                            value={formData.featured_image || ''}
-                            onChange={handleChange}
-                            placeholder="Image URL"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3"
+                        <ImageUpload 
+                            value={formData.featured_image}
+                            onChange={handleImageChange}
+                            onFileSelect={handleFileSelect}
                         />
-                        {formData.featured_image && (
-                            <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
-                                <img
-                                    src={formData.featured_image}
-                                    alt="Featured"
-                                    className="object-cover w-full h-full"
-                                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                                />
-                            </div>
-                        )}
-                        {!formData.featured_image && (
-                            <div className="aspect-video rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
-                                No image selected
-                            </div>
-                        )}
+                    </div>
+
+                    {/* Categories */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
+                        <BlogCategorySelect 
+                            selectedCategories={formData.categories || []}
+                            onChange={handleCategoriesChange}
+                        />
+                    </div>
+
+                    {/* Tags */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
+                        <BlogTagInput 
+                            selectedTags={formData.tags || []}
+                            onChange={handleTagsChange}
+                        />
                     </div>
                 </div>
             </div>

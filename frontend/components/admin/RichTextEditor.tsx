@@ -56,6 +56,11 @@ export default function RichTextEditor({ value, onChange, placeholder = "Start w
                 }
                 .rich-text-editor .ql-editor {
                     min-height: ${minHeight};
+                    color: #1f2937; /* gray-800 */
+                }
+                .rich-text-editor .ql-editor.ql-blank::before {
+                    color: #9ca3af; /* gray-400 for placeholder */
+                    font-style: normal;
                 }
             `}</style>
         </div>

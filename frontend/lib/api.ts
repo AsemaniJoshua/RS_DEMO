@@ -44,10 +44,15 @@ export async function apiFetch<T>(
 ): Promise<ApiResponse<T>> {
     const token = getAuthToken();
     
+    // Determine headers
     const headers: HeadersInit = {
-        'Content-Type': 'application/json',
         ...options.headers,
     };
+
+    // Only set Content-Type to json if body is NOT FormData
+    if (!(options.body instanceof FormData)) {
+        (headers as Record<string, string>)['Content-Type'] = 'application/json';
+    }
 
     if (token) {
         (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
@@ -78,13 +83,19 @@ export const api = {
     post: <T>(endpoint: string, body: unknown) => 
         apiFetch<T>(endpoint, { 
             method: 'POST', 
-            body: JSON.stringify(body) 
+            body: body instanceof FormData ? body : JSON.stringify(body) 
         }),
     
+    put: <T>(endpoint: string, body: unknown) => 
+        apiFetch<T>(endpoint, { 
+            method: 'PUT', 
+            body: body instanceof FormData ? body : JSON.stringify(body) 
+        }),
+
     patch: <T>(endpoint: string, body: unknown) => 
         apiFetch<T>(endpoint, { 
             method: 'PATCH', 
-            body: JSON.stringify(body) 
+            body: body instanceof FormData ? body : JSON.stringify(body) 
         }),
     
     delete: <T>(endpoint: string) => 
