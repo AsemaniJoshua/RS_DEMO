@@ -12,7 +12,9 @@ export default function BlogCategorySelect({ selectedCategories, onChange }: Blo
     const [categories, setCategories] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
+    const [highlightedIndex, setHighlightedIndex] = useState(0);
     const wrapperRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         loadCategories();
@@ -28,6 +30,11 @@ export default function BlogCategorySelect({ selectedCategories, onChange }: Blo
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [wrapperRef]);
 
+    // Reset highlighted index when filtered options change
+    useEffect(() => {
+        setHighlightedIndex(0);
+    }, [inputValue, showDropdown]);
+
     const loadCategories = async () => {
         try {
             const response = await blogService.getAllCategories();
@@ -40,10 +47,8 @@ export default function BlogCategorySelect({ selectedCategories, onChange }: Blo
     };
 
     const handleAddCategory = (name: string) => {
-        // Simple slug generation
         const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         
-        // Check if already selected
         if (selectedCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
             toast.error('Category already added');
             setInputValue('');
@@ -54,6 +59,8 @@ export default function BlogCategorySelect({ selectedCategories, onChange }: Blo
         onChange([...selectedCategories, { name, slug }]);
         setInputValue('');
         setShowDropdown(false);
+        // keep input focus
+        setTimeout(() => inputRef.current?.focus(), 0);
     };
 
     const handleRemoveCategory = (indexToRemove: number) => {
@@ -65,8 +72,44 @@ export default function BlogCategorySelect({ selectedCategories, onChange }: Blo
         !selectedCategories.some(selected => selected.name.toLowerCase() === category.toLowerCase())
     );
 
+    const showCreateOption = inputValue && !filteredCategories.includes(inputValue);
+    const totalOptions = filteredCategories.length + (showCreateOption ? 1 : 0);
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (!showDropdown) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                setShowDropdown(true);
+            }
+            return;
+        }
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setHighlightedIndex(prev => (prev + 1) % totalOptions);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setHighlightedIndex(prev => (prev - 1 + totalOptions) % totalOptions);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (totalOptions > 0) {
+                    if (highlightedIndex < filteredCategories.length) {
+                        handleAddCategory(filteredCategories[highlightedIndex]);
+                    } else if (showCreateOption) {
+                        handleAddCategory(inputValue);
+                    }
+                }
+                break;
+            case 'Escape':
+                setShowDropdown(false);
+                break;
+        }
+    };
+
     return (
-        <div className="w-full" ref={wrapperRef}>
+        <div className="w-full relative" ref={wrapperRef}>
             <label className="block text-sm font-medium text-gray-700 mb-1">Categories</label>
             
             {/* Selected Categories Chips */}
@@ -92,6 +135,7 @@ export default function BlogCategorySelect({ selectedCategories, onChange }: Blo
                         <Component className="h-4 w-4 text-gray-400" />
                     </div>
                     <input
+                        ref={inputRef}
                         type="text"
                         className="block w-full rounded-md border-gray-300 pl-10 focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 text-gray-900 placeholder-gray-500 border"
                         placeholder="Select or create category..."
@@ -101,34 +145,33 @@ export default function BlogCategorySelect({ selectedCategories, onChange }: Blo
                             setShowDropdown(true);
                         }}
                         onFocus={() => setShowDropdown(true)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                if (inputValue.trim()) {
-                                    handleAddCategory(inputValue.trim());
-                                }
-                            }
-                        }}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
 
                 {/* Dropdown */}
-                {showDropdown && (inputValue || filteredCategories.length > 0) && (
-                    <div className="absolute z-10 mt-1 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm max-h-60">
-                        {filteredCategories.map((category) => (
+                {showDropdown && totalOptions > 0 && (
+                    <div className="absolute z-50 mt-1 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm max-h-60">
+                        {filteredCategories.map((category, index) => (
                             <div
                                 key={category}
-                                className="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-gray-100 text-gray-900"
+                                className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
+                                    index === highlightedIndex ? 'bg-blue-50 text-blue-900' : 'text-gray-900 hover:bg-gray-100'
+                                }`}
                                 onClick={() => handleAddCategory(category)}
+                                onMouseEnter={() => setHighlightedIndex(index)}
                             >
                                 <span className="block truncate">{category}</span>
                             </div>
                         ))}
                         
-                        {inputValue && !filteredCategories.includes(inputValue) && (
+                        {showCreateOption && (
                             <div
-                                className="relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-gray-100 text-blue-600 font-semibold"
+                                className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
+                                    highlightedIndex === filteredCategories.length ? 'bg-blue-50' : 'hover:bg-gray-100'
+                                } text-blue-600 font-semibold`}
                                 onClick={() => handleAddCategory(inputValue)}
+                                onMouseEnter={() => setHighlightedIndex(filteredCategories.length)}
                             >
                                 Create "{inputValue}"
                             </div>
@@ -137,7 +180,7 @@ export default function BlogCategorySelect({ selectedCategories, onChange }: Blo
                 )}
             </div>
             <p className="mt-1 text-xs text-gray-500">
-                Type to search or create a new category. Press Enter to add.
+                Type to search. Use arrow keys to navigate, Enter to select.
             </p>
         </div>
     );

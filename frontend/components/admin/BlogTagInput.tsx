@@ -12,7 +12,9 @@ export default function BlogTagInput({ selectedTags, onChange }: BlogTagInputPro
     const [tags, setTags] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
+    const [highlightedIndex, setHighlightedIndex] = useState(0);
     const wrapperRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         loadTags();
@@ -28,6 +30,10 @@ export default function BlogTagInput({ selectedTags, onChange }: BlogTagInputPro
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [wrapperRef]);
 
+    useEffect(() => {
+        setHighlightedIndex(0);
+    }, [inputValue, showDropdown]);
+
     const loadTags = async () => {
         try {
             const response = await blogService.getAllTags();
@@ -40,7 +46,6 @@ export default function BlogTagInput({ selectedTags, onChange }: BlogTagInputPro
     };
 
     const handleAddTag = (name: string) => {
-        // Check if already selected
         if (selectedTags.some(t => t.name.toLowerCase() === name.toLowerCase())) {
             toast.error('Tag already added');
             setInputValue('');
@@ -51,6 +56,8 @@ export default function BlogTagInput({ selectedTags, onChange }: BlogTagInputPro
         onChange([...selectedTags, { name }]);
         setInputValue('');
         setShowDropdown(false);
+        // keep input focus
+        setTimeout(() => inputRef.current?.focus(), 0);
     };
 
     const handleRemoveTag = (indexToRemove: number) => {
@@ -62,8 +69,44 @@ export default function BlogTagInput({ selectedTags, onChange }: BlogTagInputPro
         !selectedTags.some(selected => selected.name.toLowerCase() === tag.toLowerCase())
     );
 
+    const showCreateOption = inputValue && !filteredTags.includes(inputValue);
+    const totalOptions = filteredTags.length + (showCreateOption ? 1 : 0);
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (!showDropdown) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                setShowDropdown(true);
+            }
+            return;
+        }
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setHighlightedIndex(prev => (prev + 1) % totalOptions);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setHighlightedIndex(prev => (prev - 1 + totalOptions) % totalOptions);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (totalOptions > 0) {
+                    if (highlightedIndex < filteredTags.length) {
+                        handleAddTag(filteredTags[highlightedIndex]);
+                    } else if (showCreateOption) {
+                        handleAddTag(inputValue);
+                    }
+                }
+                break;
+            case 'Escape':
+                setShowDropdown(false);
+                break;
+        }
+    };
+
     return (
-        <div className="w-full" ref={wrapperRef}>
+        <div className="w-full relative" ref={wrapperRef}>
             <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
             
             {/* Selected Tags Chips */}
@@ -89,6 +132,7 @@ export default function BlogTagInput({ selectedTags, onChange }: BlogTagInputPro
                         <Tag className="h-4 w-4 text-gray-400" />
                     </div>
                     <input
+                        ref={inputRef}
                         type="text"
                         className="block w-full rounded-md border-gray-300 pl-10 focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 text-gray-900 placeholder-gray-500 border"
                         placeholder="Select or create tags..."
@@ -98,34 +142,33 @@ export default function BlogTagInput({ selectedTags, onChange }: BlogTagInputPro
                             setShowDropdown(true);
                         }}
                         onFocus={() => setShowDropdown(true)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                if (inputValue.trim()) {
-                                    handleAddTag(inputValue.trim());
-                                }
-                            }
-                        }}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
 
                 {/* Dropdown */}
-                {showDropdown && (inputValue || filteredTags.length > 0) && (
-                    <div className="absolute z-10 mt-1 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm max-h-60">
-                        {filteredTags.map((tag) => (
+                {showDropdown && totalOptions > 0 && (
+                    <div className="absolute z-50 mt-1 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm max-h-60">
+                        {filteredTags.map((tag, index) => (
                             <div
                                 key={tag}
-                                className="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-gray-100 text-gray-900"
+                                className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
+                                    index === highlightedIndex ? 'bg-blue-50 text-blue-900' : 'text-gray-900 hover:bg-gray-100'
+                                }`}
                                 onClick={() => handleAddTag(tag)}
+                                onMouseEnter={() => setHighlightedIndex(index)}
                             >
                                 <span className="block truncate">{tag}</span>
                             </div>
                         ))}
                         
-                        {inputValue && !filteredTags.includes(inputValue) && (
+                        {showCreateOption && (
                             <div
-                                className="relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-gray-100 text-blue-600 font-semibold"
+                                className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
+                                    highlightedIndex === filteredTags.length ? 'bg-blue-50' : 'hover:bg-gray-100'
+                                } text-blue-600 font-semibold`}
                                 onClick={() => handleAddTag(inputValue)}
+                                onMouseEnter={() => setHighlightedIndex(filteredTags.length)}
                             >
                                 Create "{inputValue}"
                             </div>
@@ -134,7 +177,7 @@ export default function BlogTagInput({ selectedTags, onChange }: BlogTagInputPro
                 )}
             </div>
             <p className="mt-1 text-xs text-gray-500">
-                Type to search or create a new tag. Press Enter to add.
+                Type to search. Use arrow keys to navigate, Enter to select.
             </p>
         </div>
     );

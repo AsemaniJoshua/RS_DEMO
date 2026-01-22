@@ -17,6 +17,7 @@ export default function BlogManagerPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
+    const [publishingId, setPublishingId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchBlogs();
@@ -41,6 +42,16 @@ export default function BlogManagerPage() {
             setLoading(false);
         }
     };
+
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setPage(1);
+            fetchBlogs();
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     const handleSearch = () => {
         setPage(1);
@@ -71,6 +82,7 @@ export default function BlogManagerPage() {
 
     const handlePublishToggle = async (blog: Blog) => {
         try {
+            setPublishingId(blog.id);
             if (blog.status === 'PUBLISHED') {
                 await blogService.unpublishBlog(blog.id);
                 toast.success("Blog unpublished!");
@@ -81,6 +93,8 @@ export default function BlogManagerPage() {
             fetchBlogs();
         } catch (error: any) {
             toast.error(error.message || "Failed to update blog status");
+        } finally {
+            setPublishingId(null);
         }
     };
 
@@ -125,7 +139,6 @@ export default function BlogManagerPage() {
                             placeholder="Search blogs..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent text-gray-900 placeholder-gray-500"
                         />
                     </div>
@@ -137,14 +150,8 @@ export default function BlogManagerPage() {
                         <option value="">All Status</option>
                         <option value="PUBLISHED">Published</option>
                         <option value="DRAFT">Draft</option>
-                        <option value="ARCHIVED">Archived</option>
                     </select>
-                    <button
-                        onClick={handleSearch}
-                        className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-                    >
-                        Search
-                    </button>
+
                 </div>
             </div>
 
@@ -153,6 +160,7 @@ export default function BlogManagerPage() {
                 <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -170,6 +178,23 @@ export default function BlogManagerPage() {
                         ) : (
                             blogs.map((blog) => (
                                 <tr key={blog.id} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4">
+                                        <div className="h-12 w-20 relative rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                                            {blog.featured_image ? (
+                                                <img 
+                                                    src={blog.featured_image} 
+                                                    alt={blog.title} 
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full flex items-center justify-center text-gray-400">
+                                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td className="px-6 py-4">
                                         <Link href={`/admin/blog/${blog.id}`} className="block group">
                                             <div className="text-sm font-medium text-gray-900 group-hover:text-[#0066ff] transition-colors">{blog.title}</div>
@@ -193,13 +218,24 @@ export default function BlogManagerPage() {
                                         <div className="flex justify-end gap-2">
                                             <button
                                                 onClick={() => handlePublishToggle(blog)}
-                                                className={`px-3 py-1 rounded-lg transition-colors ${
+                                                disabled={publishingId === blog.id}
+                                                className={`px-3 py-1 rounded-lg transition-colors flex items-center gap-2 ${
                                                     blog.status === 'PUBLISHED'
                                                         ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
                                                         : 'bg-green-100 text-green-700 hover:bg-green-200'
-                                                }`}
+                                                } ${publishingId === blog.id ? 'opacity-70 cursor-not-allowed' : ''}`}
                                             >
-                                                {blog.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
+                                                {publishingId === blog.id ? (
+                                                    <>
+                                                        <svg className="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                                        </svg>
+                                                        {blog.status === 'PUBLISHED' ? 'Unpublishing...' : 'Publishing...'}
+                                                    </>
+                                                ) : (
+                                                    blog.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'
+                                                )}
                                             </button>
                                             <Link
                                                 href={`/admin/blog/${blog.id}/edit`}
