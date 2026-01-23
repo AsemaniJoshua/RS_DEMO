@@ -104,4 +104,25 @@ export const authService = {
     isAdmin(): boolean {
         return this.hasRole('ADMIN');
     },
+
+    /**
+     * Request OTP for password reset
+     */
+    async requestOTP(email: string): Promise<ApiResponse<any>> {
+        return api.post('/auth/request-otp', { email });
+    },
+
+    /**
+     * Verify OTP
+     */
+    async verifyOTP(email: string, otp: string): Promise<ApiResponse<any>> {
+        return api.post('/auth/verify-otp', { email, otp });
+    },
+
+    /**
+     * Reset Password
+     */
+    async resetPassword(data: any): Promise<ApiResponse<any>> {
+        return api.post('/auth/reset-password', data);
+    },
 };
