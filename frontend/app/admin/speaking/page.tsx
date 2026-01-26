@@ -1,43 +1,79 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import speakingData from "@/data/admin/speaking.json";
+import { speakingService, SpeakingEvent } from "@/services/speaking-service";
 import DeleteSpeakingEventModal from "@/components/admin/DeleteSpeakingEventModal";
+import toast from "react-hot-toast";
 
 export default function SpeakingEventsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("All Categories");
     const [statusFilter, setStatusFilter] = useState("All Statuses");
-    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: number | null; title: string }>({
+    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: string | null; title: string }>({
         show: false,
         id: null,
         title: ""
     });
+    const [events, setEvents] = useState<SpeakingEvent[]>([]);
+    const [categories, setCategories] = useState<string[]>(["All Categories"]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Speaking data filtering
-    const filteredSpeaking = speakingData.engagements.filter(item => {
+    // Fetch events and categories
+    useEffect(() => {
+        fetchEventsAndCategories();
+    }, []);
+
+    const fetchEventsAndCategories = async () => {
+        try {
+            setIsLoading(true);
+            const [eventsData, categoriesData] = await Promise.all([
+                speakingService.getAllEvents(),
+                speakingService.getAllCategories()
+            ]);
+            setEvents(eventsData);
+            setCategories(["All Categories", ...categoriesData]);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to load events");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Filter events
+    const filteredSpeaking = events.filter(item => {
         const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             item.location.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesCategory = categoryFilter === "All Categories" || item.category === categoryFilter;
-        const matchesStatus = statusFilter === "All Statuses" || item.status === statusFilter;
+        const matchesStatus = statusFilter === "All Statuses" || 
+            (statusFilter === "Upcoming" && item.status === "UPCOMING") ||
+            (statusFilter === "Completed" && item.status === "COMPLETED") ||
+            (statusFilter === "Cancelled" && item.status === "CANCELLED");
         return matchesSearch && matchesCategory && matchesStatus;
     });
 
-    // Calculate stats (removed revenue since all events are free)
+    // Calculate stats
     const speakingStats = {
-        total: speakingData.engagements.length,
-        upcoming: speakingData.engagements.filter(e => e.status === "Upcoming").length,
-        completed: speakingData.engagements.filter(e => e.status === "Completed").length
+        total: events.length,
+        upcoming: events.filter(e => e.status === "UPCOMING").length,
+        completed: events.filter(e => e.status === "COMPLETED").length
     };
 
-    const handleDeleteClick = (id: number, title: string) => {
+    const handleDeleteClick = (id: string, title: string) => {
         setDeleteModal({ show: true, id, title });
     };
 
-    const handleDeleteConfirm = () => {
-        console.log(`Deleting speaking event:`, deleteModal.id);
-        setDeleteModal({ show: false, id: null, title: "" });
+    const handleDeleteConfirm = async () => {
+        if (!deleteModal.id) return;
+        
+        try {
+            await speakingService.deleteEvent(deleteModal.id);
+            toast.success("Event deleted successfully");
+            setDeleteModal({ show: false, id: null, title: "" });
+            fetchEventsAndCategories(); // Refresh list
+        } catch (error: any) {
+            toast.error(error.message || "Failed to delete event");
+        }
     };
 
     const handleDeleteCancel = () => {
@@ -121,12 +157,12 @@ export default function SpeakingEventsPage() {
                             />
                         </div>
                     </div>
-                    <select
+                    <select 
+                        className="px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
-                        className="w-full sm:w-auto px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
-                        {speakingData.categories.map((cat, idx) => (
+                        {categories.map((cat, idx) => (
                             <option key={idx} value={cat}>{cat}</option>
                         ))}
                     </select>
@@ -135,9 +171,10 @@ export default function SpeakingEventsPage() {
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="w-full sm:w-auto px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
-                        {speakingData.statuses.map((status, idx) => (
-                            <option key={idx} value={status}>{status}</option>
-                        ))}
+                        <option value="All Statuses">All Statuses</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
                     </select>
                     <Link href="/admin/speaking/new">
                         <button className="w-full sm:w-auto px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center justify-center gap-2 font-medium">
@@ -162,61 +199,80 @@ export default function SpeakingEventsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredSpeaking.map((engagement, idx) => (
-                                <tr key={engagement.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                                    <td className="px-6 py-4">
-                                        <div className="font-semibold text-gray-900">{engagement.title}</div>
-                                        <div className="text-sm text-gray-600">{engagement.venue}</div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
-                                            {engagement.category}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="text-gray-900">{new Date(engagement.date).toLocaleDateString()}</div>
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900">{engagement.location}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                            engagement.status === "Upcoming" ? "bg-green-50 text-green-700" :
-                                            engagement.status === "Completed" ? "bg-blue-50 text-blue-700" :
-                                            "bg-gray-100 text-gray-700"
-                                        }`}>
-                                            {engagement.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
-                                            <Link href={`/admin/speaking/${engagement.id}`}>
-                                                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="View event">
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                                                    </svg>
-                                                </button>
-                                            </Link>
-                                            <Link href={`/admin/speaking/${engagement.id}/edit`}>
-                                                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="Edit event">
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                    </svg>
-                                                </button>
-                                            </Link>
-                                            <button 
-                                                onClick={() => handleDeleteClick(engagement.id, engagement.title)}
-                                                className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
-                                                title="Delete event"
-                                            >
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                </svg>
-                                            </button>
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-12 text-center">
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                                            <p className="text-gray-600">Loading events...</p>
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                            ) : filteredSpeaking.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-12 text-center text-gray-600">
+                                        No events found
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredSpeaking.map((engagement, idx) => (
+                                    <tr key={engagement.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                        <td className="px-6 py-4">
+                                            <div className="font-semibold text-gray-900">{engagement.title}</div>
+                                            <div className="text-sm text-gray-600">{engagement.venue}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
+                                                {engagement.category}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-gray-900">{new Date(engagement.date).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-900">{engagement.location}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                engagement.status === "UPCOMING" ? "bg-green-50 text-green-700" :
+                                                engagement.status === "COMPLETED" ? "bg-blue-50 text-blue-700" :
+                                                "bg-gray-100 text-gray-700"
+                                            }`}>
+                                                {engagement.status === "UPCOMING" ? "Upcoming" :
+                                                 engagement.status === "COMPLETED" ? "Completed" :
+                                                 "Cancelled"}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <Link href={`/admin/speaking/${engagement.id}`}>
+                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="View event">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                                                        </svg>
+                                                    </button>
+                                                </Link>
+                                                <Link href={`/admin/speaking/${engagement.id}/edit`}>
+                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="Edit event">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </Link>
+                                                <button 
+                                                    onClick={() => handleDeleteClick(engagement.id, engagement.title)}
+                                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600" 
+                                                    title="Delete event"
+                                                >
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

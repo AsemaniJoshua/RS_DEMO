@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import speakingData from "@/data/admin/speaking.json";
+import { speakingService, SpeakingEvent } from "@/services/speaking-service";
 import DeleteSpeakingEventModal from "@/components/admin/DeleteSpeakingEventModal";
 
 export default function ViewSpeakingEventPage() {
@@ -14,33 +14,30 @@ export default function ViewSpeakingEventPage() {
 
     const [isLoading, setIsLoading] = useState(true);
     const [deleteModal, setDeleteModal] = useState(false);
-    const [event, setEvent] = useState<any>(null);
+    const [event, setEvent] = useState<SpeakingEvent | null>(null);
 
     // Load event data
     useEffect(() => {
-        const foundEvent = speakingData.engagements.find(e => e.id === parseInt(eventId));
-        
-        if (foundEvent) {
-            setEvent(foundEvent);
-            setIsLoading(false);
-        } else {
-            toast.error("Event not found");
-            router.push("/admin/speaking");
-        }
+        const fetchEvent = async () => {
+            try {
+                const data = await speakingService.getEventById(eventId);
+                setEvent(data);
+                setIsLoading(false);
+            } catch (error: any) {
+                toast.error(error.message || "Failed to load event");
+                router.push("/admin/speaking");
+            }
+        };
+        fetchEvent();
     }, [eventId, router]);
 
     const handleDelete = async () => {
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            console.log("Deleting event:", eventId);
-            
+            await speakingService.deleteEvent(eventId);
             toast.success("Event deleted successfully!");
             router.push("/admin/speaking");
-        } catch (error) {
-            console.error("Error deleting event:", error);
-            toast.error("Failed to delete event. Please try again.");
+        } catch (error: any) {
+            toast.error(error.message || "Failed to delete event");
         }
     };
 
@@ -102,11 +99,13 @@ export default function ViewSpeakingEventPage() {
 
                 {/* Status Badge */}
                 <span className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${
-                    event.status === "Upcoming" ? "bg-green-50 text-green-700" :
-                    event.status === "Completed" ? "bg-blue-50 text-blue-700" :
+                    event.status === "UPCOMING" ? "bg-green-50 text-green-700" :
+                    event.status === "COMPLETED" ? "bg-blue-50 text-blue-700" :
                     "bg-gray-100 text-gray-700"
                 }`}>
-                    {event.status}
+                    {event.status === "UPCOMING" ? "Upcoming" :
+                     event.status === "COMPLETED" ? "Completed" :
+                     "Cancelled"}
                 </span>
             </div>
 
@@ -140,13 +139,14 @@ export default function ViewSpeakingEventPage() {
                         </div>
                     </div>
 
-                    {/* Description Section (when available) */}
+                    {/* Description Section */}
                     <div className="bg-white rounded-xl border border-gray-100 p-6 md:p-8">
                         <h2 className="text-lg font-bold text-gray-900 mb-4">About This Event</h2>
-                        <p className="text-gray-600">
-                            Event description and details would appear here. This includes information about topics to be covered, 
-                            live stream links, and any other relevant details for patients.
-                        </p>
+                        {event.description ? (
+                            <p className="text-gray-600 whitespace-pre-wrap">{event.description}</p>
+                        ) : (
+                            <p className="text-gray-400 italic">No description provided for this event.</p>
+                        )}
                     </div>
                 </div>
 

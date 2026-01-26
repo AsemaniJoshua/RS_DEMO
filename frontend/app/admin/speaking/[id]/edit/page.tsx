@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import speakingData from "@/data/admin/speaking.json";
+import { speakingService, SpeakingEvent } from "@/services/speaking-service";
 import DeleteSpeakingEventModal from "@/components/admin/DeleteSpeakingEventModal";
 
 export default function EditSpeakingEventPage() {
@@ -15,6 +15,7 @@ export default function EditSpeakingEventPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [deleteModal, setDeleteModal] = useState(false);
+    const [categories, setCategories] = useState<string[]>([]);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -23,28 +24,35 @@ export default function EditSpeakingEventPage() {
         date: "",
         location: "",
         description: "",
-        status: "Upcoming" as "Upcoming" | "Completed" | "Cancelled"
+        status: "UPCOMING" as "UPCOMING" | "COMPLETED" | "CANCELLED"
     });
 
-    // Load event data
+    // Load event data and categories
     useEffect(() => {
-        const event = speakingData.engagements.find(e => e.id === parseInt(eventId));
-        
-        if (event) {
-            setFormData({
-                title: event.title,
-                venue: event.venue,
-                category: event.category,
-                date: event.date.split('T')[0], // Convert to YYYY-MM-DD format
-                location: event.location,
-                description: "", // Not in data, would come from API
-                status: event.status as any
-            });
-            setIsLoading(false);
-        } else {
-            toast.error("Event not found");
-            router.push("/admin/speaking");
-        }
+        const fetchData = async () => {
+            try {
+                const [event, cats] = await Promise.all([
+                    speakingService.getEventById(eventId),
+                    speakingService.getAllCategories()
+                ]);
+                
+                setFormData({
+                    title: event.title,
+                    venue: event.venue,
+                    category: event.category,
+                    date: event.date.split('T')[0], // Convert to YYYY-MM-DD format
+                    location: event.location,
+                    description: event.description || "",
+                    status: event.status
+                });
+                setCategories(cats);
+                setIsLoading(false);
+            } catch (error: any) {
+                toast.error(error.message || "Failed to load event");
+                router.push("/admin/speaking");
+            }
+        };
+        fetchData();
     }, [eventId, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -52,7 +60,7 @@ export default function EditSpeakingEventPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         // Validation
@@ -76,17 +84,11 @@ export default function EditSpeakingEventPage() {
         setIsSubmitting(true);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // In a real app, you would PUT to your API here
-            console.log("Updating event:", eventId, formData);
-            
+            await speakingService.updateEvent(eventId, formData);
             toast.success("Speaking event updated successfully!");
             router.push("/admin/speaking");
-        } catch (error) {
-            console.error("Error updating event:", error);
-            toast.error("Failed to update event. Please try again.");
+        } catch (error: any) {
+            toast.error(error.message || "Failed to update event");
         } finally {
             setIsSubmitting(false);
         }
@@ -94,16 +96,11 @@ export default function EditSpeakingEventPage() {
 
     const handleDelete = async () => {
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            console.log("Deleting event:", eventId);
-            
+            await speakingService.deleteEvent(eventId);
             toast.success("Event deleted successfully!");
             router.push("/admin/speaking");
-        } catch (error) {
-            console.error("Error deleting event:", error);
-            toast.error("Failed to delete event. Please try again.");
+        } catch (error: any) {
+            toast.error(error.message || "Failed to delete event");
         }
     };
 
@@ -188,7 +185,7 @@ export default function EditSpeakingEventPage() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             >
-                                {speakingData.categories.filter(cat => cat !== "All Categories").map((cat, idx) => (
+                                {categories.map((cat, idx) => (
                                     <option key={idx} value={cat}>{cat}</option>
                                 ))}
                             </select>
@@ -205,9 +202,9 @@ export default function EditSpeakingEventPage() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             >
-                                <option value="Upcoming">Upcoming</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
+                                <option value="UPCOMING">Upcoming</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="CANCELLED">Cancelled</option>
                             </select>
                         </div>
                     </div>

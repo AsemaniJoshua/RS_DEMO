@@ -1,31 +1,48 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import speakingData from "@/data/admin/speaking.json";
+import { speakingService } from "@/services/speaking-service";
 
 export default function NewSpeakingEventPage() {
     const router = useRouter();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const [formData, setFormData] = useState({
         title: "",
         venue: "",
-        category: speakingData.categories[1], // Default to first non-"All" category
+        category: "", // Default to empty, will be set by useEffect
         date: "",
         location: "",
         description: "",
-        status: "Upcoming" as "Upcoming" | "Completed" | "Cancelled"
+        status: "UPCOMING" as "UPCOMING" | "COMPLETED" | "CANCELLED"
     });
+    const [categories, setCategories] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Fetch categories on component mount
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const cats = await speakingService.getAllCategories();
+                setCategories(cats);
+                if (cats.length > 0) {
+                    // Set the first category as default if available
+                    setFormData(prev => ({ ...prev, category: cats[0] }));
+                }
+            } catch (error: any) {
+                toast.error(error.message || "Failed to load categories");
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         // Validation
@@ -37,6 +54,10 @@ export default function NewSpeakingEventPage() {
             toast.error("Venue is required");
             return;
         }
+        if (!formData.category.trim()) {
+            toast.error("Category is required");
+            return;
+        }
         if (!formData.date) {
             toast.error("Event date is required");
             return;
@@ -46,22 +67,16 @@ export default function NewSpeakingEventPage() {
             return;
         }
 
-        setIsSubmitting(true);
+        setIsLoading(true);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // In a real app, you would POST to your API here
-            console.log("Creating event:", formData);
-            
+            await speakingService.createEvent(formData);
             toast.success("Speaking event created successfully!");
             router.push("/admin/speaking");
-        } catch (error) {
-            console.error("Error creating event:", error);
-            toast.error("Failed to create event. Please try again.");
+        } catch (error: any) {
+            toast.error(error.message || "Failed to create event");
         } finally {
-            setIsSubmitting(false);
+            setIsLoading(false);
         }
     };
 
@@ -135,7 +150,7 @@ export default function NewSpeakingEventPage() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             >
-                                {speakingData.categories.filter(cat => cat !== "All Categories").map((cat, idx) => (
+                                {categories.map((cat, idx) => (
                                     <option key={idx} value={cat}>{cat}</option>
                                 ))}
                             </select>
@@ -152,9 +167,9 @@ export default function NewSpeakingEventPage() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             >
-                                <option value="Upcoming">Upcoming</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
+                                <option value="UPCOMING">Upcoming</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="CANCELLED">Cancelled</option>
                             </select>
                         </div>
                     </div>
@@ -214,10 +229,10 @@ export default function NewSpeakingEventPage() {
                 <div className="flex items-center gap-4 mt-6">
                     <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isLoading}
                         className="px-8 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isSubmitting ? "Creating..." : "Create Event"}
+                        {isLoading ? "Creating..." : "Create Event"}
                     </button>
                     <Link
                         href="/admin/speaking"
