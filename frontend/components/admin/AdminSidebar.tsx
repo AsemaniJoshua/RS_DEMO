@@ -62,7 +62,7 @@ const menuItems = [
         href: "/admin/blog"
     },
     {
-        label: "Speaking & Consulting",
+        label: "Speaking Events",
         icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z" stroke="currentColor" strokeWidth="2"/>

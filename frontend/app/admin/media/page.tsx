@@ -120,6 +120,31 @@ export default function MediaLibraryPage() {
         return new Date(dateString).toLocaleDateString();
     };
 
+    const handleDownload = async (url: string, filename: string) => {
+        try {
+            // Fetch the file as a blob
+            const response = await fetch(url);
+            const blob = await response.blob();
+            
+            // Create a temporary URL for the blob
+            const blobUrl = window.URL.createObjectURL(blob);
+            
+            // Create a temporary anchor element and trigger download
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            
+            // Cleanup
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error('Download error:', error);
+            toast.error('Failed to download file');
+        }
+    };
+
     return (
         <div className="p-4 md:p-8">
             {/* Header */}
@@ -139,7 +164,7 @@ export default function MediaLibraryPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
                 <div className="bg-white rounded-xl p-6 border border-gray-100">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-600">Total Files</span>
@@ -175,6 +200,18 @@ export default function MediaLibraryPage() {
                         </div>
                     </div>
                     <div className="text-2xl font-bold text-gray-900">{stats.videos}</div>
+                </div>
+                <div className="bg-white rounded-xl p-6 border border-gray-100">
+                    <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-gray-600">Documents</span>
+                        <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-orange-500">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">{stats.documents}</div>
                 </div>
             </div>
 
@@ -274,31 +311,80 @@ export default function MediaLibraryPage() {
                         {media.map((file) => (
                             <div 
                                 key={file.id} 
-                                className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
-                                onClick={() => setSelectedFile(file.id)}
+                                className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all group"
                             >
-                                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
-                                    {getFileIcon(file.file_type)}
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {/* File Preview */}
+                                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
+                                    {file.file_type === 'IMAGE' ? (
+                                        <img 
+                                            src={file.url} 
+                                            alt={file.original_name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : file.file_type === 'VIDEO' ? (
+                                        <video 
+                                            src={file.url} 
+                                            className="w-full h-full object-cover"
+                                            controls={false}
+                                        />
+                                    ) : (
+                                        getFileIcon(file.file_type)
+                                    )}
+                                    
+                                    {/* Hover Actions */}
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                        <a 
+                                            href={file.url} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-100"
+                                            title="View"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                        </a>
                                         <button 
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                handleDeleteClick(file.id, file.name);
+                                                handleDownload(file.url, file.original_name);
+                                            }}
+                                            className="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-100"
+                                            title="Download"
+                                        >
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                        </button>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteClick(file.id, file.original_name);
                                             }}
                                             className="p-2 bg-white rounded-lg shadow-sm hover:bg-red-50"
+                                            title="Delete"
                                         >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-red-600">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-red-600">
                                                 <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2"/>
                                             </svg>
                                         </button>
                                     </div>
                                 </div>
+                                
+                                {/* File Info */}
                                 <div className="p-4">
-                                    <div className="font-semibold text-gray-900 text-sm mb-1 truncate">{file.name}</div>
+                                    <div className="font-semibold text-gray-900 text-sm mb-1 truncate" title={file.original_name}>
+                                        {file.original_name}
+                                    </div>
                                     <div className="flex items-center justify-between text-xs text-gray-500">
                                         <span>{formatFileSize(file.size)}</span>
                                         <span>{formatDate(file.created_at)}</span>
                                     </div>
+                                    {file.dimensions && (
+                                        <div className="text-xs text-gray-400 mt-1">{file.dimensions}</div>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -308,6 +394,7 @@ export default function MediaLibraryPage() {
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b border-gray-100">
                                 <tr>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Preview</th>
                                     <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Name</th>
                                     <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Type</th>
                                     <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Size</th>
@@ -319,10 +406,30 @@ export default function MediaLibraryPage() {
                                 {media.map((file) => (
                                     <tr key={file.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                {getFileIcon(file.file_type)}
-                                                <span className="font-medium text-gray-900">{file.name}</span>
+                                            <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                                {file.file_type === 'IMAGE' ? (
+                                                    <img 
+                                                        src={file.url} 
+                                                        alt={file.original_name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : file.file_type === 'VIDEO' ? (
+                                                    <video 
+                                                        src={file.url} 
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    getFileIcon(file.file_type)
+                                                )}
                                             </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="font-medium text-gray-900 max-w-xs truncate" title={file.original_name}>
+                                                {file.original_name}
+                                            </div>
+                                            {file.dimensions && (
+                                                <div className="text-xs text-gray-400">{file.dimensions}</div>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="text-sm text-gray-600 capitalize">{file.file_type.toLowerCase()}</span>
@@ -339,15 +446,25 @@ export default function MediaLibraryPage() {
                                                     href={file.url} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer"
+                                                    className="p-2 hover:bg-blue-50 rounded-lg transition-colors" 
+                                                    title="View"
+                                                >
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-blue-600">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/>
+                                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                                                    </svg>
+                                                </a>
+                                                <button 
+                                                    onClick={() => handleDownload(file.url, file.original_name)}
                                                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors" 
                                                     title="Download"
                                                 >
                                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-600">
                                                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2"/>
                                                     </svg>
-                                                </a>
+                                                </button>
                                                 <button 
-                                                    onClick={() => handleDeleteClick(file.id, file.name)}
+                                                    onClick={() => handleDeleteClick(file.id, file.original_name)}
                                                     className="p-2 hover:bg-red-50 rounded-lg transition-colors" 
                                                     title="Delete"
                                                 >
