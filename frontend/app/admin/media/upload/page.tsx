@@ -8,6 +8,32 @@ export default function UploadMediaPage() {
     const router = useRouter();
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
     const [isDragging, setIsDragging] = useState(false);
+    const [error, setError] = useState("");
+
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
+
+    const validateAndAddFiles = (files: File[]) => {
+        const validFiles: File[] = [];
+        const invalidFiles: string[] = [];
+
+        files.forEach(file => {
+            if (file.size > MAX_FILE_SIZE) {
+                invalidFiles.push(`${file.name} (${formatFileSize(file.size)})`);
+            } else {
+                validFiles.push(file);
+            }
+        });
+
+        if (invalidFiles.length > 0) {
+            setError(`The following files exceed the 50MB limit and were not added: ${invalidFiles.join(", ")}`);
+        } else {
+            setError("");
+        }
+
+        if (validFiles.length > 0) {
+            setUploadedFiles([...uploadedFiles, ...validFiles]);
+        }
+    };
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
@@ -22,13 +48,13 @@ export default function UploadMediaPage() {
         e.preventDefault();
         setIsDragging(false);
         const files = Array.from(e.dataTransfer.files);
-        setUploadedFiles([...uploadedFiles, ...files]);
+        validateAndAddFiles(files);
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const files = Array.from(e.target.files);
-            setUploadedFiles([...uploadedFiles, ...files]);
+            validateAndAddFiles(files);
         }
     };
 
@@ -63,6 +89,29 @@ export default function UploadMediaPage() {
                     </button>
                 </Link>
             </div>
+
+            {/* Error Message */}
+            {error && (
+                <div className="max-w-4xl mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                    <div className="flex items-start gap-3">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-red-500 flex-shrink-0 mt-0.5">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                            <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                        <div className="flex-1">
+                            <p className="text-sm text-red-800">{error}</p>
+                        </div>
+                        <button 
+                            onClick={() => setError("")}
+                            className="text-red-500 hover:text-red-700"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div className="max-w-4xl">
                 {/* Upload Area */}
@@ -100,6 +149,8 @@ export default function UploadMediaPage() {
                         </label>
                         <p className="text-sm text-gray-500 mt-4">
                             Supported formats: Images (JPG, PNG, GIF), Videos (MP4, MOV), Documents (PDF, DOC)
+                            <br />
+                            <span className="font-medium">Maximum file size: 50MB</span>
                         </p>
                     </div>
                 </div>
@@ -138,36 +189,6 @@ export default function UploadMediaPage() {
                         </div>
                     </div>
                 )}
-
-                {/* Upload Settings */}
-                <div className="bg-white rounded-xl p-6 border border-gray-100 mb-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Upload Settings</h3>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Folder
-                            </label>
-                            <select className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900">
-                                <option>Root Directory</option>
-                                <option>Course Materials</option>
-                                <option>Blog Images</option>
-                                <option>eBook Covers</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" id="optimize" className="w-4 h-4 text-[#00d4aa]" defaultChecked />
-                            <label htmlFor="optimize" className="text-sm text-gray-700">
-                                Automatically optimize images for web
-                            </label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" id="backup" className="w-4 h-4 text-[#00d4aa]" />
-                            <label htmlFor="backup" className="text-sm text-gray-700">
-                                Create backup of original files
-                            </label>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-3">
