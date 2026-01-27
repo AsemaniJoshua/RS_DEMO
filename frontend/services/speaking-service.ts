@@ -31,9 +31,16 @@ export interface SpeakingEventFilters {
   search?: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 class SpeakingService {
   private getAuthHeader() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token');
     return {
       headers: {
         Authorization: `Bearer ${token}`
@@ -122,7 +129,7 @@ class SpeakingService {
   }
 
   // Get all categories
-  async getAllCategories(): Promise<string[]> {
+  async getAllCategories(): Promise<Category[]> {
     try {
       const response = await axios.get(
         `${API_BASE_URL}/admin/speaking/categories`,

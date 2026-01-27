@@ -5,13 +5,15 @@ interface DeleteSpeakingEventModalProps {
     onCancel: () => void;
     onConfirm: () => void;
     eventTitle: string;
+    isDeleting?: boolean;
 }
 
 export default function DeleteSpeakingEventModal({
     isOpen,
     onCancel,
     onConfirm,
-    eventTitle
+    eventTitle,
+    isDeleting = false
 }: DeleteSpeakingEventModalProps) {
     if (!isOpen) return null;
 
@@ -20,7 +22,7 @@ export default function DeleteSpeakingEventModal({
             {/* Backdrop */}
             <div 
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-                onClick={onCancel}
+                onClick={isDeleting ? undefined : onCancel}
             />
 
             {/* Modal */}
@@ -44,15 +46,24 @@ export default function DeleteSpeakingEventModal({
                 <div className="flex gap-3">
                     <button
                         onClick={onCancel}
-                        className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                        disabled={isDeleting}
+                        className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={onConfirm}
-                        className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                        disabled={isDeleting}
+                        className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        Delete Event
+                        {isDeleting ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                Deleting...
+                            </>
+                        ) : (
+                            "Delete Event"
+                        )}
                     </button>
                 </div>
             </div>

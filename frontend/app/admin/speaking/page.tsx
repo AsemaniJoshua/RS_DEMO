@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { speakingService, SpeakingEvent } from "@/services/speaking-service";
+import { speakingService, SpeakingEvent, Category } from "@/services/speaking-service";
 import DeleteSpeakingEventModal from "@/components/admin/DeleteSpeakingEventModal";
+import CategoryManagementModal from "@/components/admin/CategoryManagementModal";
 import toast from "react-hot-toast";
 
 export default function SpeakingEventsPage() {
@@ -15,8 +16,9 @@ export default function SpeakingEventsPage() {
         id: null,
         title: ""
     });
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [events, setEvents] = useState<SpeakingEvent[]>([]);
-    const [categories, setCategories] = useState<string[]>(["All Categories"]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Fetch events and categories
@@ -32,7 +34,7 @@ export default function SpeakingEventsPage() {
                 speakingService.getAllCategories()
             ]);
             setEvents(eventsData);
-            setCategories(["All Categories", ...categoriesData]);
+            setCategories(categoriesData);
         } catch (error: any) {
             toast.error(error.message || "Failed to load events");
         } finally {
@@ -59,6 +61,8 @@ export default function SpeakingEventsPage() {
         completed: events.filter(e => e.status === "COMPLETED").length
     };
 
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const handleDeleteClick = (id: string, title: string) => {
         setDeleteModal({ show: true, id, title });
     };
@@ -66,6 +70,7 @@ export default function SpeakingEventsPage() {
     const handleDeleteConfirm = async () => {
         if (!deleteModal.id) return;
         
+        setIsDeleting(true);
         try {
             await speakingService.deleteEvent(deleteModal.id);
             toast.success("Event deleted successfully");
@@ -73,11 +78,15 @@ export default function SpeakingEventsPage() {
             fetchEventsAndCategories(); // Refresh list
         } catch (error: any) {
             toast.error(error.message || "Failed to delete event");
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     const handleDeleteCancel = () => {
-        setDeleteModal({ show: false, id: null, title: "" });
+        if (!isDeleting) {
+            setDeleteModal({ show: false, id: null, title: "" });
+        }
     };
 
     return (
@@ -157,15 +166,27 @@ export default function SpeakingEventsPage() {
                             />
                         </div>
                     </div>
-                    <select 
-                        className="px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
-                        value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
-                    >
-                        {categories.map((cat, idx) => (
-                            <option key={idx} value={cat}>{cat}</option>
-                        ))}
-                    </select>
+                    <div className="flex gap-2">
+                        <select 
+                            className="px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                        >
+                            <option value="All Categories">All Categories</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.name}>{cat.name}</option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={() => setShowCategoryModal(true)}
+                            className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                            title="Manage categories"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
@@ -279,7 +300,7 @@ export default function SpeakingEventsPage() {
             </div>
 
             {/* Empty State */}
-            {filteredSpeaking.length === 0 && (
+            {!isLoading && filteredSpeaking.length === 0 && (
                 <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-gray-400">
@@ -303,6 +324,15 @@ export default function SpeakingEventsPage() {
                 onCancel={handleDeleteCancel}
                 onConfirm={handleDeleteConfirm}
                 eventTitle={deleteModal.title}
+                isDeleting={isDeleting}
+            />
+
+            {/* Category Management Modal */}
+            <CategoryManagementModal
+                isOpen={showCategoryModal}
+                onClose={() => setShowCategoryModal(false)}
+                categories={categories}
+                onCategoryChange={fetchEventsAndCategories}
             />
         </div>
     );

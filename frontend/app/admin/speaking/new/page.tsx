@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { speakingService } from "@/services/speaking-service";
+import { speakingService, Category } from "@/services/speaking-service";
 
 export default function NewSpeakingEventPage() {
     const router = useRouter();
@@ -17,7 +17,7 @@ export default function NewSpeakingEventPage() {
         description: "",
         status: "UPCOMING" as "UPCOMING" | "COMPLETED" | "CANCELLED"
     });
-    const [categories, setCategories] = useState<string[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     // Fetch categories on component mount
@@ -27,8 +27,8 @@ export default function NewSpeakingEventPage() {
                 const cats = await speakingService.getAllCategories();
                 setCategories(cats);
                 if (cats.length > 0) {
-                    // Set the first category as default if available
-                    setFormData(prev => ({ ...prev, category: cats[0] }));
+                    // Set the first category name as default if available
+                    setFormData(prev => ({ ...prev, category: cats[0].name }));
                 }
             } catch (error: any) {
                 toast.error(error.message || "Failed to load categories");
@@ -60,6 +60,15 @@ export default function NewSpeakingEventPage() {
         }
         if (!formData.date) {
             toast.error("Event date is required");
+            return;
+        }
+
+        const selectedDate = new Date(formData.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day for fair comparison
+
+        if (selectedDate <= today) {
+            toast.error("Event date must be in the future");
             return;
         }
         if (!formData.location.trim()) {
@@ -131,7 +140,7 @@ export default function NewSpeakingEventPage() {
                             name="venue"
                             value={formData.venue}
                             onChange={handleChange}
-                            placeholder="e.g., Convention Center Hall A"
+                            placeholder="Specific Building/Room (e.g., Convention Center, Room 204)"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             required
                         />
@@ -150,8 +159,8 @@ export default function NewSpeakingEventPage() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             >
-                                {categories.map((cat, idx) => (
-                                    <option key={idx} value={cat}>{cat}</option>
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.name}>{cat.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -201,7 +210,7 @@ export default function NewSpeakingEventPage() {
                             name="location"
                             value={formData.location}
                             onChange={handleChange}
-                            placeholder="e.g., New York, NY"
+                            placeholder="City, State (e.g., Austin, TX)"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             required
                         />

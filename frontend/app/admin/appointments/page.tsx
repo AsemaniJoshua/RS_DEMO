@@ -1,24 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import appointmentsData from "@/data/admin/appointments.json";
+import { appointmentService, Appointment, AppointmentType } from "@/services/appointment-service";
 import DeleteCourseModal from "@/components/admin/DeleteCourseModal";
+import AppointmentTypeModal from "@/components/admin/AppointmentTypeModal";
+import toast from "react-hot-toast";
 
 export default function AppointmentsPage() {
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [types, setTypes] = useState<AppointmentType[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [typeFilter, setTypeFilter] = useState("All Types");
     const [statusFilter, setStatusFilter] = useState("All Statuses");
-    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: number | null; name: string }>({
+    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: string | null; name: string }>({
         show: false,
         id: null,
         name: ""
     });
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [typeModal, setTypeModal] = useState(false);
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        setIsLoading(true);
+        try {
+            const [appointmentsData, typesData] = await Promise.all([
+                appointmentService.getAllAppointments(),
+                appointmentService.getAllTypes()
+            ]);
+            setAppointments(appointmentsData);
+            setTypes(typesData);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to load data");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Filter appointments
-    const filteredAppointments = appointmentsData.appointments.filter(appointment => {
+    const filteredAppointments = appointments.filter(appointment => {
         const matchesSearch = appointment.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            appointment.patientEmail.toLowerCase().includes(searchQuery.toLowerCase());
+                            appointment.patientEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            appointment.reason.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesType = typeFilter === "All Types" || appointment.type === typeFilter;
         const matchesStatus = statusFilter === "All Statuses" || appointment.status === statusFilter;
         return matchesSearch && matchesType && matchesStatus;
@@ -26,41 +54,63 @@ export default function AppointmentsPage() {
 
     // Calculate stats
     const stats = {
-        total: appointmentsData.appointments.length,
-        scheduled: appointmentsData.appointments.filter(a => a.status === "Scheduled").length,
-        confirmed: appointmentsData.appointments.filter(a => a.status === "Confirmed").length,
-        completed: appointmentsData.appointments.filter(a => a.status === "Completed").length
+        total: appointments.length,
+        scheduled: appointments.filter(a => a.status === "SCHEDULED").length,
+        confirmed: appointments.filter(a => a.status === "CONFIRMED").length,
+        completed: appointments.filter(a => a.status === "COMPLETED").length
     };
 
-    const handleDeleteClick = (id: number, name: string) => {
+    const handleDeleteClick = (id: string, name: string) => {
         setDeleteModal({ show: true, id, name });
     };
 
-    const handleDeleteConfirm = () => {
-        console.log("Deleting appointment:", deleteModal.id);
-        setDeleteModal({ show: false, id: null, name: "" });
+    const handleDeleteConfirm = async () => {
+        if (!deleteModal.id) return;
+        
+        setIsDeleting(true);
+        try {
+            await appointmentService.deleteAppointment(deleteModal.id);
+            toast.success("Appointment deleted successfully");
+            setDeleteModal({ show: false, id: null, name: "" });
+            fetchData();
+        } catch (error: any) {
+            toast.error(error.message || "Failed to delete appointment");
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const handleDeleteCancel = () => {
-        setDeleteModal({ show: false, id: null, name: "" });
+        if (!isDeleting) {
+            setDeleteModal({ show: false, id: null, name: "" });
+        }
     };
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case "Scheduled":
+            case "SCHEDULED":
                 return "bg-blue-50 text-blue-700";
-            case "Confirmed":
+            case "CONFIRMED":
                 return "bg-green-50 text-green-700";
-            case "Completed":
+            case "COMPLETED":
                 return "bg-purple-50 text-purple-700";
-            case "Cancelled":
+            case "CANCELLED":
                 return "bg-red-50 text-red-700";
-            case "No Show":
-                return "bg-gray-100 text-gray-700";
             default:
                 return "bg-gray-100 text-gray-700";
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="p-4 md:p-8 flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin mx-auto mb-4"/>
+                    <p className="text-gray-600">Loading appointments...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 md:p-8">
@@ -150,101 +200,131 @@ export default function AppointmentsPage() {
                             </svg>
                             <input
                                 type="text"
-                                placeholder="Search by patient name or email..."
+                                placeholder="Search by patient name, email, or reason..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             />
                         </div>
                     </div>
-                    <select
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
-                        className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
-                    >
-                        {appointmentsData.types.map((type, idx) => (
-                            <option key={idx} value={type}>{type}</option>
-                        ))}
-                    </select>
+                    <div className="flex gap-2 items-center">
+                        <select
+                            value={typeFilter}
+                            onChange={(e) => setTypeFilter(e.target.value)}
+                            className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        >
+                            <option value="All Types">All Types</option>
+                            {types.map((type) => (
+                                <option key={type.id} value={type.name}>{type.name}</option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={() => setTypeModal(true)}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700"
+                            title="Manage Types"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
-                        {appointmentsData.statuses.map((status, idx) => (
-                            <option key={idx} value={status}>{status}</option>
-                        ))}
+                        <option value="All Statuses">All Statuses</option>
+                        <option value="SCHEDULED">Scheduled</option>
+                        <option value="CONFIRMED">Confirmed</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
                     </select>
                 </div>
             </div>
 
             {/* Appointments Table */}
-            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[768px]">
-                        <thead>
-                            <tr className="bg-gray-50 border-b border-gray-100">
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Patient</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Date & Time</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Duration</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contact</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredAppointments.map((appointment, idx) => (
-                                <tr key={appointment.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                                    <td className="px-6 py-4">
-                                        <div className="font-semibold text-gray-900">{appointment.patientName}</div>
-                                        <div className="text-sm text-gray-600">{appointment.reason}</div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
-                                            {appointment.type}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="text-gray-900">{new Date(appointment.date).toLocaleDateString()}</div>
-                                        <div className="text-sm text-gray-600">{appointment.time}</div>
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900">{appointment.duration}</td>
-                                    <td className="px-6 py-4">
-                                        <div className="text-sm text-gray-900">{appointment.patientPhone}</div>
-                                        <div className="text-sm text-gray-600">{appointment.patientEmail}</div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
-                                            {appointment.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
-                                            <Link href={`/admin/appointments/${appointment.id}/edit`}>
-                                                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700">
+            {!isLoading && filteredAppointments.length === 0 && (
+                <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No appointments found</h3>
+                    <p className="text-gray-600 mb-4">Try adjusting your search or filters</p>
+                </div>
+            )}
+
+            {filteredAppointments.length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[768px]">
+                            <thead>
+                                <tr className="bg-gray-50 border-b border-gray-100">
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Patient</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Date & Time</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Duration</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contact</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredAppointments.map((appointment, idx) => (
+                                    <tr key={appointment.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                        <td className="px-6 py-4">
+                                            <div className="font-semibold text-gray-900">{appointment.patientName}</div>
+                                            <div className="text-sm text-gray-600">{appointment.reason}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
+                                                {appointment.type}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-gray-900">{new Date(appointment.date).toLocaleDateString()}</div>
+                                            <div className="text-sm text-gray-600">{appointment.time}</div>
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-900">{appointment.duration}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-sm text-gray-900">{appointment.patientPhone}</div>
+                                            <div className="text-sm text-gray-600">{appointment.patientEmail}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
+                                                {appointment.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <Link href={`/admin/appointments/${appointment.id}/edit`}>
+                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </Link>
+                                                <button 
+                                                    onClick={() => handleDeleteClick(appointment.id, appointment.patientName)}
+                                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                                                >
                                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                                     </svg>
                                                 </button>
-                                            </Link>
-                                            <button 
-                                                onClick={() => handleDeleteClick(appointment.id, appointment.patientName)}
-                                                className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
-                                            >
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Delete Modal */}
             <DeleteCourseModal
@@ -252,6 +332,14 @@ export default function AppointmentsPage() {
                 onCancel={handleDeleteCancel}
                 onConfirm={handleDeleteConfirm}
                 courseName={deleteModal.name}
+                isDeleting={isDeleting}
+            />
+
+            {/* Type Management Modal */}
+            <AppointmentTypeModal
+                isOpen={typeModal}
+                onClose={() => setTypeModal(false)}
+                onUpdate={fetchData}
             />
         </div>
     );

@@ -54,7 +54,8 @@ export async function apiFetch<T>(
         (headers as Record<string, string>)['Content-Type'] = 'application/json';
     }
 
-    if (token) {
+    // Only add Authorization header if token is valid
+    if (token && token !== 'undefined' && token !== 'null' && token.trim() !== '') {
         (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { speakingService, SpeakingEvent } from "@/services/speaking-service";
+import { speakingService, SpeakingEvent, Category } from "@/services/speaking-service";
 import DeleteSpeakingEventModal from "@/components/admin/DeleteSpeakingEventModal";
 
 export default function EditSpeakingEventPage() {
@@ -15,7 +15,7 @@ export default function EditSpeakingEventPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [deleteModal, setDeleteModal] = useState(false);
-    const [categories, setCategories] = useState<string[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -76,6 +76,15 @@ export default function EditSpeakingEventPage() {
             toast.error("Event date is required");
             return;
         }
+
+        const selectedDate = new Date(formData.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate <= today) {
+            toast.error("Event date must be in the future");
+            return;
+        }
         if (!formData.location.trim()) {
             toast.error("Location is required");
             return;
@@ -94,13 +103,17 @@ export default function EditSpeakingEventPage() {
         }
     };
 
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const handleDelete = async () => {
+        setIsDeleting(true);
         try {
             await speakingService.deleteEvent(eventId);
             toast.success("Event deleted successfully!");
             router.push("/admin/speaking");
         } catch (error: any) {
             toast.error(error.message || "Failed to delete event");
+            setIsDeleting(false); // Only set to false on error, as success redirects
         }
     };
 
@@ -166,7 +179,7 @@ export default function EditSpeakingEventPage() {
                             name="venue"
                             value={formData.venue}
                             onChange={handleChange}
-                            placeholder="e.g., Convention Center Hall A"
+                            placeholder="Specific Building/Room (e.g., Convention Center, Room 204)"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             required
                         />
@@ -185,8 +198,9 @@ export default function EditSpeakingEventPage() {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             >
-                                {categories.map((cat, idx) => (
-                                    <option key={idx} value={cat}>{cat}</option>
+
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.name}>{cat.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -236,7 +250,7 @@ export default function EditSpeakingEventPage() {
                             name="location"
                             value={formData.location}
                             onChange={handleChange}
-                            placeholder="e.g., New York, NY"
+                            placeholder="City, State (e.g., Austin, TX)"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             required
                         />
@@ -291,9 +305,10 @@ export default function EditSpeakingEventPage() {
             {/* Delete Modal */}
             <DeleteSpeakingEventModal
                 isOpen={deleteModal}
-                onCancel={() => setDeleteModal(false)}
+                onCancel={() => !isDeleting && setDeleteModal(false)}
                 onConfirm={handleDelete}
                 eventTitle={formData.title}
+                isDeleting={isDeleting}
             />
         </div>
     );
