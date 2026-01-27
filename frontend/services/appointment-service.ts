@@ -9,7 +9,7 @@ export interface Appointment {
   patientPhone: string;
   type: AppointmentType; // Full type object from relation
   typeId: string;
-  status: 'SCHEDULED' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  status: 'SCHEDULED' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
   date: string;
   time: string;
   duration: string;
@@ -24,7 +24,7 @@ export interface CreateAppointmentData {
   patientEmail: string;
   patientPhone: string;
   typeId: string; // Send typeId instead of type name
-  status?: 'SCHEDULED' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  status?: string; // Status can be any valid appointment status
   date: string;
   time: string;
   duration: string;
@@ -176,6 +176,13 @@ class AppointmentService {
       throw new Error(error.response?.data?.message || 'Failed to delete appointment type');
     }
   }
+
+  // Convenience aliases for shorter method names
+  getTypes = this.getAllTypes.bind(this);
+  getById = this.getAppointmentById.bind(this);
+  create = this.createAppointment.bind(this);
+  update = this.updateAppointment.bind(this);
+  delete = this.deleteAppointment.bind(this);
 }
 
 export const appointmentService = new AppointmentService();

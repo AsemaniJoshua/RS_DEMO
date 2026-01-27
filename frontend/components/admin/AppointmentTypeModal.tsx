@@ -85,7 +85,7 @@ export default function AppointmentTypeModal({ isOpen, onClose, onUpdate }: Appo
                     <h2 className="text-xl font-bold text-gray-900">Manage Appointment Types</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>

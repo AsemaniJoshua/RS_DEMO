@@ -47,7 +47,7 @@ export default function AppointmentsPage() {
         const matchesSearch = appointment.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             appointment.patientEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             appointment.reason.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesType = typeFilter === "All Types" || appointment.type === typeFilter;
+        const matchesType = typeFilter === "All Types" || appointment.typeId === typeFilter;
         const matchesStatus = statusFilter === "All Statuses" || appointment.status === statusFilter;
         return matchesSearch && matchesType && matchesStatus;
     });
@@ -215,7 +215,7 @@ export default function AppointmentsPage() {
                         >
                             <option value="All Types">All Types</option>
                             {types.map((type) => (
-                                <option key={type.id} value={type.name}>{type.name}</option>
+                                <option key={type.id} value={type.id}>{type.name}</option>
                             ))}
                         </select>
                         <button
@@ -281,7 +281,7 @@ export default function AppointmentsPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
-                                                {appointment.type}
+                                                {appointment.type.name}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">

@@ -1,25 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import appointmentsData from "@/data/admin/appointments.json";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import { appointmentService } from "@/services/appointment-service";
+import toast from "react-hot-toast";
 
 export default function NewAppointmentPage() {
     const router = useRouter();
+    const [types, setTypes] = useState<{ id: string; name: string }[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         patientName: "",
         patientEmail: "",
         patientPhone: "",
-        type: "Consultation",
+        typeId: "",
         date: "",
         time: "",
         duration: "30 min",
-        status: "Scheduled",
+        status: "SCHEDULED",
         reason: "",
         notes: ""
     });
+
+    useEffect(() => {
+        const fetchTypes = async () => {
+            try {
+                const data = await appointmentService.getTypes();
+                setTypes(data);
+                if (data.length > 0) {
+                    setFormData(prev => ({ ...prev, typeId: data[0].id }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch types:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTypes();
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({
@@ -28,10 +49,29 @@ export default function NewAppointmentPage() {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("New appointment:", formData);
-        router.push("/admin/appointments");
+        
+        // Validate date is in the future
+        const selectedDate = new Date(formData.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate <= today) {
+            toast.error("Appointment date must be in the future");
+            return;
+        }
+        
+        setIsSubmitting(true);
+        try {
+            await appointmentService.create(formData);
+            toast.success("Appointment created successfully");
+            router.push("/admin/appointments");
+        } catch (error) {
+            console.error("Failed to create appointment:", error);
+            toast.error("Failed to create appointment. Please try again.");
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -117,14 +157,15 @@ export default function NewAppointmentPage() {
                                     Appointment Type <span className="text-red-500">*</span>
                                 </label>
                                 <select
-                                    name="type"
-                                    value={formData.type}
+                                    name="typeId"
+                                    value={formData.typeId}
                                     onChange={handleChange}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                                    disabled={loading}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900 disabled:bg-gray-50"
                                 >
-                                    {appointmentsData.types.filter(t => t !== "All Types").map((type, idx) => (
-                                        <option key={idx} value={type}>{type}</option>
+                                    {types.map((type) => (
+                                        <option key={type.id} value={type.id}>{type.name}</option>
                                     ))}
                                 </select>
                             </div>
@@ -139,9 +180,10 @@ export default function NewAppointmentPage() {
                                     required
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 >
-                                    {appointmentsData.statuses.filter(s => s !== "All Statuses").map((status, idx) => (
-                                        <option key={idx} value={status}>{status}</option>
-                                    ))}
+                                    <option value="SCHEDULED">Scheduled</option>
+                                    <option value="CONFIRMED">Confirmed</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="CANCELLED">Cancelled</option>
                                 </select>
                             </div>
                         </div>
@@ -178,26 +220,23 @@ export default function NewAppointmentPage() {
                                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                                     Duration <span className="text-red-500">*</span>
                                 </label>
-                                <select
+                                <input
+                                    type="text"
                                     name="duration"
                                     value={formData.duration}
                                     onChange={handleChange}
                                     required
+                                    placeholder="e.g., 30 min, 1 hour, 45 min"
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
-                                >
-                                    <option value="15 min">15 minutes</option>
-                                    <option value="20 min">20 minutes</option>
-                                    <option value="30 min">30 minutes</option>
-                                    <option value="45 min">45 minutes</option>
-                                    <option value="60 min">1 hour</option>
-                                </select>
+                                />
+                                <p className="text-xs text-gray-500 mt-1">Format: "30 min", "1 hour", etc.</p>
                             </div>
                         </div>
 
                         {/* Reason */}
                         <div className="mb-4">
                             <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Reason for Visit <span className="text-red-500">*</span>
+                                Reason of Appointment <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -228,9 +267,17 @@ export default function NewAppointmentPage() {
                     <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
                         <button
                             type="submit"
-                            className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium"
+                            disabled={isSubmitting}
+                            className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Schedule Appointment
+                            {isSubmitting ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Scheduling...
+                                </>
+                            ) : (
+                                "Schedule Appointment"
+                            )}
                         </button>
                         <Link href="/admin/appointments">
                             <button
