@@ -8,11 +8,12 @@ interface ImageUploadProps {
     value?: string;
     onChange: (url: string) => void;
     onFileSelect?: (file: File | null) => void;
+    onUploadComplete?: (data: { url: string; public_id: string }) => void;
     label?: string;
     className?: string;
 }
 
-export default function ImageUpload({ value, onChange, onFileSelect, label = "Featured Image", className = "" }: ImageUploadProps) {
+export default function ImageUpload({ value, onChange, onFileSelect, onUploadComplete, label = "Featured Image", className = "" }: ImageUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string>("");
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,10 +51,22 @@ export default function ImageUpload({ value, onChange, onFileSelect, label = "Fe
 
             if (response.status === 'success' && response.data?.url) {
                 onChange(response.data.url);
+                if (onUploadComplete && (response.data as any).public_id) {
+                    onUploadComplete({ 
+                        url: response.data.url, 
+                        public_id: (response.data as any).public_id 
+                    });
+                }
                 toast.success('Image uploaded successfully');
             } else if (response.data?.url) {
                 // Fallback if response structure is different but has url
                 onChange(response.data.url);
+                if (onUploadComplete && (response.data as any).public_id) {
+                    onUploadComplete({ 
+                        url: response.data.url, 
+                        public_id: (response.data as any).public_id 
+                    });
+                }
                 toast.success('Image uploaded successfully');
             } else {
                 toast.error('Upload failed: No URL returned');

@@ -26,7 +26,8 @@ export default function EditAppointmentPage() {
         duration: "30 min",
         status: "SCHEDULED",
         reason: "",
-        notes: ""
+        notes: "",
+        cancellationReason: ""
     });
 
     useEffect(() => {
@@ -56,7 +57,8 @@ export default function EditAppointmentPage() {
                     duration: appointmentData.duration,
                     status: appointmentData.status,
                     reason: appointmentData.reason,
-                    notes: appointmentData.notes || ""
+                    notes: appointmentData.notes || "",
+                    cancellationReason: appointmentData.cancellationReason || ""
                 });
             } catch (error) {
                 console.error("Failed to fetch data:", error);
@@ -67,7 +69,7 @@ export default function EditAppointmentPage() {
         fetchData();
     }, [appointmentId]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
@@ -265,8 +267,16 @@ export default function EditAppointmentPage() {
                                     <option value="CONFIRMED">Confirmed</option>
                                     <option value="COMPLETED">Completed</option>
                                     <option value="CANCELLED">Cancelled</option>
-                                    <option value="NO_SHOW">No Show</option>
+
                                 </select>
+                                <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                    Changing status will notify the user via email.
+                                </p>
                             </div>
                         </div>
 
@@ -343,6 +353,24 @@ export default function EditAppointmentPage() {
                                 minHeight="150px"
                             />
                         </div>
+
+                        {/* Cancellation Reason - Only visible when status is CANCELLED */}
+                        {formData.status === "CANCELLED" && (
+                            <div className="mt-6 animation-fade-in">
+                                <label className="block text-sm font-semibold text-red-600 mb-2">
+                                    Reason for Cancellation <span className="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    name="cancellationReason"
+                                    value={formData.cancellationReason}
+                                    onChange={handleChange} // RichTextEditor uses onChange(value), textarea uses standard event
+                                    required={formData.status === "CANCELLED"}
+                                    placeholder="Please provide a reason for cancelling this appointment..."
+                                    className="w-full px-4 py-3 border border-red-200 rounded-lg focus:border-red-500 focus:outline-none text-gray-900 min-h-[100px] bg-red-50/10"
+                                />
+                                <p className="text-xs text-red-500 mt-1">This reason will be included in the email notification to the patient.</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Submit Buttons */}

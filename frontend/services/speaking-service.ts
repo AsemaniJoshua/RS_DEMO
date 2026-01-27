@@ -9,6 +9,8 @@ export interface SpeakingEvent {
   category: string;
   date: string;
   location: string;
+  image: string;
+  imagePublicId: string;
   description?: string;
   status: 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
   created_at: string;
@@ -21,6 +23,8 @@ export interface CreateSpeakingEventData {
   category: string;
   date: string;
   location: string;
+  image: string;
+  imagePublicId: string;
   description?: string;
   status?: 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
 }

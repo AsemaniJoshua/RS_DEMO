@@ -6,6 +6,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { speakingService, SpeakingEvent, Category } from "@/services/speaking-service";
 import DeleteSpeakingEventModal from "@/components/admin/DeleteSpeakingEventModal";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 export default function EditSpeakingEventPage() {
     const router = useRouter();
@@ -23,6 +24,8 @@ export default function EditSpeakingEventPage() {
         category: "",
         date: "",
         location: "",
+        image: "",
+        imagePublicId: "",
         description: "",
         status: "UPCOMING" as "UPCOMING" | "COMPLETED" | "CANCELLED"
     });
@@ -42,6 +45,8 @@ export default function EditSpeakingEventPage() {
                     category: event.category,
                     date: event.date.split('T')[0], // Convert to YYYY-MM-DD format
                     location: event.location,
+                    image: event.image,
+                    imagePublicId: event.imagePublicId,
                     description: event.description || "",
                     status: event.status
                 });
@@ -165,6 +170,23 @@ export default function EditSpeakingEventPage() {
                             placeholder="e.g., Healthcare Innovation Summit 2024"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             required
+                        />
+                    </div>
+
+                    {/* Image Upload */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                            Event Image <span className="text-red-500">*</span>
+                        </label>
+                        <ImageUpload
+                            value={formData.image}
+                            onChange={(url) => setFormData(prev => ({ ...prev, image: url }))}
+                            onUploadComplete={(data) => setFormData(prev => ({ 
+                                ...prev, 
+                                image: data.url,
+                                imagePublicId: data.public_id 
+                            }))}
+                            label="Update Event Image"
                         />
                     </div>
 

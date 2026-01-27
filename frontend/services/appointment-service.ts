@@ -15,6 +15,7 @@ export interface Appointment {
   duration: string;
   reason: string;
   notes?: string;
+  cancellationReason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -30,6 +31,7 @@ export interface CreateAppointmentData {
   duration: string;
   reason: string;
   notes?: string;
+  cancellationReason?: string;
 }
 
 export interface AppointmentFilters {

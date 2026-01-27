@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { blogService, Blog } from "@/services/blog-service";
 import toast from "react-hot-toast";
+import { Eye } from "lucide-react";
 
 export default function BlogManagerPage() {
     const router = useRouter();
@@ -237,6 +238,13 @@ export default function BlogManagerPage() {
                                                     blog.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'
                                                 )}
                                             </button>
+                                            <Link
+                                                href={`/admin/blog/${blog.id}`}
+                                                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-1"
+                                                title="View Details"
+                                            >
+                                                <Eye className="w-4 h-4" />
+                                            </Link>
                                             <Link
                                                 href={`/admin/blog/${blog.id}/edit`}
                                                 className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"

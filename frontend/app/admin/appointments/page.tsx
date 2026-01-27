@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { appointmentService, Appointment, AppointmentType } from "@/services/appointment-service";
-import DeleteCourseModal from "@/components/admin/DeleteCourseModal";
+import DeleteAppointmentModal from "@/components/admin/DeleteAppointmentModal";
 import AppointmentTypeModal from "@/components/admin/AppointmentTypeModal";
 import toast from "react-hot-toast";
 
@@ -277,7 +277,7 @@ export default function AppointmentsPage() {
                                     <tr key={appointment.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
                                         <td className="px-6 py-4">
                                             <div className="font-semibold text-gray-900">{appointment.patientName}</div>
-                                            <div className="text-sm text-gray-600">{appointment.reason}</div>
+
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
@@ -300,6 +300,14 @@ export default function AppointmentsPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
+                                                <Link href={`/admin/appointments/${appointment.id}`}>
+                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="View Details">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                    </button>
+                                                </Link>
                                                 <Link href={`/admin/appointments/${appointment.id}/edit`}>
                                                     <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700">
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -327,11 +335,11 @@ export default function AppointmentsPage() {
             )}
 
             {/* Delete Modal */}
-            <DeleteCourseModal
+            <DeleteAppointmentModal
                 isOpen={deleteModal.show}
                 onCancel={handleDeleteCancel}
                 onConfirm={handleDeleteConfirm}
-                courseName={deleteModal.name}
+                appointmentName={deleteModal.name}
                 isDeleting={isDeleting}
             />
 

@@ -211,7 +211,7 @@ export default function SpeakingEventsPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100">
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Event Title</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Event</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Category</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Date & Time</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Location</th>
@@ -239,8 +239,27 @@ export default function SpeakingEventsPage() {
                                 filteredSpeaking.map((engagement, idx) => (
                                     <tr key={engagement.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
                                         <td className="px-6 py-4">
-                                            <div className="font-semibold text-gray-900">{engagement.title}</div>
-                                            <div className="text-sm text-gray-600">{engagement.venue}</div>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 relative rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                                                    {engagement.image ? (
+                                                        <img 
+                                                            src={engagement.image} 
+                                                            alt={engagement.title}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM11 13.5l2.5 3.01L17 12l4 5H3l4-6 4 7.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-gray-900">{engagement.title}</div>
+                                                    <div className="text-sm text-gray-600">{engagement.venue}</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
