@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { courseService } from "@/services/course-service";
@@ -8,13 +8,8 @@ import toast from "react-hot-toast";
 import ImageUpload from "@/components/admin/ImageUpload";
 import FileUpload from "@/components/admin/FileUpload";
 
-interface EditCoursePageProps {
-    params: {
-        id: string;
-    };
-}
-
-export default function EditCoursePage({ params }: EditCoursePageProps) {
+export default function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(true); // Loading initial data
     const [submitting, setSubmitting] = useState(false);
@@ -38,16 +33,18 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
 
     useEffect(() => {
         const init = async () => {
-            await Promise.all([loadCategories(), loadCourse()]);
-            setLoading(false);
+            if (id) {
+                await Promise.all([loadCategories(), loadCourse()]);
+                setLoading(false);
+            }
         };
         init();
-    }, [params.id]);
+    }, [id]);
 
     const loadCategories = async () => {
         try {
             const res = await courseService.getCategories();
-            setCategories(res.data || []);
+            setCategories(res || []);
         } catch (error) {
             console.error("Failed to load categories", error);
         }
@@ -55,14 +52,14 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
 
     const loadCourse = async () => {
         try {
-            const res = await courseService.getCourseById(params.id);
-            const course = res.data;
+            const course: any = await courseService.getCourseById(id);
             if (course) {
                 setFormData({
                     title: course.title,
                     category: course.categoryId,
                     price: course.price,
-                    duration: course.duration || "",
+                    // Parse "X hours" to just "X"
+                    duration: course.duration ? course.duration.replace(" hours", "") : "",
                     description: course.description,
                     status: course.status
                 });
@@ -103,7 +100,7 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
             if (thumbnail) data.append("thumbnail", thumbnail);
             if (courseFile) data.append("courseFile", courseFile);
 
-            await courseService.updateCourse(params.id, data);
+            await courseService.updateCourse(id, data);
             toast.success("Course updated successfully!");
             router.push("/admin/courses");
         } catch (error: any) {
@@ -114,7 +111,16 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
         }
     };
 
-    if (loading) return <div className="p-8 text-center">Loading course details...</div>;
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-500 font-medium">Loading course details...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-8">
@@ -184,21 +190,37 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
                         </div>
                     </div>
 
-                    {/* Status */}
-                    <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
-                            Status <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            name="status"
-                            value={formData.status}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
-                        >
-                            <option value="DRAFT">Draft</option>
-                            <option value="PUBLISHED">Published</option>
-                        </select>
+                    {/* Duration and Status */}
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-900 mb-2">
+                                Duration (Hours) <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                name="duration"
+                                value={formData.duration}
+                                onChange={handleChange}
+                                required
+                                placeholder="e.g., 2"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-900 mb-2">
+                                Status <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                name="status"
+                                value={formData.status}
+                                onChange={handleChange}
+                                required
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                            >
+                                <option value="DRAFT">Draft</option>
+                                <option value="PUBLISHED">Published</option>
+                            </select>
+                        </div>
                     </div>
 
                     {/* Description */}

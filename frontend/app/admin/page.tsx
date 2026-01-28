@@ -8,11 +8,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 // Import JSON data
-import analyticsData from "@/data/admin/analytics.json";
+// Import JSON data
 import appointmentsData from "@/data/admin/appointments.json";
-import activitiesData from "@/data/admin/activities.json";
 import quickActionsData from "@/data/admin/quickActions.json";
-import chartDataImport from "@/data/admin/chartData.json";
 import { dashboardService } from "@/services/dashboard-service";
 
 export default function AdminDashboard() {
@@ -104,10 +102,10 @@ export default function AdminDashboard() {
     const appointmentDates = appointments.map((appt: any) => appt.date);
 
     // Use backend data if available, otherwise fallback (or empty)
-    const recentActivities = stats?.recentActivities || activitiesData.recentActivities;
+    const recentActivities = stats?.recentActivities || [];
     const quickActions = quickActionsData.quickActions;
-    const revenueData = stats?.charts?.revenueData || chartDataImport.revenueData;
-    const pieChartData = stats?.charts?.pieChartData || chartDataImport.pieChartData;
+    const revenueData = stats?.charts?.revenueData || [];
+    const pieChartData = stats?.charts?.pieChartData || [];
 
     // Computed Analytics Data
     const realAnalytics = [
@@ -468,7 +466,14 @@ export default function AdminDashboard() {
                                         <div className="text-sm font-semibold text-gray-900">{activity.user}</div>
                                         <div className="text-xs text-gray-600">{activity.action}</div>
                                     </div>
-                                    <div className="text-xs text-gray-400">{activity.time}</div>
+                                    <div className="text-xs text-gray-400">
+                                        {new Date(activity.time).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </div>
                                 </div>
                             ))}
                         </div>

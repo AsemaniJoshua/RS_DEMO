@@ -244,6 +244,14 @@ export default function CoursesPage() {
                                     </td>
                                     <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                                         <div className="flex items-center justify-end gap-2">
+                                            <Link href={`/admin/courses/${course.id}`}>
+                                                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View Details">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-600">
+                                                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    </svg>
+                                                </button>
+                                            </Link>
                                             <Link href={`/admin/courses/${course.id}/edit`}>
                                                 <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
                                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-600">

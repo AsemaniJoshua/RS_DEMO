@@ -38,6 +38,11 @@ export const courseService = {
         return response.data;
     },
 
+    deleteCategory: async (id: string) => {
+        const response = await api.delete(`/admin/courses/categories/${id}`);
+        return response.data;
+    },
+
     // Courses
     getAllCourses: async (status?: string, category?: string, search?: string) => {
         const params = new URLSearchParams();

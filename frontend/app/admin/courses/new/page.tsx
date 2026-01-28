@@ -1,20 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import coursesData from "@/data/admin/courses.json";
+import { courseService } from "@/services/course-service";
+import toast from "react-hot-toast";
+import ImageUpload from "@/components/admin/ImageUpload";
+import FileUpload from "@/components/admin/FileUpload";
 
 export default function AddCoursePage() {
     const router = useRouter();
+    const [categories, setCategories] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+    
+    // File states
+    const [thumbnail, setThumbnail] = useState<File | null>(null);
+    const [courseFile, setCourseFile] = useState<File | null>(null);
+
     const [formData, setFormData] = useState({
         title: "",
-        category: "Chronic Disease",
+        category: "",
         price: "",
         duration: "",
         description: "",
-        status: "Draft"
+        status: "DRAFT"
     });
+
+    useEffect(() => {
+        loadCategories();
+    }, []);
+
+    const loadCategories = async () => {
+        try {
+            const res = await courseService.getCategories();
+            // courseService.getCategories returns the array directly
+            setCategories(res || []);
+        } catch (error) {
+            console.error("Failed to load categories", error);
+            toast.error("Failed to load categories");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({
@@ -23,12 +51,36 @@ export default function AddCoursePage() {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Here you would typically send data to backend
-        console.log("Course data:", formData);
-        // Redirect back to courses page
-        router.push("/admin/courses");
+        
+        if (!formData.category) {
+            toast.error("Please select a category");
+            return;
+        }
+
+        try {
+            setSubmitting(true);
+            const data = new FormData();
+            data.append("title", formData.title);
+            data.append("description", formData.description);
+            data.append("price", formData.price.toString());
+            data.append("categoryId", formData.category);
+            data.append("status", formData.status);
+            data.append("duration", formData.duration);
+            
+            if (thumbnail) data.append("thumbnail", thumbnail);
+            if (courseFile) data.append("courseFile", courseFile);
+
+            await courseService.createCourse(data);
+            toast.success("Course created successfully!");
+            router.push("/admin/courses");
+        } catch (error: any) {
+            console.error("Error creating course", error);
+            toast.error(error.response?.data?.message || "Failed to create course");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -77,8 +129,9 @@ export default function AddCoursePage() {
                                 required
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             >
-                                {coursesData.categories.filter(c => c !== "All Categories").map((cat, idx) => (
-                                    <option key={idx} value={cat}>{cat}</option>
+                                <option value="">Select Category</option>
+                                {categories.map((cat: any) => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -87,7 +140,7 @@ export default function AddCoursePage() {
                                 Price <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">GHS</span>
                                 <input
                                     type="number"
                                     name="price"
@@ -95,7 +148,7 @@ export default function AddCoursePage() {
                                     onChange={handleChange}
                                     required
                                     placeholder="99"
-                                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                                    className="w-full pl-14 pr-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                                 />
                             </div>
                         </div>
@@ -105,15 +158,15 @@ export default function AddCoursePage() {
                     <div className="grid grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                Duration <span className="text-red-500">*</span>
+                                Duration (Hours) <span className="text-red-500">*</span>
                             </label>
                             <input
-                                type="text"
+                                type="number"
                                 name="duration"
                                 value={formData.duration}
                                 onChange={handleChange}
                                 required
-                                placeholder="e.g., 6 weeks"
+                                placeholder="e.g., 2"
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             />
                         </div>
@@ -128,8 +181,8 @@ export default function AddCoursePage() {
                                 required
                                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             >
-                                <option value="Draft">Draft</option>
-                                <option value="Published">Published</option>
+                                <option value="DRAFT">Draft</option>
+                                <option value="PUBLISHED">Published</option>
                             </select>
                         </div>
                     </div>
@@ -155,22 +208,37 @@ export default function AddCoursePage() {
                         <label className="block text-sm font-semibold text-gray-900 mb-2">
                             Course Thumbnail
                         </label>
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#00d4aa] transition-colors cursor-pointer">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" className="mx-auto mb-3 text-gray-400">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                            <p className="text-sm text-gray-600 mb-1">Click to upload or drag and drop</p>
-                            <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
-                        </div>
+                        <ImageUpload
+                            label=""
+                            value={thumbnail ? URL.createObjectURL(thumbnail) : ""}
+                            onChange={(file) => setThumbnail(file)}
+                        />
+                    </div>
+
+                    {/* Course File (ZIP) */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                            Course Content (ZIP)
+                        </label>
+                        <FileUpload
+                            label="Upload Course ZIP"
+                            accept={ { 'application/zip': ['.zip'], 'application/x-zip-compressed': ['.zip'], 'application/x-7z-compressed': ['.7z'], 'application/x-rar-compressed': ['.rar'] } }
+                            value={courseFile}
+                            onChange={(file) => setCourseFile(file)}
+                            onRemove={() => setCourseFile(null)}
+                            maxSize={1024 * 1024 * 1024} // 1GB
+                        />
+                         <p className="text-xs text-gray-500 mt-1">Max size: 1GB</p>
                     </div>
 
                     {/* Submit Buttons */}
                     <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
                         <button
                             type="submit"
-                            className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium"
+                            disabled={submitting}
+                            className="px-6 py-3 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors font-medium disabled:opacity-70 disabled:cursor-not-allowed"
                         >
-                            Create Course
+                            {submitting ? "Creating..." : "Create Course"}
                         </button>
                         <Link href="/admin/courses">
                             <button

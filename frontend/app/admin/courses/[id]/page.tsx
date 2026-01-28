@@ -1,166 +1,228 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { courseService } from "@/services/course-service";
+import { useRouter } from "next/navigation";
+import { courseService, Course } from "@/services/course-service";
 import toast from "react-hot-toast";
+import { 
+    ArrowLeft, 
+    Edit2, 
+    Calendar, 
+    Users, 
+    Folder, 
+    Clock, 
+    DollarSign,
+    ImageIcon,
+    FileText,
+    CheckCircle
+} from "lucide-react";
 
-interface CourseDetailPageProps {
-    params: {
-        id: string;
-    };
-}
-
-export default function CourseDetailPage({ params }: CourseDetailPageProps) {
-    const [course, setCourse] = useState<any>(null);
+export default function CourseDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+    const router = useRouter();
+    const [course, setCourse] = useState<Course | null>(null);
     const [loading, setLoading] = useState(true);
-    const [downloading, setDownloading] = useState(false);
 
     useEffect(() => {
-        loadCourse();
-    }, [params.id]);
+        const fetchCourse = async () => {
+            try {
+                setLoading(true);
+                const course: any = await courseService.getCourseById(id);
+                setCourse(course);
+            } catch (error: any) {
+                console.error("Failed to load course details", error);
+                toast.error("Failed to load course details");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const loadCourse = async () => {
-        try {
-            const res = await courseService.getCourseById(params.id);
-            setCourse(res.data);
-        } catch (error) {
-            console.error("Failed to load course", error);
-            toast.error("Failed to load course details");
-        } finally {
-            setLoading(false);
+        if (id) {
+            fetchCourse();
+        }
+    }, [id]);
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'PUBLISHED': return 'bg-green-50 text-green-700 border-green-100';
+            case 'DRAFT': return 'bg-yellow-50 text-yellow-700 border-yellow-100';
+            case 'ARCHIVED': return 'bg-gray-50 text-gray-700 border-gray-100';
+            default: return 'bg-gray-50 text-gray-700 border-gray-100';
         }
     };
 
-    const handleDownload = async () => {
-        try {
-            setDownloading(true);
-            await courseService.downloadCourse(params.id);
-            toast.success("Download started");
-        } catch (error: any) {
-            console.error("Download failed", error);
-            toast.error(error.response?.data?.message || "Failed to download course");
-        } finally {
-            setDownloading(false);
-        }
-    };
+    if (loading) {
+        return (
+            <div className="p-8 flex items-center justify-center min-h-[60vh]">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-500 font-medium">Loading course details...</p>
+                </div>
+            </div>
+        );
+    }
 
-    if (loading) return <div className="p-8 text-center">Loading course...</div>;
-    if (!course) return <div className="p-8 text-center">Course not found</div>;
-
-    return (
-        <div className="p-8">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <Link href="/admin/courses">
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 12H5m7 7l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        Back to Courses
-                    </button>
-                </Link>
-                <Link href={`/admin/courses/${course.id}/edit`}>
-                    <button className="px-4 py-2 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors">
-                        Edit Course
-                    </button>
+    if (!course) {
+        return (
+            <div className="p-8 text-center">
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Course Not Found</h2>
+                <p className="text-gray-600 mb-4">The course you are looking for does not exist.</p>
+                <Link href="/admin/courses" className="px-4 py-2 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors">
+                    Back to Course List
                 </Link>
             </div>
+        );
+    }
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    return (
+        <div className="p-4 md:p-8 max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div className="flex items-center gap-4">
+                    <Link 
+                        href="/admin/courses"
+                        className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </Link>
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Course Details</h1>
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                            <span>ID: {course.id.slice(0, 8)}...</span>
+                            <span>•</span>
+                            <span>Created {new Date(course.created_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <Link href={`/admin/courses/${course.id}/edit`}>
+                        <button className="px-5 py-2.5 bg-[#00d4aa] text-white rounded-xl hover:bg-[#00bfa6] transition-colors font-medium flex items-center gap-2 shadow-sm shadow-teal-500/20">
+                            <Edit2 className="w-4 h-4" />
+                            Edit Course
+                        </button>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Thumbnail Banner */}
+            {course.thumbnailUrl ? (
+                <div className="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <img 
+                        src={course.thumbnailUrl} 
+                        alt={course.title} 
+                        className="w-full h-64 md:h-[400px] object-cover"
+                    />
+                </div>
+            ) : (
+                <div className="mb-8 bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] rounded-2xl border border-gray-100 shadow-sm h-48 md:h-64 flex flex-col items-center justify-center text-white">
+                    <ImageIcon className="w-16 h-16 mb-4 opacity-50" />
+                    <span className="text-xl font-bold">{course.title}</span>
+                </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white rounded-xl p-6 border border-gray-100">
-                        <div className="flex items-start justify-between mb-4">
-                            <div>
-                                <span className="inline-block px-3 py-1 rounded-full bg-[#00d4aa]/10 text-[#00d4aa] text-sm font-medium mb-3">
-                                    {course.category?.name || "Uncategorized"}
+                    {/* Overview Card */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                        <div className="mb-6">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">{course.title}</h2>
+                            <div className="flex items-center gap-3">
+                                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(course.status)}`}>
+                                    {course.status}
                                 </span>
-                                <h1 className="text-3xl font-bold text-gray-900 mb-2">{course.title}</h1>
-                                <p className="text-gray-500">Created on {new Date(course.created_at).toLocaleDateString()}</p>
+                                {course.category && (
+                                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 flex items-center gap-1">
+                                        <Folder className="w-3 h-3" />
+                                        {course.category.name}
+                                    </span>
+                                )}
                             </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                course.status === "PUBLISHED" 
-                                    ? "bg-green-100 text-green-700" 
-                                    : "bg-gray-100 text-gray-700"
-                            }`}>
-                                {course.status}
-                            </span>
                         </div>
-                        
-                        <div className="prose max-w-none text-gray-600">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-                            <p className="whitespace-pre-wrap">{course.description}</p>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <div>
+                                <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                    <DollarSign className="w-3 h-3" /> Price
+                                </div>
+                                <div className="font-semibold text-gray-900">
+                                    {Number(course.price) === 0 ? "Free" : `GHS ${course.price}`}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" /> Duration
+                                </div>
+                                <div className="font-semibold text-gray-900">
+                                    {course.duration || "Self-paced"}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                    <Users className="w-3 h-3" /> Students
+                                </div>
+                                <div className="font-semibold text-gray-900">
+                                    {course.students || 0}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" /> Updated
+                                </div>
+                                <div className="font-semibold text-gray-900">
+                                    {new Date(course.updated_at).toLocaleDateString()}
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Description</h3>
+                        <div className="prose prose-blue max-w-none text-gray-700 whitespace-pre-wrap">
+                            {course.description}
                         </div>
                     </div>
                 </div>
 
                 {/* Sidebar */}
-                <div className="space-y-6">
-                    {/* Course Card */}
-                    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                        <div className="aspect-video bg-gray-100 relative">
-                             {course.thumbnailUrl ? (
-                                <img 
-                                    src={course.thumbnailUrl} 
-                                    alt={course.title} 
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] text-white font-bold text-4xl">
-                                    {course.title.substring(0, 2).toUpperCase()}
+                <div className="lg:col-span-1 space-y-6">
+                    {/* Course Materials */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Course Materials</h3>
+                        
+                        {course.fileUrl ? (
+                            <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                                        <FileText className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="font-medium text-gray-900">Course Content</div>
+                                        <div className="text-xs text-gray-500">ZIP Archive</div>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <span className="text-gray-600">Price</span>
-                                <span className="text-2xl font-bold text-gray-900">
-                                    {Number(course.price) === 0 ? "Free" : `GHS ${course.price}`}
-                                </span>
+                                <button className="w-full py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                                    Download Materials
+                                </button>
                             </div>
-
-                            <button
-                                onClick={handleDownload}
-                                disabled={downloading || (!course.isPurchased && course.price > 0)} // Admin logic handled in backend, but frontend assumes admin since this is admin route. Actually users also use this route? No, users will have a separate view presumably or this one adapts. For ADMIN, isPurchased should be true from backend.
-                                className="w-full py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {downloading ? (
-                                    <>
-                                        <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Downloading...
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                        Download Course Content
-                                    </>
-                                )}
-                            </button>
-                            {(!course.isPurchased && course.price > 0) && (
-                                <p className="text-xs text-center text-gray-500 mt-2">
-                                    (Purchase required to download)
-                                </p>
-                            )}
-                        </div>
+                        ) : (
+                            <div className="text-center p-6 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+                                <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                <p className="text-sm text-gray-500">No downloadable materials available.</p>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Additional Info */}
-                    <div className="bg-white rounded-xl p-6 border border-gray-100">
-                        <h3 className="font-semibold text-gray-900 mb-4">Course Info</h3>
-                        <div className="space-y-3 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">Students</span>
-                                <span className="font-medium text-gray-900">{course.purchases?.length || 0}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">Last Updated</span>
-                                <span className="font-medium text-gray-900">{new Date(course.updated_at).toLocaleDateString()}</span>
+                    {/* Quick Stats / Info */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Information</h3>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-3">
+                                <CheckCircle className="w-5 h-5 text-[#00d4aa] mt-0.5" />
+                                <div>
+                                    <div className="font-medium text-gray-900">Full Lifetime Access</div>
+                                    <div className="text-sm text-gray-500">Students get unlimited access</div>
+                                </div>
                             </div>
                         </div>
                     </div>

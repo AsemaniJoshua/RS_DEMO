@@ -26,7 +26,7 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
         try {
             setLoading(true);
             const res = await courseService.getCategories();
-            setCategories(res.data || []);
+            setCategories(res || []);
         } catch (error) {
             console.error("Failed to load categories", error);
             toast.error("Failed to load categories");
@@ -76,7 +76,7 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
                             value={newCategory}
                             onChange={(e) => setNewCategory(e.target.value)}
                             placeholder="New category name"
-                            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
+                            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                             disabled={adding}
                         />
                         <button 
@@ -98,7 +98,27 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
                             categories.map((cat) => (
                                 <div key={cat.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
                                     <span className="text-gray-700 font-medium">{cat.name}</span>
-                                    {/* Delete button could go here if implemented in backend */}
+                                    <button 
+                                        onClick={async () => {
+                                            if (confirm('Are you sure you want to delete this category?')) {
+                                                try {
+                                                    await courseService.deleteCategory(cat.id);
+                                                    toast.success('Category deleted');
+                                                    loadCategories();
+                                                    onUpdate();
+                                                } catch (error) {
+                                                    console.error("Failed to delete category", error);
+                                                    toast.error('Failed to delete category');
+                                                }
+                                            }
+                                        }}
+                                        className="p-1 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded transition-colors"
+                                        title="Delete Category"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </button>
                                 </div>
                             ))
                         )}
