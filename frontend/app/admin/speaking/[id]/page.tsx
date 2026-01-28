@@ -112,25 +112,25 @@ export default function ViewSpeakingEventPage() {
                 </div>
             </div>
 
+            {/* Hero Banner (Image) */}
+            {event.image ? (
+                <div className="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <img 
+                        src={event.image} 
+                        alt={event.title} 
+                        className="w-full h-64 md:h-[400px] object-cover"
+                    />
+                </div>
+            ) : (
+                <div className="mb-8 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm h-48 flex flex-col items-center justify-center text-gray-400">
+                    <ImageIcon className="w-12 h-12 mb-2 opacity-50" />
+                    <span className="text-sm font-medium">No event image provided</span>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Hero Banner (Image) */}
-                    {event.image ? (
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                            <img 
-                                src={event.image} 
-                                alt={event.title} 
-                                className="w-full h-64 md:h-80 object-cover"
-                            />
-                        </div>
-                    ) : (
-                        <div className="bg-gray-50 rounded-2xl border border-gray-100 shadow-sm h-48 flex flex-col items-center justify-center text-gray-400">
-                            <ImageIcon className="w-12 h-12 mb-2 opacity-50" />
-                            <span className="text-sm font-medium">No event image provided</span>
-                        </div>
-                    )}
-
                     {/* Basic Info */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">

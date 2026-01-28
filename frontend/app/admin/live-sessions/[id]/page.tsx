@@ -202,7 +202,7 @@ export default function LiveSessionDetailsPage() {
                         <div>
                             <label className="text-sm font-medium text-gray-500">Recording Price</label>
                             <p className="text-gray-900 mt-1">
-                                {session.recording_price ? `₦${Number(session.recording_price).toLocaleString()}` : 'Free'}
+                                {session.recording_price ? `GHS ${Number(session.recording_price).toLocaleString()}` : 'Free'}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">*Registered users always get free access</p>
                         </div>

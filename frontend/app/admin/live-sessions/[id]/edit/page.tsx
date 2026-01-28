@@ -185,7 +185,7 @@ export default function EditLiveSessionPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 mb-2">Recording Price (₦)</label>
+                            <label className="block text-sm font-medium text-gray-900 mb-2">Recording Price (GHS)</label>
                             <input 
                                 type="number" 
                                 min="0"

@@ -25,10 +25,8 @@ export default function EditEbookPage() {
         status: "",
         format: "",
         description: "",
-        coverImage: "",
-        coverImagePublicId: "",
-        fileUrl: "",
-        filePublicId: ""
+        coverImage: null as File | string | null,
+        file: null as File | string | null
     });
 
     useEffect(() => {
@@ -69,9 +67,7 @@ export default function EditEbookPage() {
                     format: ebook.format || "PDF",
                     description: ebook.description || "",
                     coverImage: ebook.coverImage || "",
-                    coverImagePublicId: ebook.coverImagePublicId || "",
-                    fileUrl: ebook.fileUrl || "",
-                    filePublicId: ebook.filePublicId || ""
+                    file: ebook.fileUrl || ""
                 });
             }
         } catch (error) {
@@ -95,7 +91,10 @@ export default function EditEbookPage() {
             return;
         }
 
-        if (!formData.fileUrl) {
+        // Check if file is missing (only strict if it was never uploaded, but for edit it might be string url)
+        // Ideally we trust the string url if it exists.
+        if (!formData.file) { 
+             // If it's null, that's bad. If it's string, good. If it's File, good.
             toast.error("Ebook file is required");
             return;
         }
@@ -154,7 +153,7 @@ export default function EditEbookPage() {
                                 type="text"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:ring-4 focus:ring-[#00d4aa]/10 outline-none transition-all"
+                                className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:ring-4 focus:ring-[#00d4aa]/10 outline-none transition-all placeholder:text-gray-400"
                                 placeholder="E.g. The Complete Guide to Dental Hygiene"
                                 required
                             />
@@ -166,7 +165,7 @@ export default function EditEbookPage() {
                                 type="text"
                                 value={formData.author}
                                 onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
+                                className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none placeholder:text-gray-400"
                                 placeholder="E.g. Dr. George"
                                 required
                             />
@@ -177,7 +176,7 @@ export default function EditEbookPage() {
                             <select
                                 value={formData.categoryId}
                                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
+                                className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
                                 required
                             >
                                 <option value="">Select Category</option>
@@ -188,14 +187,14 @@ export default function EditEbookPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Price ($)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Price (GHS)</label>
                             <input
                                 type="number"
                                 step="0.01"
                                 min="0"
                                 value={formData.price}
                                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
+                                className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none placeholder:text-gray-400"
                                 placeholder="0.00"
                             />
                             <p className="text-xs text-gray-500 mt-1">Set to 0 for free ebooks</p>
@@ -208,7 +207,7 @@ export default function EditEbookPage() {
                                 min="1"
                                 value={formData.pages}
                                 onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
+                                className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none placeholder:text-gray-400"
                                 placeholder="Total pages"
                             />
                         </div>
@@ -228,7 +227,7 @@ export default function EditEbookPage() {
                             <select
                                 value={formData.format}
                                 onChange={(e) => setFormData({ ...formData, format: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
+                                className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
                             >
                                 <option value="PDF">PDF</option>
                                 <option value="EPUB">EPUB</option>
@@ -241,7 +240,7 @@ export default function EditEbookPage() {
                             <select
                                 value={formData.status}
                                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
+                                className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none"
                             >
                                 <option value="DRAFT">Draft (Hidden)</option>
                                 <option value="PUBLISHED">Published (Visible)</option>
@@ -255,7 +254,7 @@ export default function EditEbookPage() {
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             rows={4}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none resize-none"
+                            className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none resize-none placeholder:text-gray-400"
                             placeholder="Describe what the ebook is about..."
                         />
                     </div>
@@ -271,12 +270,7 @@ export default function EditEbookPage() {
                         </h2>
                         <ImageUpload
                             value={formData.coverImage}
-                            onChange={(url) => setFormData(prev => ({ ...prev, coverImage: url }))}
-                            onUploadComplete={({ url, public_id }) => setFormData(prev => ({ 
-                                ...prev, 
-                                coverImage: url,
-                                coverImagePublicId: public_id 
-                            }))}
+                            onChange={(file) => setFormData(prev => ({ ...prev, coverImage: file }))}
                             label="Upload Cover"
                         />
                         <p className="text-xs text-center text-gray-500 mt-2">Recommended size: 600x900px</p>
@@ -289,9 +283,9 @@ export default function EditEbookPage() {
                             Ebook File *
                         </h2>
                         <FileUpload
-                            value={formData.fileUrl}
-                            onChange={(url, publicId) => setFormData({ ...formData, fileUrl: url, filePublicId: publicId })}
-                            onRemove={() => setFormData({ ...formData, fileUrl: "", filePublicId: "" })}
+                            value={formData.file}
+                            onChange={(file) => setFormData(prev => ({ ...prev, file: file }))}
+                            onRemove={() => setFormData(prev => ({ ...prev, file: null }))}
                             label="Upload Book File"
                         />
                     </div>

@@ -5,20 +5,28 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 
 interface ImageUploadProps {
-    value?: string;
-    onChange: (url: string) => void;
-    onFileSelect?: (file: File | null) => void;
-    onUploadComplete?: (data: { url: string; public_id: string }) => void;
+    value?: File | string | null;
+    onChange: (file: File | null) => void;
     label?: string;
     className?: string;
 }
 
-export default function ImageUpload({ value, onChange, onFileSelect, onUploadComplete, label = "Featured Image", className = "" }: ImageUploadProps) {
-    const [isUploading, setIsUploading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string>("");
+export default function ImageUpload({ value, onChange, label = "Featured Image", className = "" }: ImageUploadProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [previewUrl, setPreviewUrl] = useState<string>("");
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Initialize preview if value is a string (URL)
+    // If value is a File, create object URL
+    const getDisplayUrl = () => {
+        if (!value) return "";
+        if (typeof value === 'string') return value;
+        if (value instanceof File) return URL.createObjectURL(value);
+        return "";
+    };
+
+    const displayUrl = getDisplayUrl();
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -34,66 +42,15 @@ export default function ImageUpload({ value, onChange, onFileSelect, onUploadCom
             return;
         }
 
-        // Create local preview immediately
-        const objectUrl = URL.createObjectURL(file);
-        setPreviewUrl(objectUrl);
-
-        // If onFileSelect is provided, just pass the file back and skip upload
-        if (onFileSelect) {
-            onFileSelect(file);
-            return;
-        }
-
-        try {
-            setIsUploading(true);
-            const response = await blogService.uploadImage(file);
-            console.log("Upload response:", response);
-
-            if (response.status === 'success' && response.data?.url) {
-                onChange(response.data.url);
-                if (onUploadComplete && (response.data as any).public_id) {
-                    onUploadComplete({ 
-                        url: response.data.url, 
-                        public_id: (response.data as any).public_id 
-                    });
-                }
-                toast.success('Image uploaded successfully');
-            } else if (response.data?.url) {
-                // Fallback if response structure is different but has url
-                onChange(response.data.url);
-                if (onUploadComplete && (response.data as any).public_id) {
-                    onUploadComplete({ 
-                        url: response.data.url, 
-                        public_id: (response.data as any).public_id 
-                    });
-                }
-                toast.success('Image uploaded successfully');
-            } else {
-                toast.error('Upload failed: No URL returned');
-                setPreviewUrl(""); // Clear preview on failure
-            }
-        } catch (error) {
-            console.error('Upload error:', error);
-            toast.error('Failed to upload image');
-            setPreviewUrl(""); // Clear preview on failure
-        } finally {
-            setIsUploading(false);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
-        }
+        onChange(file);
     };
 
     const handleRemove = () => {
-        onChange('');
-        setPreviewUrl('');
-        if (onFileSelect) {
-            onFileSelect(null);
+        onChange(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
         }
     };
-
-    // Use value (server URL) if available, otherwise use previewUrl (local)
-    const displayUrl = value || previewUrl;
 
     return (
         <div className={`w-full ${className}`}>
@@ -103,28 +60,23 @@ export default function ImageUpload({ value, onChange, onFileSelect, onUploadCom
                 <div className="relative aspect-video w-full max-w-md rounded-lg overflow-hidden border border-gray-200 group">
                     <img
                         src={displayUrl} 
-                        alt="Uploaded image" 
+                        alt="Uploaded preview" 
                         className="object-cover w-full h-full"
                     />
                     
-                    {/* Overlay for uploading state */}
-                    {isUploading && (
-                        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white">
-                            <Loader2 className="w-8 h-8 animate-spin mb-2" />
-                            <span className="text-sm font-medium">Uploading...</span>
-                        </div>
-                    )}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button
+                            type="button"
+                            onClick={handleRemove}
+                            className="p-2 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
 
-                    {/* Remove button (only show if not uploading) */}
-                    {!isUploading && (
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button
-                                type="button"
-                                onClick={handleRemove}
-                                className="p-2 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
+                    {value instanceof File && (
+                        <div className="absolute bottom-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded shadow">
+                            Ready to upload
                         </div>
                     )}
                 </div>
@@ -151,7 +103,6 @@ export default function ImageUpload({ value, onChange, onFileSelect, onUploadCom
                 accept="image/*"
                 onChange={handleFileChange}
                 className="hidden"
-                disabled={isUploading}
             />
         </div>
     );

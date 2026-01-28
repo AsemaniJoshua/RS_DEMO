@@ -6,8 +6,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 interface FileUploadProps {
-    value?: string;
-    onChange: (url: string, publicId: string) => void;
+    value?: File | string | null;
+    onChange: (file: File | null) => void;
     onRemove: () => void;
     accept?: Record<string, string[]>;
     maxSize?: number; // in bytes
@@ -23,46 +23,24 @@ export default function FileUpload({
         'application/epub+zip': ['.epub'],
         'application/x-mobipocket-ebook': ['.mobi']
     },
-    maxSize = 10 * 1024 * 1024, // 10MB default
+    maxSize = 500 * 1024 * 1024, // 500MB default
     label = "Upload File"
 }: FileUploadProps) {
-    const [isLoading, setIsLoading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    
+    // Helper to display file name
+    const getDisplayValue = () => {
+        if (!value) return null;
+        if (value instanceof File) return value.name;
+        // If it's a string URL, extract filename or show generic text
+        return "Existing File";
+    };
 
-    const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const isFileObject = value instanceof File;
+
+    const onDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
-        if (!file) return;
-
-        setIsLoading(true);
-        setUploadProgress(0);
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "rs_demo_unsigned");
-        // Important for non-image files like PDFs
-        formData.append("resource_type", "auto"); 
-
-        try {
-            const response = await axios.post(
-                `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
-                formData,
-                {
-                    onUploadProgress: (progressEvent) => {
-                        const percentCompleted = Math.round(
-                            (progressEvent.loaded * 100) / (progressEvent.total || file.size)
-                        );
-                        setUploadProgress(percentCompleted);
-                    }
-                }
-            );
-
-            onChange(response.data.secure_url, response.data.public_id);
-            toast.success("File uploaded successfully");
-        } catch (error) {
-            console.error("Upload error:", error);
-            toast.error("Failed to upload file. Please try again.");
-        } finally {
-            setIsLoading(false);
-            setUploadProgress(0);
+        if (file) {
+            onChange(file);
         }
     }, [onChange]);
 
@@ -86,15 +64,20 @@ export default function FileUpload({
                             </svg>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">File Uploaded</p>
-                            <a 
-                                href={value} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-xs text-[#00d4aa] hover:underline truncate block"
-                            >
-                                View File
-                            </a>
+                            <p className="text-sm font-medium text-gray-900 truncate">{getDisplayValue()}</p>
+                            {!isFileObject && typeof value === 'string' && (
+                                <a 
+                                    href={value} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-[#00d4aa] hover:underline truncate block"
+                                >
+                                    View Current File
+                                </a>
+                            )}
+                            {isFileObject && (
+                                <p className="text-xs text-green-600">Ready to upload</p>
+                            )}
                         </div>
                     </div>
                     <button
@@ -118,26 +101,17 @@ export default function FileUpload({
                 >
                     <input {...getInputProps()} />
                     
-                    {isLoading ? (
-                        <div className="flex flex-col items-center justify-center">
-                            <div className="w-10 h-10 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin mb-3"></div>
-                            <p className="text-sm text-gray-600 font-medium">{uploadProgress}% Uploading...</p>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-500">
-                                    <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                            </div>
-                            <p className="text-sm font-medium text-gray-700 text-center mb-1">
-                                {isDragActive ? "Drop the file here" : label}
-                            </p>
-                            <p className="text-xs text-gray-500 text-center">
-                                PDF, EPUB, MOBI (max {Math.round(maxSize / 1024 / 1024)}MB)
-                            </p>
-                        </>
-                    )}
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-gray-500">
+                            <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700 text-center mb-1">
+                        {isDragActive ? "Drop the file here" : label}
+                    </p>
+                    <p className="text-xs text-gray-500 text-center">
+                        PDF, EPUB, MOBI (max {Math.round(maxSize / 1024 / 1024)}MB)
+                    </p>
                 </div>
             )}
         </div>

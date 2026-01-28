@@ -45,12 +45,34 @@ export const ebookService = {
     },
 
     createEbook: async (data: any) => {
-        const response = await api.post('/admin/ebooks', data);
+        const formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if ((key === 'coverImage' || key === 'file') && data[key] instanceof File) {
+                formData.append(key, data[key]);
+            } else if (data[key] !== undefined && data[key] !== null) {
+                formData.append(key, String(data[key]));
+            }
+        });
+        
+        // Ensure we're not sending "undefined" string for missing files
+        if (!data.coverImage) formData.delete('coverImage');
+        if (!data.file) formData.delete('file');
+
+        const response = await api.post('/admin/ebooks', formData);
         return response;
     },
 
     updateEbook: async (id: string, data: any) => {
-        const response = await api.patch(`/admin/ebooks/${id}`, data);
+        const formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if ((key === 'coverImage' || key === 'file') && data[key] instanceof File) {
+                formData.append(key, data[key]);
+            } else if (data[key] !== undefined && data[key] !== null) {
+                formData.append(key, String(data[key]));
+            }
+        });
+
+        const response = await api.put(`/admin/ebooks/${id}`, formData);
         return response;
     },
 

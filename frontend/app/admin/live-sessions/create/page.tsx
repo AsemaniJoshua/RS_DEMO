@@ -154,7 +154,7 @@ export default function CreateLiveSessionPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-900 mb-2">
-                                    Recording Price (₦)
+                                    Recording Price (GHS)
                                 </label>
                                 <input
                                     type="number"

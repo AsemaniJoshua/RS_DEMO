@@ -105,25 +105,25 @@ export default function BlogDetailsPage({ params }: { params: Promise<{ id: stri
                 </div>
             </div>
 
+            {/* Featured Image Banner */}
+            {blog.featured_image ? (
+                <div className="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <img 
+                        src={blog.featured_image} 
+                        alt={blog.title} 
+                        className="w-full h-64 md:h-[400px] object-cover"
+                    />
+                </div>
+            ) : (
+                <div className="mb-8 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm h-48 flex flex-col items-center justify-center text-gray-400">
+                    <ImageIcon className="w-12 h-12 mb-2 opacity-50" />
+                    <span className="text-sm font-medium">No featured image</span>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Hero Image */}
-                    {blog.featured_image ? (
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                            <img 
-                                src={blog.featured_image} 
-                                alt={blog.title} 
-                                className="w-full h-64 md:h-96 object-cover"
-                            />
-                        </div>
-                    ) : (
-                        <div className="bg-gray-50 rounded-2xl border border-gray-100 shadow-sm h-48 flex flex-col items-center justify-center text-gray-400">
-                            <ImageIcon className="w-12 h-12 mb-2 opacity-50" />
-                            <span className="text-sm font-medium">No featured image</span>
-                        </div>
-                    )}
-
                     {/* Content Card */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                         <div className="mb-6">
