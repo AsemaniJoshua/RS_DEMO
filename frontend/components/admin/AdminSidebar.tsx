@@ -157,29 +157,30 @@ export default function AdminSidebar({ isMobileMenuOpen = false, onMobileMenuClo
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
             }`}>
             {/* Logo/Brand */}
-            <div className="p-6 border-b border-white/10">
-                <Link href="/admin" className="flex items-center gap-3">
-                    <div className="relative w-48 h-16">
+            <div className="p-2 border-b border-white/10">
+                <Link href="/admin" onClick={onMobileMenuClose} className="flex items-center gap-3 bg-white/5 p-2 rounded-lg justify-center">
+                    <div className="relative w-48 h-24">
                         <Image 
                             src="/rx-logo.png" 
                             alt="RxWithDrGeorge" 
                             fill
-                            className="object-contain object-left"
+                            className="object-contain object-left md:object-center"
                         />
                     </div>
                 </Link>
             </div>
 
             {/* Navigation - with flex-1 to push logout down */}
-            <nav className="flex-1 overflow-y-auto py-4 px-3">
-                <ul className="space-y-1">
+            <nav className="flex-1 overflow-y-auto py-1 px-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                <ul className="space-y-0">
                     {menuItems.map((item, index) => {
                         const isActive = pathname === item.href;
                         return (
                             <li key={index}>
                                 <Link
                                     href={item.href}
-                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                                    onClick={onMobileMenuClose}
+                                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                                         isActive
                                             ? "bg-[#00d4aa] text-white shadow-lg"
                                             : "text-gray-300 hover:bg-white/5 hover:text-white"
@@ -195,10 +196,10 @@ export default function AdminSidebar({ isMobileMenuOpen = false, onMobileMenuClo
             </nav>
 
             {/* Logout - pinned to bottom */}
-            <div className="p-3 border-t border-white/10">
+            <div className="p-2 border-t border-white/10">
                 <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 w-full"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 w-full"
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

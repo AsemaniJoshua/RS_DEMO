@@ -127,6 +127,18 @@ export default function AppointmentsPage() {
                 </Link>
             </div>
 
+            <div className="flex justify-end mb-6">
+                 <button 
+                    onClick={() => setTypeModal(true)}
+                    className="text-sm text-[#00d4aa] hover:text-[#00bfa6] font-medium flex items-center gap-1 cursor-pointer"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Manage Types
+                </button>
+            </div>
+
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
                 <div className="bg-white rounded-xl p-6 border border-gray-100">
@@ -218,15 +230,7 @@ export default function AppointmentsPage() {
                                 <option key={type.id} value={type.id}>{type.name}</option>
                             ))}
                         </select>
-                        <button
-                            onClick={() => setTypeModal(true)}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700"
-                            title="Manage Types"
-                        >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            </svg>
-                        </button>
+
                     </div>
                     <select
                         value={statusFilter}

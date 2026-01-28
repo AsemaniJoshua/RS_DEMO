@@ -1,44 +1,86 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import coursesData from "@/data/admin/courses.json";
+import { courseService } from "@/services/course-service";
+import CategoryManagerModal from "@/components/admin/CategoryManagerModal";
 import DeleteCourseModal from "@/components/admin/DeleteCourseModal";
+import toast from "react-hot-toast";
 
 export default function CoursesPage() {
+    const [courses, setCourses] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]); // Categories from backend
+    const [loading, setLoading] = useState(true);
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All Categories");
+
     const [selectedStatus, setSelectedStatus] = useState("All");
-    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; courseId: number | null; courseName: string }>({
+    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; courseId: string | null; courseName: string }>({
         isOpen: false,
         courseId: null,
         courseName: ""
     });
 
-    const { courses, categories } = coursesData;
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [coursesData, categoriesData] = await Promise.all([
+                courseService.getAllCourses(),
+                courseService.getCategories()
+            ]);
+            // Service already returns response.data, so simply use the returned value
+            setCourses(coursesData || []);
+            setCategories(categoriesData || []);
+        } catch (error) {
+            // Log error for debugging but suppress explicit console.error if requested
+            console.error("Failed to fetch data", error);
+            toast.error("Failed to fetch courses. Please check if backend is running.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Filter courses
     const filteredCourses = courses.filter(course => {
         const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            course.category.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesCategory = selectedCategory === "All Categories" || course.category === selectedCategory;
+                            (course.category?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategory === "All Categories" || course.category?.name === selectedCategory;
         const matchesStatus = selectedStatus === "All" || course.status === selectedStatus;
         return matchesSearch && matchesCategory && matchesStatus;
     });
 
-    const handleDeleteClick = (courseId: number, courseName: string) => {
+    const handleDeleteClick = (courseId: string, courseName: string) => {
         setDeleteModal({ isOpen: true, courseId, courseName });
     };
 
-    const handleDeleteConfirm = () => {
-        // Here you would typically send delete request to backend
-        console.log("Deleting course:", deleteModal.courseId);
-        setDeleteModal({ isOpen: false, courseId: null, courseName: "" });
+    const handleDeleteConfirm = async () => {
+        if (!deleteModal.courseId) return;
+        try {
+            await courseService.deleteCourse(deleteModal.courseId);
+            setCourses(courses.filter(c => c.id !== deleteModal.courseId));
+            setDeleteModal({ isOpen: false, courseId: null, courseName: "" });
+        } catch (error) {
+            console.error("Error deleting course", error);
+        }
     };
 
     const handleDeleteCancel = () => {
         setDeleteModal({ isOpen: false, courseId: null, courseName: "" });
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-[400px] flex flex-col items-center justify-center gap-3">
+                <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-gray-600 font-medium">Loading courses...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 md:p-8">
@@ -56,6 +98,18 @@ export default function CoursesPage() {
                         Add New Course
                     </button>
                 </Link>
+            </div>
+
+            <div className="flex justify-end mb-6">
+                 <button 
+                    onClick={() => setShowCategoryModal(true)}
+                    className="text-sm text-[#00d4aa] hover:text-[#00bfa6] font-medium flex items-center gap-1 cursor-pointer"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Manage Categories
+                </button>
             </div>
 
             {/* Stats Cards */}
@@ -81,33 +135,9 @@ export default function CoursesPage() {
                             </svg>
                         </div>
                     </div>
-                    <div className="text-2xl font-bold text-gray-900">{courses.filter(c => c.status === "Published").length}</div>
+                    <div className="text-2xl font-bold text-gray-900">{courses.filter(c => c.status === "PUBLISHED").length}</div>
                 </div>
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Total Students</span>
-                        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-blue-500">
-                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2"/>
-                                <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">{courses.reduce((sum, c) => sum + c.students, 0)}</div>
-                </div>
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Avg Rating</span>
-                        <div className="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-yellow-500">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">
-                        {(courses.filter(c => c.rating > 0).reduce((sum, c) => sum + c.rating, 0) / courses.filter(c => c.rating > 0).length).toFixed(1)}
-                    </div>
-                </div>
+                {/* Other stats can be added similarly */}
             </div>
 
             {/* Filters */}
@@ -134,8 +164,9 @@ export default function CoursesPage() {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
-                        {categories.map((cat, idx) => (
-                            <option key={idx} value={cat}>{cat}</option>
+                        <option value="All Categories">All Categories</option>
+                        {categories.map((cat: any) => (
+                            <option key={cat.id} value={cat.name}>{cat.name}</option>
                         ))}
                     </select>
 
@@ -146,8 +177,8 @@ export default function CoursesPage() {
                         className="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
                     >
                         <option value="All">All Status</option>
-                        <option value="Published">Published</option>
-                        <option value="Draft">Draft</option>
+                        <option value="PUBLISHED">Published</option>
+                        <option value="DRAFT">Draft</option>
                     </select>
                 </div>
             </div>
@@ -162,7 +193,6 @@ export default function CoursesPage() {
                             <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Category</th>
                             <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Students</th>
                             <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Price</th>
-                            <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Rating</th>
                             <th className="text-left px-6 py-4 text-sm font-semibold text-gray-900">Status</th>
                             <th className="text-right px-6 py-4 text-sm font-semibold text-gray-900">Actions</th>
                         </tr>
@@ -170,55 +200,49 @@ export default function CoursesPage() {
                     <tbody className="divide-y divide-gray-100">
                         {filteredCourses.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                                     No courses found
                                 </td>
                             </tr>
                         ) : (
                             filteredCourses.map((course) => (
-                                <tr key={course.id} className="hover:bg-gray-50 transition-colors">
+                                <tr key={course.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => window.location.href=`/admin/courses/${course.id}`}>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] rounded-lg flex items-center justify-center text-white font-bold">
-                                                {course.title.substring(0, 2).toUpperCase()}
-                                            </div>
+                                            {course.thumbnailUrl ? (
+                                                <img src={course.thumbnailUrl} alt={course.title} className="w-12 h-12 rounded-lg object-cover" />
+                                            ) : (
+                                                <div className="w-12 h-12 bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] rounded-lg flex items-center justify-center text-white font-bold">
+                                                    {course.title.substring(0, 2).toUpperCase()}
+                                                </div>
+                                            )}
                                             <div>
                                                 <div className="font-semibold text-gray-900">{course.title}</div>
-                                                <div className="text-sm text-gray-500">{course.duration}</div>
+                                                <div className="text-sm text-gray-500">Self-paced</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="text-sm text-gray-700">{course.category}</span>
+                                        <span className="text-sm text-gray-700">{course.category?.name || 'Uncategorized'}</span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="text-sm text-gray-900 font-medium">{course.students}</span>
+                                        <span className="text-sm text-gray-900 font-medium">{course.students || 0}</span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="text-sm text-gray-900 font-medium">{course.price}</span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {course.rating > 0 ? (
-                                            <div className="flex items-center gap-1">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-yellow-500">
-                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                                                </svg>
-                                                <span className="text-sm text-gray-900 font-medium">{course.rating}</span>
-                                            </div>
-                                        ) : (
-                                            <span className="text-sm text-gray-400">N/A</span>
-                                        )}
+                                        <span className="text-sm text-gray-900 font-medium">
+                                            {Number(course.price) === 0 ? "Free" : `GHS ${course.price}`}
+                                        </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                            course.status === "Published" 
+                                            course.status === "PUBLISHED" 
                                                 ? "bg-green-100 text-green-700" 
                                                 : "bg-gray-100 text-gray-700"
                                         }`}>
                                             {course.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                                         <div className="flex items-center justify-end gap-2">
                                             <Link href={`/admin/courses/${course.id}/edit`}>
                                                 <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
@@ -253,6 +277,13 @@ export default function CoursesPage() {
                 courseName={deleteModal.courseName}
                 onConfirm={handleDeleteConfirm}
                 onCancel={handleDeleteCancel}
+            />
+
+            {/* Category Modal */}
+            <CategoryManagerModal 
+                isOpen={showCategoryModal}
+                onClose={() => setShowCategoryModal(false)}
+                onUpdate={fetchData}
             />
         </div>
     );

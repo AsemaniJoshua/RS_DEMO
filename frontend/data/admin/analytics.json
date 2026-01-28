@@ -16,14 +16,14 @@
     },
     {
       "id": "revenue",
-      "label": "Revenue",
+      "label": "Revenue from Courses",
       "value": "$45.2K",
       "change": "+23%",
       "color": "from-[#1a1f35] to-[#2a3f55]"
     },
     {
       "id": "courses",
-      "label": "Courses Sold",
+      "label": "Revenue from Live Session",
       "value": "342",
       "change": "+18%",
       "color": "from-[#f59e0b] to-[#d97706]"

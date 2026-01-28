@@ -110,7 +110,7 @@ export default function FileUpload({
                         {isDragActive ? "Drop the file here" : label}
                     </p>
                     <p className="text-xs text-gray-500 text-center">
-                        PDF, EPUB, MOBI (max {Math.round(maxSize / 1024 / 1024)}MB)
+                        PDF, EPUB, MOBI, ZIP, RAR (max {Math.round(maxSize / 1024 / 1024)}MB)
                     </p>
                 </div>
             )}

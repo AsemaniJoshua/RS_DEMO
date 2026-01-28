@@ -414,12 +414,12 @@ export default function AdminDashboard() {
                             </div>
                             <div className="grid grid-cols-2 gap-3 text-center">
                                 <div className="bg-gray-50 rounded-lg p-2">
-                                    <div className="text-lg font-bold text-gray-900">156</div>
-                                    <div className="text-xs text-gray-600">Sessions</div>
+                                    <div className="text-lg font-bold text-gray-900">0</div>
+                                    <div className="text-xs text-gray-600">Total Students</div>
                                 </div>
                                 <div className="bg-gray-50 rounded-lg p-2">
-                                    <div className="text-lg font-bold text-gray-900">4.9</div>
-                                    <div className="text-xs text-gray-600">Rating</div>
+                                    <div className="text-lg font-bold text-gray-900">0</div>
+                                    <div className="text-xs text-gray-600">Published Content</div>
                                 </div>
                             </div>
                         </div>
