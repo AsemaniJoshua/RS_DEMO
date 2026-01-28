@@ -13,6 +13,7 @@ import appointmentsData from "@/data/admin/appointments.json";
 import activitiesData from "@/data/admin/activities.json";
 import quickActionsData from "@/data/admin/quickActions.json";
 import chartDataImport from "@/data/admin/chartData.json";
+import { dashboardService } from "@/services/dashboard-service";
 
 export default function AdminDashboard() {
     const [mounted, setMounted] = useState(false);
@@ -21,12 +22,28 @@ export default function AdminDashboard() {
     const [hoveredDate, setHoveredDate] = useState<number | null>(null);
     const [chartProgress, setChartProgress] = useState(0);
 
+    const [stats, setStats] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         setMounted(true);
         // Animate chart
         setTimeout(() => {
             setChartProgress(100);
         }, 500);
+
+        const fetchDashboardStats = async () => {
+            try {
+                const response = await dashboardService.getStats();
+                setStats(response);
+            } catch (error) {
+                console.error("Failed to fetch dashboard stats", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardStats();
     }, []);
 
     // Analytics icons
@@ -81,14 +98,48 @@ export default function AdminDashboard() {
     };
 
     // Extract data from JSON imports
-    const analytics = analyticsData.analytics;
+    // Extract data from JSON imports (fallback)
     const appointments = appointmentsData.appointments || [];
     // Generate appointmentDates from appointments array
     const appointmentDates = appointments.map((appt: any) => appt.date);
-    const recentActivities = activitiesData.recentActivities;
+
+    // Use backend data if available, otherwise fallback (or empty)
+    const recentActivities = stats?.recentActivities || activitiesData.recentActivities;
     const quickActions = quickActionsData.quickActions;
-    const revenueData = chartDataImport.revenueData;
-    const pieChartData = chartDataImport.pieChartData;
+    const revenueData = stats?.charts?.revenueData || chartDataImport.revenueData;
+    const pieChartData = stats?.charts?.pieChartData || chartDataImport.pieChartData;
+
+    // Computed Analytics Data
+    const realAnalytics = [
+        {
+            id: "patients",
+            label: "Total Patients",
+            value: stats ? stats.counts.patients.toLocaleString() : "...",
+            change: "+0%", // Placeholder as we don't have historical data yet
+            color: "from-[#00d4aa] to-[#00bfa6]"
+        },
+        {
+            id: "appointments",
+            label: "Appointments",
+            value: stats ? stats.counts.appointments.toLocaleString() : "...",
+            change: "+0%",
+            color: "from-[#0066ff] to-[#0052cc]"
+        },
+        {
+            id: "revenue",
+            label: "Revenue from Courses",
+            value: stats ? `GHS ${stats.revenue.courseRevenue.toLocaleString()}` : "...",
+            change: "+0%",
+            color: "from-[#1a1f35] to-[#2a3f55]"
+        },
+        {
+            id: "courses",
+            label: "Revenue from Live Session",
+            value: stats ? `GHS ${stats.revenue.sessionRevenue.toLocaleString()}` : "...",
+            change: "+0%",
+            color: "from-[#f59e0b] to-[#d97706]"
+        }
+    ];
 
     // Calendar functions
     const getDaysInMonth = (date: Date) => {
@@ -133,11 +184,15 @@ export default function AdminDashboard() {
                             <div className="flex flex-wrap gap-3 md:gap-4">
                                 <div className="bg-white/10 backdrop-blur-sm px-4 md:px-5 py-2 md:py-3 rounded-lg border border-white/20">
                                     <div className="text-xs text-gray-300">Today's Appointments</div>
-                                    <div className="text-xl md:text-2xl font-bold">12</div>
+                                    <div className="text-xl md:text-2xl font-bold">
+                                        {stats ? stats.counts.todayAppointments : 0}
+                                    </div>
                                 </div>
                                 <div className="bg-white/10 backdrop-blur-sm px-4 md:px-5 py-2 md:py-3 rounded-lg border border-white/20">
-                                    <div className="text-xs text-gray-300">Pending Reviews</div>
-                                    <div className="text-xl md:text-2xl font-bold">5</div>
+                                    <div className="text-xs text-gray-300">Total Revenue</div>
+                                    <div className="text-xl md:text-2xl font-bold">
+                                         {stats ? `GHS ${stats.revenue.total.toLocaleString()}` : "..."}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -161,7 +216,7 @@ export default function AdminDashboard() {
             {/* Analytics Cards */}
             <div className="px-4 md:px-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-                    {analytics.map((item, idx) => (
+                    {realAnalytics.map((item, idx) => (
                         <div
                             key={idx}
                             className={`bg-white rounded-xl p-6 shadow-sm border border-gray-100 transform transition-all duration-500 hover:shadow-lg hover:scale-105 ${
@@ -222,37 +277,75 @@ export default function AdminDashboard() {
                     <div className="lg:col-span-4 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
                         <h3 className="text-lg font-bold text-gray-900 mb-6">Patient Distribution</h3>
                         <div className="flex items-center justify-center">
-                            <svg width="200" height="200" viewBox="0 0 200 200">
-                                <circle cx="100" cy="100" r="80" fill="#e5e7eb"/>
-                                <path 
-                                    d="M 100 20 A 80 80 0 0 1 180 100 L 100 100 Z" 
-                                    fill="#00d4aa"
-                                    style={{
-                                        transform: mounted ? 'scale(1)' : 'scale(0)',
-                                        transformOrigin: '100px 100px',
-                                        transition: 'transform 0.8s ease-out 0.3s'
-                                    }}
-                                />
-                                <path 
-                                    d="M 180 100 A 80 80 0 0 1 100 180 L 100 100 Z" 
-                                    fill="#0066ff"
-                                    style={{
-                                        transform: mounted ? 'scale(1)' : 'scale(0)',
-                                        transformOrigin: '100px 100px',
-                                        transition: 'transform 0.8s ease-out 0.5s'
-                                    }}
-                                />
-                                <path 
-                                    d="M 100 180 A 80 80 0 0 1 20 100 L 100 100 Z" 
-                                    fill="#1a1f35"
-                                    style={{
-                                        transform: mounted ? 'scale(1)' : 'scale(0)',
-                                        transformOrigin: '100px 100px',
-                                        transition: 'transform 0.8s ease-out 0.7s'
-                                    }}
-                                />
+                            <svg width="200" height="200" viewBox="0 0 200 200" className="transform -rotate-90">
+                                {pieChartData.length > 0 ? (() => {
+                                    let cumulativePercent = 0;
+                                    
+                                    function getCoordinatesForPercent(percent: number) {
+                                        const x = 100 + 80 * Math.cos(2 * Math.PI * percent);
+                                        const y = 100 + 80 * Math.sin(2 * Math.PI * percent);
+                                        return [x, y];
+                                    }
+
+                                    return pieChartData.map((item: any, idx: number) => {
+                                        // Ensure we have a valid number for percentage. 
+                                        // item.percentage comes from backend. If fallback, parse string.
+                                        const percentVal = typeof item.percentage === 'number' ? item.percentage : parseInt(item.value) || 0;
+                                        const percent = percentVal / 100;
+                                        
+                                        // Handle 100% case (circle)
+                                        if (percent >= 1) {
+                                            return (
+                                                <circle 
+                                                    key={idx} 
+                                                    cx="100" 
+                                                    cy="100" 
+                                                    r="80" 
+                                                    fill={item.color} 
+                                                    stroke="white" 
+                                                    strokeWidth="2"
+                                                />
+                                            );
+                                        }
+
+                                        const [startX, startY] = getCoordinatesForPercent(cumulativePercent);
+                                        cumulativePercent += percent;
+                                        const [endX, endY] = getCoordinatesForPercent(cumulativePercent);
+                                        const largeArcFlag = percent > 0.5 ? 1 : 0;
+
+                                        const pathData = [
+                                            `M 100 100`,
+                                            `L ${startX} ${startY}`,
+                                            `A 80 80 0 ${largeArcFlag} 1 ${endX} ${endY}`,
+                                            `Z`
+                                        ].join(' ');
+
+                                        return (
+                                            <path 
+                                                key={idx}
+                                                d={pathData}
+                                                fill={item.color}
+                                                stroke="white" 
+                                                strokeWidth="2"
+                                                style={{
+                                                    transition: 'all 0.8s ease-out'
+                                                }}
+                                            />
+                                        );
+                                    });
+                                })() : (
+                                    <circle cx="100" cy="100" r="80" fill="#e5e7eb"/>
+                                )}
                                 <circle cx="100" cy="100" r="50" fill="white"/>
-                                <text x="100" y="105" textAnchor="middle" className="text-2xl font-bold fill-gray-900">2.8K</text>
+                                <text 
+                                    x="100" 
+                                    y="100" 
+                                    textAnchor="middle" 
+                                    dominantBaseline="central"
+                                    className="text-2xl font-bold fill-gray-900 transform rotate-90"
+                                >
+                                    {stats ? stats.counts.appointments : "0"}
+                                </text>
                             </svg>
                         </div>
                         <div className="mt-4 space-y-2">
@@ -414,11 +507,11 @@ export default function AdminDashboard() {
                             </div>
                             <div className="grid grid-cols-2 gap-3 text-center">
                                 <div className="bg-gray-50 rounded-lg p-2">
-                                    <div className="text-lg font-bold text-gray-900">0</div>
+                                    <div className="text-lg font-bold text-gray-900">{stats ? stats.counts.totalStudents : 0}</div>
                                     <div className="text-xs text-gray-600">Total Students</div>
                                 </div>
                                 <div className="bg-gray-50 rounded-lg p-2">
-                                    <div className="text-lg font-bold text-gray-900">0</div>
+                                    <div className="text-lg font-bold text-gray-900">{stats ? stats.counts.publishedContent : 0}</div>
                                     <div className="text-xs text-gray-600">Published Content</div>
                                 </div>
                             </div>
