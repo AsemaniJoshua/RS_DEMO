@@ -1,9 +1,7 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ApiError } from "@/lib/api";
 import toast from 'react-hot-toast';
@@ -18,18 +16,22 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get('redirect');
     const { login, isAuthenticated, isAdminOrEditor, isLoading: isAuthLoading } = useAuth();
 
     // Redirect if already authenticated (only after auth loading is complete)
     useEffect(() => {
         if (!isAuthLoading && isAuthenticated) {
-            if (isAdminOrEditor()) {
+            if (redirectUrl) {
+                router.push(redirectUrl);
+            } else if (isAdminOrEditor()) {
                 router.push('/admin');
             } else {
                 router.push('/dashboard');
             }
         }
-    }, [isAuthLoading, isAuthenticated, isAdminOrEditor, router]);
+    }, [isAuthLoading, isAuthenticated, isAdminOrEditor, router, redirectUrl]);
 
     // Show nothing while auth is loading or if authenticated (redirecting)
     if (isAuthLoading || isAuthenticated) {

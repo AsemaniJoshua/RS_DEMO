@@ -12,8 +12,10 @@ import Image from "next/image";
 import appointmentsData from "@/data/admin/appointments.json";
 import quickActionsData from "@/data/admin/quickActions.json";
 import { dashboardService } from "@/services/dashboard-service";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function AdminDashboard() {
+    const { user } = useAuth();
     const [mounted, setMounted] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
@@ -177,7 +179,7 @@ export default function AdminDashboard() {
 
                     <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div className="text-white flex-1">
-                            <h2 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, Dr. George!</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'User'}!</h2>
                             <p className="text-gray-300 mb-4 md:mb-6 text-sm md:text-base">Here's what's happening with your practice today</p>
                             <div className="flex flex-wrap gap-3 md:gap-4">
                                 <div className="bg-white/10 backdrop-blur-sm px-4 md:px-5 py-2 md:py-3 rounded-lg border border-white/20">

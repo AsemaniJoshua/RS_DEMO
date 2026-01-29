@@ -157,7 +157,7 @@ export const personalBrandService = {
 
         // Use fetch directly for multipart/form-data
         const token = localStorage.getItem('auth_token');
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'}/admin/personal-brand/profile`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/admin/personal-brand/profile`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${token}`
