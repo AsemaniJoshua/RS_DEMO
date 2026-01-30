@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import DeleteMediaModal from "@/components/admin/DeleteMediaModal";
-import { mediaService, Media, MediaStats } from "@/services/media-service";
+import { mediaService, MediaItem, MediaStats } from "@/services/media-service";
 import toast from "react-hot-toast";
 
 export default function MediaLibraryPage() {
-    const [media, setMedia] = useState<Media[]>([]);
+    const [media, setMedia] = useState<MediaItem[]>([]);
     const [stats, setStats] = useState<MediaStats>({
         totalFiles: 0,
         images: 0,
@@ -30,15 +30,16 @@ export default function MediaLibraryPage() {
     const fetchMedia = async () => {
         try {
             setIsLoading(true);
-            const response = await mediaService.getAllMedia({
-                file_type: selectedType !== 'all' ? selectedType : undefined,
-                search: searchQuery || undefined,
-                limit: 100
-            });
+            const response = await mediaService.getAllMedia(
+                1,
+                100,
+                selectedType !== 'all' ? selectedType : 'all',
+                searchQuery || undefined
+            );
 
-            if (response.status === 'success' && response.data) {
-                setMedia(response.data.media);
-                setStats(response.data.stats);
+            if (response) {
+                setMedia(response.media);
+                setStats(response.stats);
             }
         } catch (error: any) {
             console.error('Error fetching media:', error);

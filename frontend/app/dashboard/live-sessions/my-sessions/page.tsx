@@ -1,10 +1,40 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { liveSessionsService, type LiveSession } from "@/services/live-sessions-service";
+import { liveSessionsService, type LiveSession, type SessionStatus } from "@/services/live-sessions-service";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import BackButton from "@/components/ui/BackButton";
+
+    const getStatusColor = (status: SessionStatus) => {
+        switch (status) {
+            case 'LIVE':
+                return 'bg-red-100 text-red-800';
+            case 'UPCOMING':
+                return 'bg-blue-100 text-blue-800';
+            case 'COMPLETED':
+                return 'bg-green-100 text-green-800';
+            case 'CANCELLED':
+                return 'bg-gray-100 text-gray-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    const formatTime = (dateString: string) => {
+        return new Date(dateString).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
 export default function MySessionsPage() {
     const [registrations, setRegistrations] = useState<any[]>([]); // Using any for now to avoid strict type refactoring of the whole file, but ideally SessionRegistration

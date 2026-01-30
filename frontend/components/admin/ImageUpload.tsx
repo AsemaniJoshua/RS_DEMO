@@ -6,12 +6,14 @@ import Image from 'next/image';
 
 interface ImageUploadProps {
     value?: File | string | null;
-    onChange: (file: File | null) => void;
+    onChange: (value: File | string | null) => void;
+    onUploadComplete?: (data: { url: string; public_id: string }) => void;
+    onFileSelect?: (file: File | null) => void;
     label?: string;
     className?: string;
 }
 
-export default function ImageUpload({ value, onChange, label = "Featured Image", className = "" }: ImageUploadProps) {
+export default function ImageUpload({ value, onChange, onUploadComplete, onFileSelect, label = "Featured Image", className = "" }: ImageUploadProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string>("");
 
@@ -26,7 +28,7 @@ export default function ImageUpload({ value, onChange, label = "Featured Image",
 
     const displayUrl = getDisplayUrl();
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -42,11 +44,40 @@ export default function ImageUpload({ value, onChange, label = "Featured Image",
             return;
         }
 
-        onChange(file);
+        // Handle upload if onUploadComplete is provided
+        if (onUploadComplete) {
+            const loadingToast = toast.loading('Uploading image...');
+            try {
+                const response = await blogService.uploadImage(file);
+                // Cast response to any to access public_id if it exists, or just pass empty string if not typed
+                const responseData = response.data as any;
+                
+                onUploadComplete({
+                    url: responseData.url,
+                    public_id: responseData.public_id || ''
+                });
+                onChange(responseData.url);
+                toast.dismiss(loadingToast);
+                toast.success('Image uploaded successfully');
+            } catch (error) {
+                toast.dismiss(loadingToast);
+                toast.error('Failed to upload image');
+                console.error(error);
+            }
+        } else {
+            // Default behavior if no upload handler
+            onChange(file);
+            if (onFileSelect) {
+                onFileSelect(file);
+            }
+        }
     };
 
     const handleRemove = () => {
         onChange(null);
+        if (onFileSelect) {
+            onFileSelect(null);
+        }
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }

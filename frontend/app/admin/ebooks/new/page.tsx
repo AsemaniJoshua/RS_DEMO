@@ -222,7 +222,11 @@ export default function NewEbookPage() {
                         </h2>
                         <ImageUpload
                             value={formData.coverImage}
-                            onChange={(file) => setFormData(prev => ({ ...prev, coverImage: file }))}
+                            onChange={(file) => {
+                                if (file === null || file instanceof File) {
+                                    setFormData(prev => ({ ...prev, coverImage: file }));
+                                }
+                            }}
                             label="Upload Cover"
                         />
                         <p className="text-xs text-center text-gray-500 mt-2">Recommended size: 600x900px</p>

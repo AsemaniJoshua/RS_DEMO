@@ -39,17 +39,19 @@ export default function EditSpeakingEventPage() {
                     speakingService.getAllCategories()
                 ]);
                 
-                setFormData({
-                    title: event.title,
-                    venue: event.venue,
-                    category: event.category,
-                    date: event.date.split('T')[0], // Convert to YYYY-MM-DD format
-                    location: event.location,
-                    image: event.image,
-                    imagePublicId: event.imagePublicId,
-                    description: event.description || "",
-                    status: event.status
-                });
+                if (event) {
+                    setFormData({
+                        title: event.title,
+                        venue: event.venue,
+                        category: event.category,
+                        date: event.date.split('T')[0], // Convert to YYYY-MM-DD format
+                        location: event.location,
+                        image: event.image,
+                        imagePublicId: event.imagePublicId,
+                        description: event.description || "",
+                        status: event.status
+                    });
+                }
                 setCategories(cats);
                 setIsLoading(false);
             } catch (error: any) {
@@ -180,7 +182,11 @@ export default function EditSpeakingEventPage() {
                         </label>
                         <ImageUpload
                             value={formData.image}
-                            onChange={(url) => setFormData(prev => ({ ...prev, image: url }))}
+                            onChange={(url) => {
+                                if (typeof url === 'string') {
+                                    setFormData(prev => ({ ...prev, image: url }));
+                                }
+                            }}
                             onUploadComplete={(data) => setFormData(prev => ({ 
                                 ...prev, 
                                 image: data.url,

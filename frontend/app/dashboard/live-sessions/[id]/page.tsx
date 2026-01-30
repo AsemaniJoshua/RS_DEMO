@@ -26,7 +26,9 @@ export default function LiveSessionDetailsPage() {
         try {
             setLoading(true);
             const response = await liveSessionsService.getSessionById(sessionId);
-            setSession(response.data);
+            if (response.data) {
+                setSession(response.data);
+            }
         } catch (error: any) {
             toast.error(error.message || 'Failed to load session');
             router.push('/dashboard/live-sessions');
@@ -229,7 +231,7 @@ export default function LiveSessionDetailsPage() {
                                                 : 'You have purchased access to this recording.'}
                                         </p>
                                         <a
-                                            href={session.recording_url}
+                                            href={session.recording_url || '#'}
                                             target="_blank"
                                             rel="noreferrer"
                                             className="inline-flex items-center gap-2 px-6 py-3 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors font-medium"

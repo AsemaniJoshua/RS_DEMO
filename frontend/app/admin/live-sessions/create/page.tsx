@@ -33,8 +33,8 @@ export default function CreateLiveSessionPage() {
             const payload = {
                 ...formData,
                 duration_minutes: parseInt(formData.duration_minutes.toString()) || 60,
-                recording_price: formData.recording_price ? parseFloat(formData.recording_price) : null,
-                max_participants: formData.max_participants ? parseInt(formData.max_participants) : null
+                recording_price: formData.recording_price ? parseFloat(formData.recording_price) : undefined,
+                max_participants: formData.max_participants ? parseInt(formData.max_participants) : undefined
             };
 
             await liveSessionsService.createSession(payload);

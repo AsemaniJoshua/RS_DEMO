@@ -42,6 +42,7 @@ export interface LiveSession {
     is_registered?: boolean;
     is_full?: boolean;
     user_attended?: boolean;
+    has_purchased_recording?: boolean;
 }
 
 export interface SessionRegistration {

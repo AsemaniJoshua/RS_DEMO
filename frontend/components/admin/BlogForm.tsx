@@ -79,8 +79,12 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
         setFormData(prev => ({ ...prev, tags }));
     };
 
-    const handleImageChange = (url: string) => {
-        setFormData(prev => ({ ...prev, featured_image: url }));
+    const handleImageChange = (value: string | File | null) => {
+        if (typeof value === 'string') {
+            setFormData(prev => ({ ...prev, featured_image: value }));
+        } else if (value === null) {
+             setFormData(prev => ({ ...prev, featured_image: '' }));
+        }
     };
 
     const handleFileSelect = (file: File | null) => {

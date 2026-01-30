@@ -246,7 +246,11 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                         <ImageUpload
                             label="Change Thumbnail"
                             value={thumbnail ? URL.createObjectURL(thumbnail) : existingThumbnail}
-                            onChange={(file) => setThumbnail(file)}
+                            onChange={(val) => {
+                                if (val === null || val instanceof File) {
+                                    setThumbnail(val);
+                                }
+                            }}
                         />
                     </div>
 

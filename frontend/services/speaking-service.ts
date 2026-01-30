@@ -11,8 +11,8 @@ export interface SpeakingEvent {
     imagePublicId: string;
     description?: string;
     status: 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
-    createdAt: string;
-    updatedAt: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface SpeakingEventFilters {

@@ -143,7 +143,11 @@ export default function NewSpeakingEventPage() {
                         </label>
                         <ImageUpload
                             value={formData.image}
-                            onChange={(url) => setFormData(prev => ({ ...prev, image: url }))}
+                            onChange={(url) => {
+                                if (typeof url === 'string') {
+                                    setFormData(prev => ({ ...prev, image: url }));
+                                }
+                            }}
                             onUploadComplete={(data) => setFormData(prev => ({ 
                                 ...prev, 
                                 image: data.url,

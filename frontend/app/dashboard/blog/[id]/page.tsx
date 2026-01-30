@@ -24,7 +24,9 @@ export default function BlogDetailsPage() {
     const fetchBlog = async (id: string) => {
         try {
             const data = await userBlogService.getBlogById(id);
-            setBlog(data);
+            if (data) {
+                setBlog(data);
+            }
         } catch (error) {
             console.error("Failed to fetch blog details", error);
         } finally {

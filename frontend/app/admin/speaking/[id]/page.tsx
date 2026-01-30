@@ -232,7 +232,7 @@ export default function ViewSpeakingEventPage() {
                                 <div className="flex items-center gap-2">
                                     <Clock className="w-4 h-4 text-gray-400" />
                                     <span className="text-sm text-gray-600">
-                                        {new Date(event.updated_at).toLocaleDateString()}
+                                        {event?.updated_at ? new Date(event.updated_at).toLocaleDateString() : 'N/A'}
                                     </span>
                                 </div>
                             </div>

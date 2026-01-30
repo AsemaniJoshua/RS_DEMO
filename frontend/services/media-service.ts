@@ -93,6 +93,48 @@ class MediaService {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
+
+    // Upload media
+    async uploadMedia(files: File[]): Promise<{ status: string; message: string; data: MediaItem[] }> {
+        try {
+            const formData = new FormData();
+            files.forEach(file => {
+                formData.append('files', file);
+            });
+
+            const response = await axios.post(
+                `${API_BASE_URL}/user/media/upload`,
+                formData,
+                {
+                    ...this.getAuthHeader(),
+                    headers: {
+                        ...this.getAuthHeader().headers,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+            return response.data;
+        } catch (error: any) {
+             console.error('Error uploading media:', error);
+             throw new Error(error.response?.data?.message || 'Failed to upload media');
+        }
+    }
+
+
+
+    // Delete media
+    async deleteMedia(id: string): Promise<{ status: string; message: string }> {
+        try {
+            const response = await axios.delete(
+                `${API_BASE_URL}/user/media/${id}`,
+                this.getAuthHeader()
+            );
+            return response.data;
+        } catch (error: any) {
+             console.error('Error deleting media:', error);
+             throw new Error(error.response?.data?.message || 'Failed to delete media');
+        }
+    }
 }
 
 export const mediaService = new MediaService();

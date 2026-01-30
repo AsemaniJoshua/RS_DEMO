@@ -211,7 +211,11 @@ export default function AddCoursePage() {
                         <ImageUpload
                             label=""
                             value={thumbnail ? URL.createObjectURL(thumbnail) : ""}
-                            onChange={(file) => setThumbnail(file)}
+                            onChange={(file) => {
+                                if (file === null || file instanceof File) {
+                                    setThumbnail(file);
+                                }
+                            }}
                         />
                     </div>
 

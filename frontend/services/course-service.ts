@@ -61,16 +61,12 @@ export const courseService = {
     },
 
     createCourse: async (formData: FormData): Promise<any> => {
-        const response = await api.post('/admin/courses', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const response = await api.post('/admin/courses', formData);
         return response.data;
     },
 
     updateCourse: async (id: string, formData: FormData): Promise<any> => {
-        const response = await api.put(`/admin/courses/${id}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const response = await api.put(`/admin/courses/${id}`, formData);
         return response.data;
     },
 
@@ -81,7 +77,7 @@ export const courseService = {
 
     downloadCourse: async (id: string) => {
         // We get the URL from the backend
-        const response = await api.get(`/admin/courses/${id}/download`);
+        const response = await api.get<any>(`/admin/courses/${id}/download`);
         
         if (response.data.success && response.data.downloadUrl) {
             // Initiate download by opening in new tab or creating link
