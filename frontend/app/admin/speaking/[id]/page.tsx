@@ -32,6 +32,7 @@ export default function ViewSpeakingEventPage() {
         const fetchEvent = async () => {
             try {
                 const data = await speakingService.getEventById(eventId);
+                if (!data) throw new Error("Event not found");
                 setEvent(data);
                 setIsLoading(false);
             } catch (error: any) {

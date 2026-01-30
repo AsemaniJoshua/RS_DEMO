@@ -169,7 +169,7 @@ export default function EbookDetailPage() {
                             <div>
                                 <label className="text-sm text-gray-500 block mb-1">Price</label>
                                 <div className="font-medium text-gray-900">
-                                    {parseFloat(ebook.price) === 0 ? "Free" : `GHS ${ebook.price}`}
+                                    {ebook.price === 0 ? "Free" : `GHS ${ebook.price}`}
                                 </div>
                             </div>
                             <div>
@@ -211,7 +211,7 @@ export default function EbookDetailPage() {
                             </div>
                             <div className="min-w-0">
                                 <p className="text-sm font-medium text-gray-900 truncate">
-                                    {ebook.title}.{ebook.format.toLowerCase()}
+                                    {ebook.title}.{ebook.format?.toLowerCase() || 'pdf'}
                                 </p>
                             </div>
                         </div>

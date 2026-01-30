@@ -43,7 +43,7 @@ export const userBlogService = {
         return response.data?.blogs || [];
     },
 
-    async getBlogById(id: string): Promise<BlogPost> {
+    async getBlogById(id: string): Promise<BlogPost | undefined> {
         const response = await api.get<{ blog: BlogPost }>(`/user/blog/${id}`);
         return response.data?.blog;
     }

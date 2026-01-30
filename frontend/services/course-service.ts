@@ -60,14 +60,14 @@ export const courseService = {
         return response.data;
     },
 
-    createCourse: async (formData: FormData) => {
+    createCourse: async (formData: FormData): Promise<any> => {
         const response = await api.post('/admin/courses', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
         return response.data;
     },
 
-    updateCourse: async (id: string, formData: FormData) => {
+    updateCourse: async (id: string, formData: FormData): Promise<any> => {
         const response = await api.put(`/admin/courses/${id}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         });

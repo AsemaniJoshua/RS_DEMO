@@ -20,6 +20,17 @@ export interface Ebook {
     rating?: number;
     created_at?: string;
     format?: string;
+    fileUrl?: string;
+}
+
+export interface EbookCategory {
+    id: string;
+    name: string;
+    description?: string;
+    count?: number;
+    _count?: {
+        ebooks: number;
+    };
 }
 
 export interface EbookPurchase {
@@ -94,8 +105,102 @@ class EbookService {
     /**
      * Download ebook
      */
+    /**
+     * Download ebook
+     */
     async downloadEbook(id: string) {
         return apiFetch<DownloadResponse>(`/user/ebooks/${id}/download`);
+    }
+
+    // ==========================================
+    // Admin Methods
+    // ==========================================
+
+    /**
+     * Get all ebooks (Admin)
+     */
+    async getAllEbooks() {
+        return apiFetch<{ ebooks: Ebook[] }>('/admin/ebooks');
+    }
+
+    /**
+     * Get all categories
+     */
+    async getAllCategories() {
+        return apiFetch<{ categories: EbookCategory[] }>('/admin/ebook-categories');
+    }
+
+    /**
+     * Create new ebook
+     */
+    async createEbook(data: any) {
+        const formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (data[key] !== null && data[key] !== undefined) {
+                 formData.append(key, data[key]);
+            }
+        });
+
+        return apiFetch('/admin/ebooks', {
+            method: 'POST',
+            body: formData,
+            // Header is automatically set by browser for FormData
+        });
+    }
+
+    /**
+     * Create category
+     */
+    async createCategory(name: string) {
+        return apiFetch('/admin/ebook-categories', {
+            method: 'POST',
+            body: JSON.stringify({ name }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+
+    /**
+     * Delete category
+     */
+    async deleteCategory(id: string) {
+        return apiFetch(`/admin/ebook-categories/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * Update ebook
+     */
+    async updateEbook(id: string, data: any) {
+        const formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (data[key] !== null && data[key] !== undefined) {
+                 formData.append(key, data[key]);
+            }
+        });
+
+        return apiFetch(`/admin/ebooks/${id}`, {
+            method: 'PUT',
+            body: formData,
+        });
+    }
+
+    /**
+     * Get ebook for admin (includes drafts)
+     */
+    async getAdminEbookById(id: string) {
+        return apiFetch<{ ebook: Ebook }>(`/admin/ebooks/${id}`);
+    }
+
+    /**
+     * Delete ebook
+     */
+    async deleteEbook(id: string) {
+        return apiFetch(`/admin/ebooks/${id}`, {
+            method: 'DELETE'
+        });
     }
 }
 

@@ -101,13 +101,34 @@ export default function AdminDashboard() {
     // Extract data from JSON imports (fallback)
     const appointments = appointmentsData.appointments || [];
     // Generate appointmentDates from appointments array
-    const appointmentDates = appointments.map((appt: any) => appt.date);
+    interface Activity {
+        id?: string;
+        user: string;
+        action: string;
+        time: string;
+        color: string;
+        [key: string]: any;
+    }
 
-    // Use backend data if available, otherwise fallback (or empty)
-    const recentActivities = stats?.recentActivities || [];
+    interface RevenueItem {
+        label?: string;
+        month: string;
+        amount: number;
+        value: number;
+        height?: string;
+    }
+
+    interface PieChartItem {
+        label: string;
+        value: string | number;
+        percentage?: number;
+        color: string;
+    }
+
+    const recentActivities: Activity[] = stats?.recentActivities || [];
     const quickActions = quickActionsData.quickActions;
-    const revenueData = stats?.charts?.revenueData || [];
-    const pieChartData = stats?.charts?.pieChartData || [];
+    const revenueData: RevenueItem[] = stats?.charts?.revenueData || [];
+    const pieChartData: PieChartItem[] = stats?.charts?.pieChartData || [];
 
     // Computed Analytics Data
     const realAnalytics = [

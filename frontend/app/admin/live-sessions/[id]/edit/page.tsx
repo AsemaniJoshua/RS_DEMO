@@ -34,6 +34,12 @@ export default function EditLiveSessionPage() {
             const response = await liveSessionsService.getSessionById(sessionId);
             const data = response.data;
             
+            if (!data) {
+                toast.error("Session not found");
+                router.push('/admin/live-sessions');
+                return;
+            }
+
             setSession({
                 title: data.title,
                 description: data.description || "",

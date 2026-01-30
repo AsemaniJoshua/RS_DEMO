@@ -54,13 +54,13 @@ export default function EditEbookPage() {
 
     const fetchEbook = async (id: string) => {
         try {
-            const response = await ebookService.getEbookById(id);
-            const ebook = (response as any).data.ebook;
+            const response = await ebookService.getAdminEbookById(id);
+            const ebook = response.data?.ebook;
             if (ebook) {
                 setFormData({
                     title: ebook.title || "",
                     author: ebook.author || "",
-                    categoryId: ebook.categoryId || "",
+                    categoryId: ebook.category?.id || "",
                     price: ebook.price ? String(ebook.price) : "0",
                     pages: ebook.pages ? String(ebook.pages) : "",
                     status: ebook.status || "DRAFT",

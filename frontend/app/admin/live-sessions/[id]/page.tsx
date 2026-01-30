@@ -24,6 +24,9 @@ export default function LiveSessionDetailsPage() {
         try {
             setLoading(true);
             const response = await liveSessionsService.getSessionById(sessionId);
+            if (!response.data) {
+                throw new Error("Session not found");
+            }
             setSession(response.data);
         } catch (error: any) {
             toast.error(error.message || 'Failed to load session');
@@ -36,7 +39,9 @@ export default function LiveSessionDetailsPage() {
     const fetchRegistrations = async () => {
         try {
             const response = await liveSessionsService.getSessionRegistrations(sessionId);
-            setRegistrations(response.data.registrations);
+            if (response.data) {
+                setRegistrations(response.data.registrations);
+            }
         } catch (error: any) {
             console.error('Failed to load registrations:', error);
         }

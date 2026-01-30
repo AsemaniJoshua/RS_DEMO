@@ -276,7 +276,7 @@ export default function EbooksPage() {
                                             {book.format}
                                         </td>
                                         <td className="px-6 py-4 font-medium text-gray-900">
-                                            {parseFloat(book.price) === 0 ? "Free" : `GHS ${book.price}`}
+                                            {book.price === 0 ? "Free" : `GHS ${book.price}`}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${

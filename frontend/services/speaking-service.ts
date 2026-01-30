@@ -21,7 +21,17 @@ export interface SpeakingEventFilters {
     search?: string;
 }
 
+export interface Category {
+    id: string;
+    name: string;
+    count?: number;
+    _count?: {
+        events: number;
+    };
+}
+
 export const speakingService = {
+    // ... existing user methods ...
     async getSpeakingEvents(filters?: SpeakingEventFilters): Promise<SpeakingEvent[]> {
         const params = new URLSearchParams();
         if (filters?.category) params.append('category', filters.category);
@@ -32,8 +42,55 @@ export const speakingService = {
         return response.data?.events || [];
     },
 
-    async getSpeakingEventById(id: string): Promise<SpeakingEvent> {
+    async getSpeakingEventById(id: string): Promise<SpeakingEvent | undefined> {
         const response = await api.get<{ event: SpeakingEvent }>(`/user/speaking/${id}`);
         return response.data?.event;
+    },
+    // ==========================================
+    // Admin Methods
+    // ==========================================
+
+    async getAllEvents() {
+        const response = await api.get<{ events: SpeakingEvent[] }>('/admin/speaking');
+        return response.data?.events || [];
+    },
+
+    async getEventById(id: string) {
+        const response = await api.get<{ event: SpeakingEvent }>(`/admin/speaking/${id}`);
+        return response.data?.event;
+    },
+
+    async createEvent(data: Partial<SpeakingEvent>) {
+        const response = await api.post('/admin/speaking', data);
+        return response.data;
+    },
+
+    async updateEvent(id: string, data: Partial<SpeakingEvent>) {
+        const response = await api.put(`/admin/speaking/${id}`, data);
+        return response.data;
+    },
+
+    async deleteEvent(id: string) {
+        const response = await api.delete(`/admin/speaking/${id}`);
+        return response.data;
+    },
+
+    // ==========================================
+    // Category Methods
+    // ==========================================
+
+    async getAllCategories() {
+        const response = await api.get<{ categories: Category[] }>('/admin/speaking/categories');
+        return response.data?.categories || [];
+    },
+
+    async createCategory(name: string) {
+        const response = await api.post('/admin/speaking/categories', { name });
+        return response.data;
+    },
+
+    async deleteCategory(id: string) {
+        const response = await api.delete(`/admin/speaking/categories/${id}`);
+        return response.data;
     }
 };
