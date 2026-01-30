@@ -1,104 +1,102 @@
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
 export interface Ebook {
     id: string;
     title: string;
     author: string;
-    categoryId: string;
-    category?: EbookCategory;
-    price: string; // Decimal comes as string from JSON often, or number
-    pages: number;
-    status: 'PUBLISHED' | 'DRAFT';
-    format: 'PDF' | 'EPUB' | 'MOBI';
     description: string;
+    price: number;
+    pages: number;
+    language?: string;
+    publishDate?: string;
     coverImage: string;
     coverImagePublicId: string;
-    fileUrl: string;
-    filePublicId: string;
-    downloads: number;
-    rating: number;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface EbookCategory {
-    id: string;
-    name: string;
-    _count?: {
-        ebooks: number;
+    category: {
+        id: string;
+        name: string;
     };
-    created_at: string;
-    updated_at: string;
+    status: 'DRAFT' | 'PUBLISHED';
+    downloads?: number;
+    rating?: number;
+    created_at?: string;
+    format?: string;
 }
 
-export const ebookService = {
-    // Ebooks
-    getAllEbooks: async (params?: { status?: string; category?: string }) => {
-        const query = new URLSearchParams(params as any).toString();
-        const response = await api.get(`/admin/ebooks?${query}`);
-        return response;
-    },
+export interface EbookPurchase {
+    id: string;
+    ebookId: string;
+    paymentReference: string;
+    amount: number;
+    status: 'PENDING' | 'SUCCESS' | 'FAILED';
+    purchasedAt: string;
+    ebook: Ebook;
+}
 
-    getEbookById: async (id: string) => {
-        const response = await api.get(`/admin/ebooks/${id}`);
-        return response;
-    },
+export interface PaystackInitResponse {
+    authorization_url: string;
+    access_code: string;
+    reference: string;
+}
 
-    createEbook: async (data: any) => {
-        const formData = new FormData();
-        Object.keys(data).forEach(key => {
-            if ((key === 'coverImage' || key === 'file') && data[key] instanceof File) {
-                formData.append(key, data[key]);
-            } else if (data[key] !== undefined && data[key] !== null) {
-                formData.append(key, String(data[key]));
-            }
-        });
+export interface VerifyPurchaseResponse {
+    status: string;
+    message: string;
+}
+
+export interface DownloadResponse {
+    downloadUrl: string;
+}
+
+class EbookService {
+    /**
+     * Get all published ebooks
+     */
+    async getEbooks(category?: string, search?: string) {
+        const queryParams = new URLSearchParams();
+        if (category) queryParams.append('category', category);
+        if (search) queryParams.append('search', search);
         
-        // Ensure we're not sending "undefined" string for missing files
-        if (!data.coverImage) formData.delete('coverImage');
-        if (!data.file) formData.delete('file');
-
-        const response = await api.post('/admin/ebooks', formData);
-        return response;
-    },
-
-    updateEbook: async (id: string, data: any) => {
-        const formData = new FormData();
-        Object.keys(data).forEach(key => {
-            if ((key === 'coverImage' || key === 'file') && data[key] instanceof File) {
-                formData.append(key, data[key]);
-            } else if (data[key] !== undefined && data[key] !== null) {
-                formData.append(key, String(data[key]));
-            }
-        });
-
-        const response = await api.put(`/admin/ebooks/${id}`, formData);
-        return response;
-    },
-
-    deleteEbook: async (id: string) => {
-        const response = await api.delete(`/admin/ebooks/${id}`);
-        return response;
-    },
-
-    // Categories
-    getAllCategories: async () => {
-        const response = await api.get(`/admin/ebook-categories?t=${new Date().getTime()}`);
-        return response;
-    },
-
-    createCategory: async (name: string) => {
-        const response = await api.post('/admin/ebook-categories', { name });
-        return response;
-    },
-
-    updateCategory: async (id: string, name: string) => {
-        const response = await api.patch(`/admin/ebook-categories/${id}`, { name });
-        return response;
-    },
-
-    deleteCategory: async (id: string) => {
-        const response = await api.delete(`/admin/ebook-categories/${id}`);
-        return response.data;
+        const endpoint = `/user/ebooks?${queryParams.toString()}`;
+        return apiFetch<{ ebooks: Ebook[] }>(endpoint);
     }
-};
+
+    /**
+     * Get single ebook details
+     */
+    async getEbookById(id: string) {
+        return apiFetch<{ ebook: Ebook; isPurchased: boolean }>(`/user/ebooks/${id}`);
+    }
+
+    /**
+     * Get user's purchased ebooks
+     */
+    async getMyLibrary() {
+        return apiFetch<{ ebooks: Ebook[] }>('/user/ebooks/my-library');
+    }
+
+    /**
+     * Initialize purchase
+     */
+    async purchaseEbook(id: string, callbackUrl?: string) {
+        return apiFetch<PaystackInitResponse>(`/user/ebooks/${id}/purchase`, {
+            method: 'POST',
+            body: JSON.stringify({ callback_url: callbackUrl })
+        });
+    }
+
+    /**
+     * Verify purchase
+     */
+    async verifyPurchase(reference: string) {
+        return apiFetch<VerifyPurchaseResponse>(`/user/ebooks/verify/${reference}`);
+    }
+
+    /**
+     * Download ebook
+     */
+    async downloadEbook(id: string) {
+        return apiFetch<DownloadResponse>(`/user/ebooks/${id}/download`);
+    }
+}
+
+export const ebookService = new EbookService();
