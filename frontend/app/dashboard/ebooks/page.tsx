@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { ebookService, type Ebook } from "@/services/ebook-service";
 import toast from "react-hot-toast";
 
@@ -83,7 +82,7 @@ export default function EbooksPage() {
                                             {book.category?.name || 'Education'}
                                         </span>
                                         <span className="font-bold text-gray-900">
-                                            {book.price > 0 ? `$${book.price}` : 'Free'}
+                                            {book.price > 0 ? `GHS ${book.price}` : 'Free'}
                                         </span>
                                     </div>
                                 </div>
