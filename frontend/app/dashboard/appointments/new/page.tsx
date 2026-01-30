@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import BackButton from "@/components/ui/BackButton";
 import bookingServicesData from "@/data/bookingServices.json";
 
 export default function NewAppointmentPage() {
@@ -72,15 +73,7 @@ export default function NewAppointmentPage() {
         <div className="p-4 md:p-8">
             {/* Header */}
             <div className="mb-6 flex items-center gap-4">
-                <Link 
-                    href="/dashboard/appointments" 
-                    className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-[#0066ff] transition-colors"
-                    title="Back to Appointments"
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 12H5m7 7l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                </Link>
+                <BackButton href="/dashboard/appointments" label="Back" className="mb-0" />
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Book New Appointment</h1>
                     <p className="text-gray-600">Schedule a consultation with Dr. George</p>

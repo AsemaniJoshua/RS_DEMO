@@ -1,14 +1,8 @@
-import { api, ApiResponse } from '@/lib/api';
+import axios from 'axios';
 
-// Media interfaces
-export interface MediaUploader {
-    id: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
-export interface Media {
+export interface MediaItem {
     id: string;
     name: string;
     original_name: string;
@@ -19,10 +13,12 @@ export interface Media {
     cloudinary_id: string;
     dimensions?: string;
     duration?: string;
-    uploaded_by: string;
     created_at: string;
     updated_at: string;
-    uploader?: MediaUploader;
+    uploader?: {
+        first_name: string;
+        last_name: string;
+    };
 }
 
 export interface MediaStats {
@@ -32,92 +28,71 @@ export interface MediaStats {
     documents: number;
 }
 
-export interface MediaPagination {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-}
-
-export interface GetAllMediaResponse {
-    media: Media[];
+export interface MediaResponse {
+    media: MediaItem[];
     stats: MediaStats;
-    pagination: MediaPagination;
 }
 
-// Media Service
-export const mediaService = {
-    /**
-     * Get all media files (with pagination and filtering)
-     * GET /api/v1/admin/media
-     */
-    async getAllMedia(params?: {
-        page?: number;
-        limit?: number;
-        file_type?: string;
-        search?: string;
-    }): Promise<ApiResponse<GetAllMediaResponse>> {
-        const queryParams = new URLSearchParams();
-        if (params?.page) queryParams.append('page', params.page.toString());
-        if (params?.limit) queryParams.append('limit', params.limit.toString());
-        if (params?.file_type) queryParams.append('file_type', params.file_type);
-        if (params?.search) queryParams.append('search', params.search);
+class MediaService {
+    private getAuthHeader() {
+        if (typeof window !== 'undefined') {
+             const token = localStorage.getItem('auth_token');
+             // Add check to ensure token exists, otherwise might need redirect or let interceptor handle
+             return {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            };
+        }
+        return {};
+    }
 
-        const endpoint = `/admin/media${queryParams.toString() ? `?${queryParams}` : ''}`;
-        return api.get<GetAllMediaResponse>(endpoint);
-    },
+    // Get all media (User Route)
+    async getAllMedia(page = 1, limit = 20, type = 'all', search?: string): Promise<MediaResponse> {
+        try {
+            const params = new URLSearchParams({
+                page: page.toString(),
+                limit: limit.toString(),
+                file_type: type
+            });
+            
+            if (search) {
+                params.append('search', search);
+            }
 
-    /**
-     * Get single media file by ID
-     * GET /api/v1/admin/media/:id
-     */
-    async getMediaById(id: string): Promise<ApiResponse<Media>> {
-        return api.get<Media>(`/admin/media/${id}`);
-    },
+            const response = await axios.get(
+                `${API_BASE_URL}/user/media?${params}`,
+                this.getAuthHeader()
+            );
+            return response.data.data;
+        } catch (error: any) {
+            console.error('Error fetching media:', error);
+             throw new Error(error.response?.data?.message || 'Failed to fetch media');
+        }
+    }
 
-    /**
-     * Upload media files (multiple files)
-     * POST /api/v1/admin/media/upload
-     */
-    async uploadMedia(files: File[]): Promise<ApiResponse<Media[]>> {
-        const formData = new FormData();
-        
-        // Append all files with the same field name 'files'
-        files.forEach(file => {
-            formData.append('files', file);
-        });
+    // Get single media by ID (User Route)
+    async getMediaById(id: string): Promise<MediaItem> {
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/user/media/${id}`,
+                this.getAuthHeader()
+            );
+            return response.data.data;
+        } catch (error: any) {
+            console.error('Error fetching media details:', error);
+            throw new Error(error.response?.data?.message || 'Failed to fetch media details');
+        }
+    }
 
-        return api.post<Media[]>('/admin/media/upload', formData);
-    },
-
-    /**
-     * Delete media file
-     * DELETE /api/v1/admin/media/:id
-     */
-    async deleteMedia(id: string): Promise<ApiResponse<any>> {
-        return api.delete<any>(`/admin/media/${id}`);
-    },
-
-    /**
-     * Format file size from bytes to human-readable format
-     */
+    // Format file size
     formatFileSize(bytes: number): string {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-    },
-
-    /**
-     * Get file type display name
-     */
-    getFileTypeLabel(type: string): string {
-        const typeMap: Record<string, string> = {
-            'IMAGE': 'Images',
-            'VIDEO': 'Videos',
-            'DOCUMENT': 'Documents'
-        };
-        return typeMap[type.toUpperCase()] || type;
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
-};
+}
+
+export const mediaService = new MediaService();

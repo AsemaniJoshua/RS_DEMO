@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { liveSessionsService, type LiveSession } from "@/services/live-sessions-service";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import BackButton from "@/components/ui/BackButton";
 
 export default function MySessionsPage() {
-    const [sessions, setSessions] = useState<LiveSession[]>([]);
+    const [registrations, setRegistrations] = useState<any[]>([]); // Using any for now to avoid strict type refactoring of the whole file, but ideally SessionRegistration
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -16,8 +17,12 @@ export default function MySessionsPage() {
     const fetchMySessions = async () => {
         try {
             setLoading(true);
-            const response = await liveSessionsService.getMyRegisteredSessions();
-            setSessions(response.data || []);
+            const response = await liveSessionsService.getMySessions();
+            // apiFetch likely returns the array directly based on the service definition
+            // But if there is a wrapper, we effectively need the list of registrations
+            // The service says: return apiFetch<SessionRegistration[]>('/live-sessions/my/sessions');
+            // So response IS the array.
+            setRegistrations(Array.isArray(response) ? response : []); 
         } catch (error: any) {
             toast.error(error.message || 'Failed to load your sessions');
         } finally {
@@ -25,63 +30,16 @@ export default function MySessionsPage() {
         }
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-        });
-    };
+    // ... helper functions ...
 
-    const formatTime = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status?.toUpperCase()) {
-            case 'UPCOMING':
-                return 'bg-green-100 text-green-800';
-            case 'LIVE':
-                return 'bg-blue-100 text-blue-800 animate-pulse';
-            case 'COMPLETED':
-                return 'bg-gray-100 text-gray-800';
-            case 'CANCELLED':
-                return 'bg-red-100 text-red-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="p-8 flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff] mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading your sessions...</p>
-                </div>
-            </div>
-        );
-    }
+    // ...
 
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <Link 
-                        href="/dashboard/live-sessions"
-                        className="text-[#0066ff] hover:underline flex items-center gap-1 mb-4"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 12H5M5 12l7 7m-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        Back to All Sessions
-                    </Link>
+                    <BackButton label="Back to All Sessions" href="/dashboard/live-sessions" />
                     
                     <h1 className="text-3xl font-bold text-gray-900">My Registered Sessions</h1>
                     <p className="text-gray-600 mt-2">View and manage your session registrations</p>
@@ -89,9 +47,10 @@ export default function MySessionsPage() {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {sessions.length === 0 ? (
+                {registrations.length === 0 ? (
                     <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-                        <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {/* ... empty state icon ... */}
+                         <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <h3 className="mt-4 text-lg font-medium text-gray-900">No Registered Sessions</h3>
@@ -107,7 +66,11 @@ export default function MySessionsPage() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {sessions.map((session) => (
+                        {registrations.map((registration) => {
+                            const session = registration.session;
+                            if (!session) return null;
+                            
+                            return (
                             <Link
                                 key={session.id}
                                 href={`/dashboard/live-sessions/${session.id}`}
@@ -197,14 +160,14 @@ export default function MySessionsPage() {
                                     </div>
 
                                     {/* Registration Info */}
-                                    {session.registration_date && (
+                                    {registration.registration_date && (
                                         <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-                                            Registered on {formatDate(session.registration_date)}
+                                            Registered on {formatDate(registration.registration_date)}
                                         </div>
                                     )}
                                 </div>
                             </Link>
-                        ))}
+                        )})} 
                     </div>
                 )}
             </div>

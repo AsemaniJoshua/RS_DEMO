@@ -1,112 +1,136 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import DeleteModal from "@/components/dashboard/DeleteModal";
+import { mediaService, MediaItem } from "@/services/media-service";
+import toast from "react-hot-toast";
 
-// Mock Data
-const MEDIA_ITEMS = [
-    {
-        id: "1",
-        title: "Understanding Gut Health",
-        type: "Video",
-        duration: "15:30",
-        date: "Sep 10, 2025",
-        description: "A comprehensive video guide on improving your gut health naturally.",
-        fileSize: "250 MB",
-        format: "MP4"
-    },
-    // ...
-];
+import BackButton from "@/components/ui/BackButton";
 
 export default function MediaDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [item, setItem] = useState<MediaItem | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Mock fetch
-    const item = MEDIA_ITEMS.find(m => m.id === params.id) || MEDIA_ITEMS[0];
+    useEffect(() => {
+        const fetchMediaDetails = async () => {
+            try {
+                const data = await mediaService.getMediaById(params.id as string);
+                setItem(data);
+            } catch (error: any) {
+                console.error(error);
+                toast.error("Failed to load media details");
+                router.push("/dashboard/media"); // Redirect on error
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    const handleDelete = () => {
-        console.log("Deleting media:", item.id);
-        setIsDeleteModalOpen(false);
-        router.push("/dashboard/media");
-    };
+        if (params.id) {
+            fetchMediaDetails();
+        }
+    }, [params.id, router]);
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
+    if (!item) return null;
 
     return (
-        <div className="p-4 md:p-8 max-w-4xl mx-auto">
-             <div className="mb-6">
-                <Link href="/dashboard/media" className="text-gray-500 hover:text-gray-900 flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 12H5m0 0l7 7m-7-7l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    Back to Library
-                </Link>
-            </div>
+        <div className="p-4 md:p-8 max-w-5xl mx-auto">
+            <BackButton label="Back to Library" />
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col md:flex-row">
-                 {/* Media Preview / Player Placeholder */}
-                <div className="w-full md:w-1/2 bg-gray-900 text-white min-h-[300px] flex items-center justify-center p-6">
-                     <div className="text-center">
-                        <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4 backdrop-blur-sm cursor-pointer hover:bg-white/20 transition-colors">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="5 3 19 12 5 21 5 3"/>
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col shadow-sm">
+                 {/* Media Preview / Player */}
+                <div className="w-full bg-gray-900 relative">
+                     {item.file_type === 'VIDEO' ? (
+                         <div className="aspect-video flex items-center justify-center bg-black">
+                             <video 
+                                src={item.url} 
+                                controls 
+                                className="w-full h-full max-h-[60vh]" 
+                                poster={item.url.replace(/\.[^/.]+$/, ".jpg")} // Try to get thumb from cloudinary by changing ext
+                            />
+                         </div>
+                     ) : item.file_type === 'IMAGE' ? (
+                         <div className="bg-checkered min-h-[300px] flex items-center justify-center p-4">
+                             <img src={item.url} alt={item.name} className="max-w-full max-h-[70vh] object-contain rounded" />
+                         </div>
+                     ) : (
+                         <div className="min-h-[300px] flex flex-col items-center justify-center p-6 text-white">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-4 opacity-80">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
                             </svg>
-                        </div>
-                        <p className="text-sm font-medium opacity-80">Preview not available (Mock)</p>
-                     </div>
+                            <p className="text-lg font-medium opacity-90">{item.original_name}</p>
+                            <p className="text-sm opacity-60 mt-1">Preview not available for documents</p>
+                         </div>
+                     )}
                 </div>
 
-                <div className="w-full md:w-1/2 p-8 flex flex-col">
-                    <div className="flex items-center gap-2 mb-2">
-                         <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                            item.type === 'Video' ? 'bg-red-100 text-red-600' :
-                            item.type === 'Audio' ? 'bg-purple-100 text-purple-600' :
-                            'bg-blue-100 text-blue-600'
-                        }`}>
-                            {item.type}
-                        </span>
-                        <span className="text-xs text-gray-500">{item.duration}</span>
+                <div className="p-8 flex flex-col md:flex-row gap-8">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                                item.file_type === 'VIDEO' ? 'bg-red-50 text-red-600' :
+                                item.file_type === 'DOCUMENT' ? 'bg-blue-50 text-blue-600' :
+                                'bg-purple-50 text-purple-600'
+                            }`}>
+                                {item.file_type}
+                            </span>
+                            {item.duration && <span className="text-xs text-gray-500">• {item.duration}</span>}
+                            <span className="text-xs text-gray-500">• {mediaService.formatFileSize(item.size)}</span>
+                        </div>
+
+                        <h1 className="text-3xl font-bold text-gray-900 mb-4">{item.name}</h1>
+                        
+                        <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm text-gray-600 mb-6 bg-gray-50 p-4 rounded-lg">
+                            <div>
+                                <span className="block text-gray-400 text-xs uppercase tracking-wider mb-1">Uploaded Date</span>
+                                {new Date(item.created_at).toLocaleDateString()}
+                            </div>
+                            <div>
+                                <span className="block text-gray-400 text-xs uppercase tracking-wider mb-1">File Type</span>
+                                {item.mime_type}
+                            </div>
+                             {item.dimensions && (
+                                <div>
+                                    <span className="block text-gray-400 text-xs uppercase tracking-wider mb-1">Dimensions</span>
+                                    {item.dimensions}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">{item.title}</h1>
-                    <p className="text-gray-600 mb-6 flex-1">
-                        {item.description}
-                    </p>
-
-                    <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 mb-8 border-t border-b border-gray-100 py-4">
-                        <div>
-                            <span className="block text-gray-400 text-xs">Uploaded</span>
-                            {item.date}
-                        </div>
-                        <div>
-                            <span className="block text-gray-400 text-xs">Size</span>
-                            {item.fileSize}
-                        </div>
-                    </div>
-
-                    <div className="flex gap-3 mt-auto">
-                        <button className="flex-1 bg-[#0066ff] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#0052cc] transition-colors">
-                            Download
-                        </button>
-                        <button 
-                            onClick={() => setIsDeleteModalOpen(true)}
-                            className="px-4 py-2 border border-red-200 text-red-600 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                    <div className="w-full md:w-1/3 flex flex-col justify-start">
+                        <a 
+                            href={item.url} 
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-[#0066ff] text-white px-6 py-4 rounded-xl font-semibold hover:bg-[#0052cc] transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-200 flex items-center justify-center gap-2 mb-4"
                         >
-                            Delete
-                        </button>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            Download File
+                        </a>
+                        
+                         <p className="text-xs text-gray-400 text-center">
+                            Secure download provided by RxWithDrGeorge
+                        </p>
                     </div>
                 </div>
             </div>
-
-            <DeleteModal
-                isOpen={isDeleteModalOpen}
-                title="Remove Media"
-                message="Are you sure you want to remove this item from your library?"
-                onConfirm={handleDelete}
-                onCancel={() => setIsDeleteModalOpen(false)}
-            />
         </div>
     );
 }

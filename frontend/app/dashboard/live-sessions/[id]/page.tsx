@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { liveSessionsService, type LiveSession } from "@/services/live-sessions-service";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import BackButton from "@/components/ui/BackButton";
 
 export default function LiveSessionDetailsPage() {
     const params = useParams();
@@ -134,15 +135,7 @@ export default function LiveSessionDetailsPage() {
             {/* Header */}
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <Link 
-                        href="/dashboard/live-sessions"
-                        className="text-[#0066ff] hover:underline flex items-center gap-1 mb-4"
-                    >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 12H5M5 12l7 7m-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        Back to Live Sessions
-                    </Link>
+                    <BackButton label="Back to Live Sessions" href="/dashboard/live-sessions" />
                     
                     <div className="flex items-start justify-between">
                         <div className="flex-1">

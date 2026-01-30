@@ -1,104 +1,142 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import DeleteModal from "@/components/dashboard/DeleteModal";
+import { userBlogService, BlogPost } from "@/services/user-blog-service";
+import Link from "next/link";
+import Image from "next/image";
+import { Calendar, User, ArrowLeft, Tag, Clock } from "lucide-react";
 
-// Mock Data
-const BLOG_POSTS = [
-    {
-        id: "1",
-        title: "The Future of Telemedicine",
-        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat...",
-        category: "Healthcare",
-        date: "Oct 15, 2025",
-        author: "Dr. George",
-        readTime: "5 min read",
-        image: "/blog-1.jpg"
-    },
-    // ...
-];
+import BackButton from "@/components/ui/BackButton";
 
-export default function BlogDetailPage() {
+export default function BlogDetailsPage() {
     const params = useParams();
     const router = useRouter();
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [blog, setBlog] = useState<BlogPost | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Mock fetch
-    const post = BLOG_POSTS.find(p => p.id === params.id) || BLOG_POSTS[0];
+    useEffect(() => {
+        if (params.id) {
+            fetchBlog(params.id as string);
+        }
+    }, [params.id]);
 
-    const handleDelete = () => {
-        console.log("Deleting blog post:", post.id);
-        setIsDeleteModalOpen(false);
-        router.push("/dashboard/blog");
+    const fetchBlog = async (id: string) => {
+        try {
+            const data = await userBlogService.getBlogById(id);
+            setBlog(data);
+        } catch (error) {
+            console.error("Failed to fetch blog details", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    return (
-        <div className="p-4 md:p-8 max-w-4xl mx-auto">
-            <div className="mb-6 flex justify-between items-center">
-                <Link href="/dashboard/blog" className="text-gray-500 hover:text-gray-900 flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 12H5m0 0l7 7m-7-7l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    Back to Blog
-                </Link>
-                
-                {/* Admin/User Controls - Assuming User can delete their "saved" or "draft" post? Or strictly assuming user dashboard behavior requested */}
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="w-12 h-12 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
+    if (!blog) {
+        return (
+            <div className="p-8 text-center">
+                <h2 className="text-xl font-bold text-gray-900">Blog post not found</h2>
                 <button 
-                    onClick={() => setIsDeleteModalOpen(true)}
-                    className="text-red-500 hover:text-red-700 flex items-center gap-1 text-sm font-medium"
+                    onClick={() => router.back()}
+                    className="mt-4 text-[#0066ff] hover:underline"
                 >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Remove
+                    Go back
                 </button>
             </div>
+        );
+    }
 
-            <article className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div className="aspect-video bg-gray-100 w-full relative flex items-center justify-center text-gray-400">
-                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                        <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-                        <polyline points="21 15 16 10 5 21" stroke="currentColor" strokeWidth="2"/>
-                    </svg>
+    // Estimate read time (words / 200)
+    const wordCount = blog.content ? blog.content.replace(/<[^>]*>?/gm, '').split(/\s+/).length : 0;
+    const readTime = Math.ceil(wordCount / 200);
+
+    return (
+        <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <BackButton href="/dashboard/blog" label="Back to Articles" />
+
+            <article className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                {/* Hero Image */}
+                <div className="relative h-[300px] md:h-[400px] w-full bg-gray-100">
+                    {blog.featured_image ? (
+                        <Image
+                            src={blog.featured_image}
+                            alt={blog.title}
+                            fill
+                            className="object-cover"
+                            priority
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <span className="text-lg">No cover image</span>
+                        </div>
+                    )}
                 </div>
-                
-                <div className="p-8">
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                        <span className="text-[#0066ff] font-semibold bg-blue-50 px-3 py-1 rounded-full">
-                            {post.category}
-                        </span>
-                        <span>{post.date}</span>
-                        <span>•</span>
-                        <span>{post.readTime}</span>
-                    </div>
 
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{post.title}</h1>
-                    
-                    <div className="flex items-center gap-3 mb-8 pb-8 border-b border-gray-100">
-                        <div className="w-10 h-10 rounded-full bg-gray-200"></div>
-                        <div>
-                            <div className="font-semibold text-gray-900">{post.author}</div>
-                            <div className="text-xs text-gray-500">Author</div>
+                <div className="p-6 md:p-10">
+                    {/* Meta */}
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-6">
+                        {blog.categories && blog.categories.length > 0 && (
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-[#0066ff]/10 text-[#0066ff]">
+                                {blog.categories[0].name}
+                            </span>
+                        )}
+                        <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span>
+                                {new Date(blog.published_at || blog.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4" />
+                            <span>{readTime} min read</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            <span>{blog.author?.first_name} {blog.author?.last_name}</span>
                         </div>
                     </div>
 
-                    <div className="prose max-w-none text-gray-700 leading-relaxed">
-                        <p>{post.content}</p>
-                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
+                    {/* Title */}
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                        {blog.title}
+                    </h1>
+
+                    {/* Content */}
+                    <div 
+                        className="prose prose-lg max-w-none text-gray-700 prose-headings:text-gray-900 prose-a:text-[#0066ff] prose-img:rounded-xl"
+                        dangerouslySetInnerHTML={{ __html: blog.content }}
+                    />
+
+                    {/* Tags */}
+                    {blog.tags && blog.tags.length > 0 && (
+                        <div className="mt-10 pt-6 border-t border-gray-100">
+                            <div className="flex flex-wrap gap-2">
+                                {blog.tags.map(tag => (
+                                    <span 
+                                        key={tag.id} 
+                                        className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-sm"
+                                    >
+                                        <Tag className="w-3 h-3 mr-2" />
+                                        {tag.name}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </article>
-
-            <DeleteModal
-                isOpen={isDeleteModalOpen}
-                title="Delete Blog Post"
-                message="Are you sure you want to remove this post? This action cannot be undone."
-                onConfirm={handleDelete}
-                onCancel={() => setIsDeleteModalOpen(false)}
-            />
         </div>
     );
 }

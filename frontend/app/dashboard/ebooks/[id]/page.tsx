@@ -22,6 +22,8 @@ const EBOOKS = [
     // ... other books (matches list page)
 ];
 
+import BackButton from "@/components/ui/BackButton";
+
 export default function EbookDetailPage() {
     const params = useParams();
     const router = useRouter();
@@ -39,15 +41,7 @@ export default function EbookDetailPage() {
 
     return (
         <div className="p-4 md:p-8 max-w-5xl mx-auto">
-            {/* Breadcrumb / Back */}
-            <div className="mb-6">
-                <Link href="/dashboard/ebooks" className="text-gray-500 hover:text-gray-900 flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 12H5m0 0l7 7m-7-7l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    Back to Ebooks
-                </Link>
-            </div>
+            <BackButton href="/dashboard/ebooks" label="Back to Ebooks" />
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="flex flex-col md:flex-row">

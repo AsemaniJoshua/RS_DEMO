@@ -23,17 +23,21 @@ export function getAuthToken(): string | null {
     return localStorage.getItem('auth_token');
 }
 
-// Set token in localStorage
+// Set token in localStorage and Cookie
 export function setAuthToken(token: string): void {
     if (typeof window !== 'undefined') {
         localStorage.setItem('auth_token', token);
+        // Set cookie for middleware access (expires in 7 days)
+        document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
     }
 }
 
-// Remove token from localStorage
+// Remove token from localStorage and Cookie
 export function removeAuthToken(): void {
     if (typeof window !== 'undefined') {
         localStorage.removeItem('auth_token');
+        // Remove cookie
+        document.cookie = 'auth_token=; path=/; max-age=0';
     }
 }
 

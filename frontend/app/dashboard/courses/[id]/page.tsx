@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
+import BackButton from "@/components/ui/BackButton";
 import userData from "@/data/dashboard/user-profile.json";
 
 export default function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -36,9 +37,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         <div className="p-4 md:p-8">
             {/* Header */}
             <div className="mb-6">
-                <Link href="/dashboard/courses" className="text-[#0066ff] hover:underline mb-2 inline-block">
-                    ← Back to My Courses
-                </Link>
+                <BackButton label="Back to My Courses" href="/dashboard/courses" />
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{course.title}</h1>
                 <p className="text-gray-600">By {course.instructor}</p>
             </div>

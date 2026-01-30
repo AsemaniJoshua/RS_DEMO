@@ -1,86 +1,127 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { speakingService, SpeakingEvent } from "@/services/speaking-service";
 import Link from "next/link";
+import Image from "next/image";
+import { Calendar, MapPin, Search } from "lucide-react";
 
-// Mock Data
-const SPEAKING_EVENTS = [
-    {
-        id: "1",
-        title: "Global Health Summit 2025",
-        date: "Nov 15, 2025",
-        location: "London, UK",
-        type: "Keynote",
-        description: "Discussing the role of AI in predictive medicine.",
-        image: "/event-1.jpg"
-    },
-    {
-        id: "2",
-        title: "TechMed Conference",
-        date: "Dec 05, 2025",
-        location: "San Francisco, CA",
-        type: "Panel Discussion",
-        description: "Panel on the ethics of genetic editing.",
-        image: "/event-2.jpg"
-    },
-    {
-        id: "3",
-        title: "Vitality Webinar Series",
-        date: "Jan 20, 2026",
-        location: "Online",
-        type: "Webinar",
-        description: "Interactive session on holistic wellness strategies.",
-        image: "/event-3.jpg"
+export default function SpeakingEventsPage() {
+    const [events, setEvents] = useState<SpeakingEvent[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    useEffect(() => {
+        fetchEvents();
+    }, []);
+
+    const fetchEvents = async () => {
+        try {
+            const data = await speakingService.getSpeakingEvents();
+            setEvents(data);
+        } catch (error) {
+            console.error("Failed to fetch speaking events", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const filteredEvents = events.filter(event => 
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.venue.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="w-12 h-12 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
     }
-];
 
-export default function SpeakingPage() {
     return (
         <div className="p-4 md:p-8">
-            <div className="mb-6">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Speaking Events</h1>
-                <p className="text-gray-600">Upcoming appearances and past talks by Dr. George</p>
+            <div className="mb-8">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Speaking Sessions</h1>
+                <p className="text-gray-600">Upcoming speaking engagements and events.</p>
             </div>
 
+            {/* Search */}
+            <div className="mb-8">
+                <div className="relative max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Search events..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0066ff]/20 focus:border-[#0066ff] text-gray-900 bg-white"
+                    />
+                </div>
+            </div>
+
+            {/* Events Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {SPEAKING_EVENTS.map((event) => (
-                    <Link key={event.id} href={`/dashboard/speaking/${event.id}`} className="group">
-                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                            <div className="aspect-video bg-gray-100 relative">
-                                {/* Placeholder for Image */}
-                                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="currentColor" strokeWidth="2"/>
-                                        <path d="M19 10v2a7 7 0 01-14 0v-2" stroke="currentColor" strokeWidth="2"/>
-                                    </svg>
+                {filteredEvents.map((event) => (
+                    <Link
+                        key={event.id}
+                        href={`/dashboard/speaking/${event.id}`}
+                        className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300"
+                    >
+                        <div className="relative h-48 w-full bg-gray-100">
+                            {event.image ? (
+                                <Image
+                                    src={event.image}
+                                    alt={event.title}
+                                    fill
+                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                    <Calendar className="w-12 h-12" />
                                 </div>
-                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-[#0066ff]">
-                                    {event.type}
-                                </div>
+                            )}
+                            <div className="absolute top-4 right-4">
+                                <span className={`px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-[#0066ff]`}>
+                                    {event.category || 'Event'}
+                                </span>
                             </div>
-                            <div className="p-5">
-                                <div className="flex items-center gap-2 mb-3 text-sm text-gray-500">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                        <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2"/>
-                                        <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2"/>
-                                    </svg>
-                                    {event.date}
+                        </div>
+                        <div className="p-5">
+                            <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#0066ff] transition-colors">
+                                {event.title}
+                            </h3>
+                            <div className="space-y-2 text-sm text-gray-600">
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="shrink-0 w-4 h-4" />
+                                    <span>
+                                        {new Date(event.date).toLocaleDateString('en-US', {
+                                            weekday: 'long',
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
+                                    </span>
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#0066ff] transition-colors">{event.title}</h3>
-                                <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/>
-                                        <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
-                                    </svg>
-                                    {event.location}
+                                <div className="flex items-center gap-2">
+                                    <MapPin className="shrink-0 w-4 h-4" />
+                                    <span className="line-clamp-1">{event.venue}, {event.location}</span>
                                 </div>
-                                <p className="text-gray-600 text-sm line-clamp-2">
-                                    {event.description}
-                                </p>
                             </div>
                         </div>
                     </Link>
                 ))}
+
+                {filteredEvents.length === 0 && (
+                    <div className="col-span-full text-center py-12">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Calendar className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900">No events found</h3>
+                        <p className="text-gray-500">Try adjusting your search terms.</p>
+                    </div>
+                )}
             </div>
         </div>
     );
