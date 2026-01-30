@@ -80,6 +80,14 @@ export const usersService = {
     },
 
     /**
+     * Get user by ID (Admin only)
+     * GET /api/v1/admin/users/get-user-by-id/:id
+     */
+    async getUserById(id: string): Promise<ApiResponse<User>> {
+        return api.get<User>(`/admin/users/get-user-by-id/${id}`);
+    },
+
+    /**
      * Update user by email (Admin only)
      * PATCH /api/v1/admin/users/update-user-by-email/:email
      */

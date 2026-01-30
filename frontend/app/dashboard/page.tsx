@@ -5,7 +5,7 @@ import Link from "next/link";
 import userData from "@/data/dashboard/user-profile.json";
 
 export default function DashboardHome() {
-    const { user, enrolledCourses, upcomingAppointments, recentActivity } = userData;
+    const { user, enrolledCourses, upcomingAppointments } = userData;
     const { stats } = user;
 
     // Get in-progress courses
@@ -185,70 +185,6 @@ export default function DashboardHome() {
                 </div>
             </div>
 
-            {/* Recent Activity */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h2>
-                <div className="space-y-3">
-                    {recentActivity.slice(0, 5).map((activity) => (
-                        <div key={activity.id} className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                activity.icon === 'check' ? 'bg-green-100 text-green-600' :
-                                activity.icon === 'book' ? 'bg-blue-100 text-blue-600' :
-                                activity.icon === 'calendar' ? 'bg-purple-100 text-purple-600' :
-                                activity.icon === 'bookmark' ? 'bg-yellow-100 text-yellow-600' :
-                                'bg-teal-100 text-teal-600'
-                            }`}>
-                                {activity.icon === 'check' && (
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                )}
-                                {activity.icon === 'book' && (
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="2"/>
-                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" strokeWidth="2"/>
-                                    </svg>
-                                )}
-                                {activity.icon === 'calendar' && (
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                        <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2"/>
-                                        <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2"/>
-                                    </svg>
-                                )}
-                                {activity.icon === 'bookmark' && (
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" strokeWidth="2"/>
-                                    </svg>
-                                )}
-                                {activity.icon === 'award' && (
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <circle cx="12" cy="8" r="7" stroke="currentColor" strokeWidth="2"/>
-                                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" stroke="currentColor" strokeWidth="2"/>
-                                    </svg>
-                                )}
-                            </div>
-                            <div className="flex-1">
-                                <div className="font-medium text-gray-900 text-sm">{activity.title}</div>
-                                {activity.course && <div className="text-xs text-gray-600">{activity.course}</div>}
-                                <div className="text-xs text-gray-500 mt-1">
-                                    {new Date(activity.date).toLocaleString('en-US', { 
-                                        month: 'short', 
-                                        day: 'numeric',
-                                        hour: 'numeric',
-                                        minute: '2-digit'
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                <Link href="/dashboard/activity">
-                    <button className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-                        View All Activity
-                    </button>
-                </Link>
-            </div>
         </div>
     );
 }
