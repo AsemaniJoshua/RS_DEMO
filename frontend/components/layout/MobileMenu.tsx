@@ -25,7 +25,7 @@ export default function MobileMenu() {
             {/* Mobile Menu Button */}
             <button
                 onClick={toggleMenu}
-                className="flex md:hidden p-2 text-gray-600 hover:text-[#0066ff] transition-colors cursor-pointer"
+                className="flex xl:hidden p-2 text-gray-600 hover:text-[#0066ff] transition-colors cursor-pointer"
                 aria-label="Toggle mobile menu"
                 aria-expanded={isOpen}
             >
@@ -44,7 +44,7 @@ export default function MobileMenu() {
             {/* Mobile Menu Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    className="fixed inset-0 bg-black/50 z-40 xl:hidden"
                     onClick={closeMenu}
                     aria-hidden="true"
                 />
@@ -52,7 +52,7 @@ export default function MobileMenu() {
 
             {/* Mobile Menu Drawer */}
             <div
-                className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
+                className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out xl:hidden ${
                     isOpen ? "translate-x-0" : "translate-x-full"
                 }`}
             >

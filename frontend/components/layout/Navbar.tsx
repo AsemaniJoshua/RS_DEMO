@@ -54,12 +54,12 @@ export default function Navbar() {
         <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white shadow-sm">
             <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-3 sm:px-6 lg:px-12">
                 {/* Logo Section */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                     <Logo />
                 </div>
 
                 {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-8 flex-1 justify-center">
+                <nav className="hidden xl:flex items-center gap-8 flex-1 justify-center">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -78,7 +78,7 @@ export default function Navbar() {
                 </nav>
 
                 {/* Right Section: Contact & CTA */}
-                <div className="hidden md:flex items-center gap-4">
+                <div className="hidden xl:flex items-center gap-4">
                     <Link
                         href="/contact"
                         className="flex items-center gap-1.5 text-[15px] font-medium text-gray-600 transition-colors hover:text-[#0052cc]"

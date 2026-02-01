@@ -30,7 +30,7 @@ export default function MediaLibraryPage() {
     const fetchMedia = async () => {
         try {
             setIsLoading(true);
-            const response = await mediaService.getAllMedia(
+            const response = await mediaService.getAllMediaAdmin(
                 1,
                 100,
                 selectedType !== 'all' ? selectedType : 'all',
@@ -93,7 +93,7 @@ export default function MediaLibraryPage() {
 
         try {
             setIsDeleting(true);
-            const response = await mediaService.deleteMedia(deleteModal.fileId);
+            const response = await mediaService.deleteMediaAdmin(deleteModal.fileId);
             
             if (response.status === 'success') {
                 toast.success('File deleted successfully');

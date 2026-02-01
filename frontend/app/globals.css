@@ -106,3 +106,9 @@ body {
     animation: none !important;
   }
 }
+
+/* Hide default browser password reveal button (Edge/IE) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}

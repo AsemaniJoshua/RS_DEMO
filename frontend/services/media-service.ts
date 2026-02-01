@@ -71,6 +71,30 @@ class MediaService {
         }
     }
 
+    // Get all media (Admin Route)
+    async getAllMediaAdmin(page = 1, limit = 20, type = 'all', search?: string): Promise<MediaResponse> {
+        try {
+            const params = new URLSearchParams({
+                page: page.toString(),
+                limit: limit.toString(),
+                file_type: type
+            });
+            
+            if (search) {
+                params.append('search', search);
+            }
+
+            const response = await axios.get(
+                `${API_BASE_URL}/admin/media?${params}`,
+                this.getAuthHeader()
+            );
+            return response.data.data;
+        } catch (error: any) {
+            console.error('Error fetching admin media:', error);
+             throw new Error(error.response?.data?.message || 'Failed to fetch media');
+        }
+    }
+
     // Get single media by ID (User Route)
     async getMediaById(id: string): Promise<MediaItem> {
         try {
@@ -94,7 +118,7 @@ class MediaService {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    // Upload media
+    // Upload media (User Route)
     async uploadMedia(files: File[]): Promise<{ status: string; message: string; data: MediaItem[] }> {
         try {
             const formData = new FormData();
@@ -120,9 +144,35 @@ class MediaService {
         }
     }
 
+    // Upload media (Admin Route)
+    async uploadMediaAdmin(files: File[]): Promise<{ status: string; message: string; data: MediaItem[] }> {
+        try {
+            const formData = new FormData();
+            files.forEach(file => {
+                formData.append('files', file);
+            });
+
+            const response = await axios.post(
+                `${API_BASE_URL}/admin/media/upload`,
+                formData,
+                {
+                    ...this.getAuthHeader(),
+                    headers: {
+                        ...this.getAuthHeader().headers,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+            return response.data;
+        } catch (error: any) {
+             console.error('Error uploading media (admin):', error);
+             throw new Error(error.response?.data?.message || 'Failed to upload media');
+        }
+    }
 
 
-    // Delete media
+
+    // Delete media (User Route)
     async deleteMedia(id: string): Promise<{ status: string; message: string }> {
         try {
             const response = await axios.delete(
@@ -132,6 +182,20 @@ class MediaService {
             return response.data;
         } catch (error: any) {
              console.error('Error deleting media:', error);
+             throw new Error(error.response?.data?.message || 'Failed to delete media');
+        }
+    }
+
+    // Delete media (Admin Route)
+    async deleteMediaAdmin(id: string): Promise<{ status: string; message: string }> {
+        try {
+            const response = await axios.delete(
+                `${API_BASE_URL}/admin/media/${id}`,
+                this.getAuthHeader()
+            );
+            return response.data;
+        } catch (error: any) {
+             console.error('Error deleting media (admin):', error);
              throw new Error(error.response?.data?.message || 'Failed to delete media');
         }
     }

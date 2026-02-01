@@ -95,7 +95,7 @@ export default function UploadMediaPage() {
                 });
             }, 200);
 
-            const response = await mediaService.uploadMedia(uploadedFiles);
+            const response = await mediaService.uploadMediaAdmin(uploadedFiles);
 
             clearInterval(progressInterval);
             setUploadProgress(100);
