@@ -23,8 +23,14 @@ export default function MediaLibraryPage() {
         fileId: null,
         fileName: ""
     });
+    const [editModal, setEditModal] = useState<{ isOpen: boolean; fileId: string | null; description: string }>({
+        isOpen: false,
+        fileId: null,
+        description: ""
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Fetch media files
     const fetchMedia = async () => {
@@ -111,6 +117,37 @@ export default function MediaLibraryPage() {
 
     const handleDeleteCancel = () => {
         setDeleteModal({ isOpen: false, fileId: null, fileName: "" });
+    };
+
+    const handleEditClick = (fileId: string, description: string) => {
+        setEditModal({ isOpen: true, fileId, description: description || "" });
+    };
+
+    const handleEditSave = async () => {
+        if (!editModal.fileId) return;
+
+        try {
+            setIsSaving(true);
+            const response = await mediaService.updateMediaAdmin(editModal.fileId, {
+                description: editModal.description
+            });
+
+            if (response.status === 'success') {
+                toast.success('File updated successfully');
+                setEditModal({ isOpen: false, fileId: null, description: "" });
+                // Refresh media list
+                await fetchMedia();
+            }
+        } catch (error: any) {
+            console.error('Error updating media:', error);
+            toast.error(error.message || 'Failed to update file');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleEditCancel = () => {
+        setEditModal({ isOpen: false, fileId: null, description: "" });
     };
 
     const formatFileSize = (bytes: number) => {
@@ -350,6 +387,19 @@ export default function MediaLibraryPage() {
                                         <button 
                                             onClick={(e) => {
                                                 e.stopPropagation();
+                                                handleEditClick(file.id, file.description || "");
+                                            }}
+                                            className="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-100"
+                                            title="Edit"
+                                        >
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-gray-700">
+                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
                                                 handleDownload(file.url, file.original_name);
                                             }}
                                             className="p-2 bg-white rounded-lg shadow-sm hover:bg-gray-100"
@@ -385,6 +435,9 @@ export default function MediaLibraryPage() {
                                     </div>
                                     {file.dimensions && (
                                         <div className="text-xs text-gray-400 mt-1">{file.dimensions}</div>
+                                    )}
+                                    {file.description && (
+                                        <div className="text-xs text-gray-700 mt-2 line-clamp-2" title={file.description}>{file.description}</div>
                                     )}
                                 </div>
                             </div>
@@ -431,6 +484,9 @@ export default function MediaLibraryPage() {
                                             {file.dimensions && (
                                                 <div className="text-xs text-gray-400">{file.dimensions}</div>
                                             )}
+                                            {file.description && (
+                                                <div className="text-xs text-gray-700 mt-1 line-clamp-2" title={file.description}>{file.description}</div>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="text-sm text-gray-600 capitalize">{file.file_type.toLowerCase()}</span>
@@ -455,6 +511,16 @@ export default function MediaLibraryPage() {
                                                         <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
                                                     </svg>
                                                 </a>
+                                                <button 
+                                                    onClick={() => handleEditClick(file.id, file.description || "")}
+                                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors" 
+                                                    title="Edit"
+                                                >
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-600">
+                                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    </svg>
+                                                </button>
                                                 <button 
                                                     onClick={() => handleDownload(file.url, file.original_name)}
                                                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors" 
@@ -491,6 +557,54 @@ export default function MediaLibraryPage() {
                 onConfirm={handleDeleteConfirm}
                 onCancel={handleDeleteCancel}
             />
+
+            {/* Edit Modal */}
+            {editModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Media Details</h3>
+                        
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Description
+                            </label>
+                            <textarea
+                                value={editModal.description}
+                                onChange={(e) => setEditModal({ ...editModal, description: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#00d4aa] focus:border-[#00d4aa] min-h-[100px] text-gray-900 placeholder-gray-400"
+                                placeholder="Enter description..."
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3">
+                            <button
+                                onClick={handleEditCancel}
+                                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                disabled={isSaving}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleEditSave}
+                                className="px-4 py-2 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors flex items-center gap-2"
+                                disabled={isSaving}
+                            >
+                                {isSaving ? (
+                                    <>
+                                        <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                        </svg>
+                                        Saving...
+                                    </>
+                                ) : (
+                                    'Save Changes'
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

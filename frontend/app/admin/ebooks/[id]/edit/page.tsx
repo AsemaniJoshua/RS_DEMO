@@ -101,8 +101,17 @@ export default function EditEbookPage() {
 
         setIsLoading(true);
         try {
-            // Only send necessary data? The controller filters undefined but we are state managed here.
-            await ebookService.updateEbook(params.id as string, formData);
+            // Only send new files if changed
+            const dataToSend: any = { ...formData };
+            if (formData.coverImage && typeof formData.coverImage !== 'object') {
+                // If it's a string (URL), don't send
+                delete dataToSend.coverImage;
+            }
+            if (formData.file && typeof formData.file !== 'object') {
+                // If it's a string (URL), don't send
+                delete dataToSend.file;
+            }
+            await ebookService.updateEbook(params.id as string, dataToSend);
             toast.success("Ebook updated successfully");
             router.push(`/admin/ebooks/${params.id}`);
         } catch (error: any) {

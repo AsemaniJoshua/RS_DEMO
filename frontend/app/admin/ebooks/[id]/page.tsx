@@ -22,8 +22,9 @@ export default function EbookDetailPage() {
     const fetchEbook = async (id: string) => {
         try {
             setIsLoading(true);
-            const response = await ebookService.getEbookById(id);
-            setEbook((response as any).data.ebook);
+            const response = await ebookService.getAdminEbookById(id);
+            // Fix: response.data.ebook, not response.ebook
+            setEbook((response as any).data?.ebook || (response as any).ebook);
         } catch (error: any) {
             toast.error(error.message || "Failed to load ebook details");
             router.push("/admin/ebooks");
@@ -216,9 +217,17 @@ export default function EbookDetailPage() {
                             </div>
                         </div>
                         <a 
-                            href={ebook.fileUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
+                            href={(() => {
+                                if (ebook.fileUrl && ebook.fileUrl.includes('res.cloudinary.com')) {
+                                    // For raw files, use only fl_attachment (no filename)
+                                    return ebook.fileUrl.replace(
+                                        /\/upload(?!\/fl_attachment)/,
+                                        '/upload/fl_attachment'
+                                    );
+                                }
+                                return ebook.fileUrl;
+                            })()}
+                            download
                             className="block w-full py-2 bg-gray-900 text-white text-center rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
                         >
                             Download File

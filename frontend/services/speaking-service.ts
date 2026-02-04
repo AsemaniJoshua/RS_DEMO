@@ -60,13 +60,16 @@ export const speakingService = {
         return response.data?.event;
     },
 
-    async createEvent(data: Partial<SpeakingEvent>) {
-        const response = await api.post('/admin/speaking', data);
+
+    async createEvent(data: FormData | Partial<SpeakingEvent>) {
+        const body = data instanceof FormData ? data : undefined;
+        const response = await api.post('/admin/speaking', body || data);
         return response.data;
     },
 
-    async updateEvent(id: string, data: Partial<SpeakingEvent>) {
-        const response = await api.put(`/admin/speaking/${id}`, data);
+    async updateEvent(id: string, data: FormData | Partial<SpeakingEvent>) {
+        const body = data instanceof FormData ? data : undefined;
+        const response = await api.put(`/admin/speaking/${id}`, body || data);
         return response.data;
     },
 
@@ -81,7 +84,7 @@ export const speakingService = {
 
     async getAllCategories() {
         const response = await api.get<{ categories: Category[] }>('/admin/speaking/categories');
-        return response.data?.categories || [];
+        return response.categories || [];
     },
 
     async createCategory(name: string) {

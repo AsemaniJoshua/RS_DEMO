@@ -16,11 +16,10 @@ export default function CoursesPage() {
     const [selectedCategory, setSelectedCategory] = useState("All Categories");
 
     const [selectedStatus, setSelectedStatus] = useState("All");
-    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; courseId: string | null; courseName: string }>({
-        isOpen: false,
-        courseId: null,
-        courseName: ""
-    });
+    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; courseId: string | null; courseName: string }>(
+        { isOpen: false, courseId: null, courseName: "" }
+    );
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -60,17 +59,21 @@ export default function CoursesPage() {
 
     const handleDeleteConfirm = async () => {
         if (!deleteModal.courseId) return;
+        setIsDeleting(true);
         try {
             await courseService.deleteCourse(deleteModal.courseId);
             setCourses(courses.filter(c => c.id !== deleteModal.courseId));
             setDeleteModal({ isOpen: false, courseId: null, courseName: "" });
         } catch (error) {
             console.error("Error deleting course", error);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     const handleDeleteCancel = () => {
         setDeleteModal({ isOpen: false, courseId: null, courseName: "" });
+        setIsDeleting(false);
     };
 
     if (loading) {
@@ -283,6 +286,7 @@ export default function CoursesPage() {
             <DeleteCourseModal
                 isOpen={deleteModal.isOpen}
                 courseName={deleteModal.courseName}
+                isDeleting={isDeleting}
                 onConfirm={handleDeleteConfirm}
                 onCancel={handleDeleteCancel}
             />

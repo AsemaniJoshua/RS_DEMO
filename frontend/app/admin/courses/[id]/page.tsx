@@ -17,12 +17,31 @@ import {
     FileText,
     CheckCircle
 } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function CourseDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
     const [course, setCourse] = useState<Course | null>(null);
     const [loading, setLoading] = useState(true);
+    const [downloading, setDownloading] = useState(false);
+    const { isAdminOrEditor } = useAuth();
+
+    const handleDownload = async () => {
+        if (!course) return;
+        setDownloading(true);
+        try {
+            const result = await courseService.downloadCourse(course.id);
+            if (!result?.downloadUrl) {
+                toast.error("Failed to download course materials");
+            }
+            // If downloadUrl exists, downloadCourse already triggers download
+        } catch (error: any) {
+            toast.error("Failed to download course materials");
+        } finally {
+            setDownloading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchCourse = async () => {
@@ -112,11 +131,11 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                     <img 
                         src={course.thumbnailUrl} 
                         alt={course.title} 
-                        className="w-full h-64 md:h-[400px] object-cover"
+                        className="w-full h-64 md:h-100 object-cover"
                     />
                 </div>
             ) : (
-                <div className="mb-8 bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] rounded-2xl border border-gray-100 shadow-sm h-48 md:h-64 flex flex-col items-center justify-center text-white">
+                <div className="mb-8 bg-linear-to-br from-[#00d4aa] to-[#00bfa6] rounded-2xl border border-gray-100 shadow-sm h-48 md:h-64 flex flex-col items-center justify-center text-white">
                     <ImageIcon className="w-16 h-16 mb-4 opacity-50" />
                     <span className="text-xl font-bold">{course.title}</span>
                 </div>
@@ -190,7 +209,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Course Materials</h3>
                         
-                        {course.fileUrl ? (
+                        {course.fileUrl && isAdminOrEditor() ? (
                             <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
@@ -201,14 +220,25 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                                         <div className="text-xs text-gray-500">ZIP Archive</div>
                                     </div>
                                 </div>
-                                <button className="w-full py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                                    Download Materials
+                                <button
+                                    className="w-full py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                                    onClick={handleDownload}
+                                    disabled={downloading}
+                                >
+                                    {downloading ? (
+                                        <>
+                                            <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                                            Downloading...
+                                        </>
+                                    ) : (
+                                        <>Download Materials</>
+                                    )}
                                 </button>
                             </div>
                         ) : (
                             <div className="text-center p-6 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
                                 <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                <p className="text-sm text-gray-500">No downloadable materials available.</p>
+                                <p className="text-sm text-gray-500">No downloadable materials available or you do not have access.</p>
                             </div>
                         )}
                     </div>

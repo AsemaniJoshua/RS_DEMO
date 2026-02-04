@@ -11,8 +11,11 @@ import Image from "next/image";
 // Import JSON data
 import appointmentsData from "@/data/admin/appointments.json";
 import quickActionsData from "@/data/admin/quickActions.json";
+
 import { dashboardService } from "@/services/dashboard-service";
+import { personalBrandService, PersonalBrand } from "@/services/personal-brand-service";
 import { useAuth } from "@/contexts/auth-context";
+
 
 export default function AdminDashboard() {
     const { user } = useAuth();
@@ -24,6 +27,10 @@ export default function AdminDashboard() {
 
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+
+    // Personal brand/profile image state
+    const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+    const [profileImageLoaded, setProfileImageLoaded] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -43,11 +50,33 @@ export default function AdminDashboard() {
             }
         };
 
+        const fetchProfileImage = async () => {
+            try {
+                const response = await personalBrandService.getPersonalBrand();
+                if (response.status === 'success' && response.data && response.data.profile && response.data.profile.profile_image_url) {
+                    setProfileImageUrl(response.data.profile.profile_image_url);
+                } else {
+                    setProfileImageUrl(null);
+                }
+            } catch (error) {
+                setProfileImageUrl(null);
+            }
+        };
+
         fetchDashboardStats();
+        fetchProfileImage();
     }, []);
 
     // Analytics icons
     const analyticsIcons: { [key: string]: React.ReactNode } = {
+                'ebook-revenue': (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M7 4v16" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M17 4v16" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M7 8h10" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                ),
         patients: (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2"/>
@@ -159,6 +188,14 @@ export default function AdminDashboard() {
             value: stats ? `GHS ${stats.revenue.sessionRevenue.toLocaleString()}` : "...",
             change: "+0%",
             color: "from-[#f59e0b] to-[#d97706]"
+        },
+        // Ebook card appended at the end for row alignment
+        {
+            id: "ebook-revenue",
+            label: "Revenue from Ebooks",
+            value: stats && stats.revenue && typeof stats.revenue.ebookRevenue !== 'undefined' ? `GHS ${stats.revenue.ebookRevenue.toLocaleString()}` : "...",
+            change: "+0%",
+            color: "from-[#10b981] to-[#047857]"
         }
     ];
 
@@ -190,7 +227,7 @@ export default function AdminDashboard() {
             {/* Hero Banner */}
             <div className="px-4 md:px-8 py-4 md:py-6">
                 <div 
-                    className={`bg-gradient-to-r from-[#1a1f35] via-[#2a3f55] to-[#00d4aa] rounded-2xl p-4 md:p-8 relative overflow-hidden transform transition-all duration-700 ${
+                    className={`bg-linear-to-r from-[#1a1f35] via-[#2a3f55] to-[#00d4aa] rounded-2xl p-4 md:p-8 relative overflow-hidden transform transition-all duration-700 ${
                         mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
                     }`}
                 >
@@ -219,14 +256,32 @@ export default function AdminDashboard() {
                         </div>
                         <div className={`hidden md:block ml-8 transform transition-all duration-1000 ${mounted ? 'scale-100 rotate-0' : 'scale-0 rotate-12'}`}>
                             <div className="relative">
-                                <div className="w-40 h-40 rounded-full overflow-hidden ring-4 ring-white/30 shadow-2xl">
-                                    <Image 
-                                        src="/dr-george.png" 
-                                        alt="Dr. George" 
-                                        width={160}
-                                        height={160}
-                                        className="object-cover w-full h-full"
-                                    />
+                                <div className="w-40 h-40 rounded-full overflow-hidden ring-4 ring-white/30 shadow-2xl bg-gray-200 flex items-center justify-center">
+                                    {(!profileImageLoaded && profileImageUrl) && (
+                                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-300 animate-pulse">
+                                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                                            <path d="M12 7a3 3 0 100 6 3 3 0 000-6z" stroke="currentColor" strokeWidth="2" />
+                                        </svg>
+                                    )}
+                                    {profileImageUrl && (
+                                        <Image
+                                            src={profileImageUrl}
+                                            alt="Admin Profile"
+                                            width={160}
+                                            height={160}
+                                            className={`object-cover w-full h-full ${profileImageLoaded ? '' : 'hidden'}`}
+                                            onLoadingComplete={() => setProfileImageLoaded(true)}
+                                            onError={() => setProfileImageLoaded(true)}
+                                            priority
+                                        />
+                                    )}
+                                    {!profileImageUrl && (
+                                        <svg width="160" height="160" viewBox="0 0 160 160" fill="none" className="object-cover w-full h-full text-gray-300">
+                                            <circle cx="80" cy="80" r="80" fill="#e5e7eb" />
+                                            <circle cx="80" cy="70" r="36" fill="#cbd5e1" />
+                                            <ellipse cx="80" cy="120" rx="48" ry="28" fill="#cbd5e1" />
+                                        </svg>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -245,7 +300,7 @@ export default function AdminDashboard() {
                             }`}
                             style={{ transitionDelay: `${idx * 100}ms` }}
                         >
-                            <div className={`w-14 h-14 bg-gradient-to-br ${item.color} rounded-xl flex items-center justify-center text-white mb-4`}>
+                            <div className={`w-14 h-14 bg-linear-to-br ${item.color} rounded-xl flex items-center justify-center text-white mb-4`}>
                                 {analyticsIcons[item.id]}
                             </div>
                             <div className="text-sm text-gray-600 mb-1">{item.label}</div>
@@ -281,7 +336,7 @@ export default function AdminDashboard() {
                                         </div>
                                         {/* Bar */}
                                         <div 
-                                            className="w-full bg-gradient-to-t from-[#00d4aa] to-[#00bfa6] rounded-t-lg transition-all duration-700 hover:from-[#0066ff] hover:to-[#0052cc] cursor-pointer"
+                                            className="w-full bg-linear-to-t from-[#00d4aa] to-[#00bfa6] rounded-t-lg transition-all duration-700 hover:from-[#0066ff] hover:to-[#0052cc] cursor-pointer"
                                             style={{ 
                                                 height: mounted ? `${item.value * 2.4}px` : '0px',
                                                 transitionDelay: `${idx * 100}ms`

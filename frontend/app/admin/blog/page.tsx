@@ -157,8 +157,16 @@ export default function BlogManagerPage() {
             </div>
 
             {/* Blogs Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+                <table className="w-full table-fixed min-w-[900px]">
+                    <colgroup>
+                        <col style={{ width: '100px' }} />
+                        <col style={{ width: '220px' }} />
+                        <col style={{ width: '160px' }} />
+                        <col style={{ width: '120px' }} />
+                        <col style={{ width: '120px' }} />
+                        <col style={{ width: '180px' }} />
+                    </colgroup>
                     <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
@@ -196,11 +204,17 @@ export default function BlogManagerPage() {
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-4 max-w-[200px] align-top">
                                         <Link href={`/admin/blog/${blog.id}`} className="block group">
                                             <div className="text-sm font-medium text-gray-900 group-hover:text-[#0066ff] transition-colors">{blog.title}</div>
                                             {blog.excerpt && (
-                                                <div className="text-sm text-gray-500 truncate max-w-md mt-1">{blog.excerpt}</div>
+                                                <div
+                                                    className="text-sm text-gray-500 mt-1 overflow-hidden whitespace-nowrap text-ellipsis max-w-[180px]"
+                                                    style={{ textOverflow: 'ellipsis', display: 'block' }}
+                                                    title={blog.excerpt}
+                                                >
+                                                    {blog.excerpt}
+                                                </div>
                                             )}
                                         </Link>
                                     </td>
@@ -216,46 +230,50 @@ export default function BlogManagerPage() {
                                         {blog.published_at ? new Date(blog.published_at).toLocaleDateString() : '-'}
                                     </td>
                                     <td className="px-6 py-4 text-right text-sm font-medium">
-                                        <div className="flex justify-end gap-2">
+                                        <div className="flex justify-end gap-1 items-center">
                                             <button
                                                 onClick={() => handlePublishToggle(blog)}
                                                 disabled={publishingId === blog.id}
-                                                className={`px-3 py-1 rounded-lg transition-colors flex items-center gap-2 ${
+                                                className={`p-2 rounded-full transition-colors flex items-center justify-center ${
                                                     blog.status === 'PUBLISHED'
-                                                        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                                                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                        ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
+                                                        : 'bg-green-50 text-green-700 hover:bg-green-100'
                                                 } ${publishingId === blog.id ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                                title={blog.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
                                             >
                                                 {publishingId === blog.id ? (
-                                                    <>
-                                                        <svg className="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                                                        </svg>
-                                                        {blog.status === 'PUBLISHED' ? 'Unpublishing...' : 'Publishing...'}
-                                                    </>
+                                                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                                    </svg>
                                                 ) : (
-                                                    blog.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'
+                                                    blog.status === 'PUBLISHED' ? (
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
+                                                    ) : (
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" /></svg>
+                                                    )
                                                 )}
                                             </button>
                                             <Link
                                                 href={`/admin/blog/${blog.id}`}
-                                                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-1"
-                                                title="View Details"
+                                                className="p-2 rounded-full bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center justify-center"
+                                                title="View"
                                             >
                                                 <Eye className="w-4 h-4" />
                                             </Link>
                                             <Link
                                                 href={`/admin/blog/${blog.id}/edit`}
-                                                className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                                                className="p-2 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors flex items-center justify-center"
+                                                title="Edit"
                                             >
-                                                Edit
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2H7v-2l6-6z" /></svg>
                                             </Link>
                                             <button
                                                 onClick={() => handleDeleteClick(blog)}
-                                                className="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                                                className="p-2 rounded-full bg-red-50 text-red-700 hover:bg-red-100 transition-colors flex items-center justify-center"
+                                                title="Delete"
                                             >
-                                                Delete
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" /></svg>
                                             </button>
                                         </div>
                                     </td>

@@ -20,6 +20,7 @@ export default function CategoryManagementModal({
     const [newCategory, setNewCategory] = useState("");
     const [isCreating, setIsCreating] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string | null; name: string }>({ open: false, id: null, name: "" });
 
     if (!isOpen) return null;
 
@@ -52,15 +53,13 @@ export default function CategoryManagementModal({
         }
     };
 
-    const handleDeleteCategory = async (categoryId: string, categoryName: string) => {
-        if (!confirm(`Are you sure you want to delete "${categoryName}"?`)) {
-            return;
-        }
-
-        setDeletingId(categoryId);
+    const handleDeleteCategory = async () => {
+        if (!deleteModal.id) return;
+        setDeletingId(deleteModal.id);
         try {
-            await speakingService.deleteCategory(categoryId);
+            await speakingService.deleteCategory(deleteModal.id);
             toast.success("Category deleted successfully");
+            setDeleteModal({ open: false, id: null, name: "" });
             onCategoryChange(); // Refresh categories
         } catch (error: any) {
             toast.error(error.message || "Failed to delete category");
@@ -125,7 +124,7 @@ export default function CategoryManagementModal({
                         <h3 className="text-sm font-medium text-gray-700 mb-3">
                             Existing Categories ({categories.length})
                         </h3>
-                        
+                    
                         {categories.length === 0 ? (
                             <div className="text-center py-8 text-gray-500">
                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" className="mx-auto mb-3 text-gray-300">
@@ -151,7 +150,7 @@ export default function CategoryManagementModal({
                                             <span className="text-gray-900 font-medium">{category.name}</span>
                                         </div>
                                         <button
-                                            onClick={() => handleDeleteCategory(category.id, category.name)}
+                                            onClick={() => setDeleteModal({ open: true, id: category.id, name: category.name })}
                                             disabled={deletingId === category.id}
                                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                                             title="Delete category"
@@ -170,6 +169,32 @@ export default function CategoryManagementModal({
                         )}
                     </div>
                 </div>
+
+                {/* Delete Modal */}
+                {deleteModal.open && (
+                    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-xl shadow-xl p-8 max-w-sm w-full">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Delete Category</h3>
+                            <p className="text-gray-700 mb-6">Are you sure you want to delete <span className="font-semibold">{deleteModal.name}</span>? This action cannot be undone.</p>
+                            <div className="flex gap-4 justify-end">
+                                <button
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
+                                    onClick={() => setDeleteModal({ open: false, id: null, name: "" })}
+                                    disabled={deletingId === deleteModal.id}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50"
+                                    onClick={handleDeleteCategory}
+                                    disabled={deletingId === deleteModal.id}
+                                >
+                                    {deletingId === deleteModal.id ? "Deleting..." : "Delete"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Footer */}
                 <div className="p-6 border-t border-gray-100">

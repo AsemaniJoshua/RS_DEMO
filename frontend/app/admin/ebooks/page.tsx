@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ebookService, Ebook, EbookCategory } from "@/services/ebook-service";
 import EbookCategoryManagementModal from "@/components/admin/ebooks/EbookCategoryManagementModal";
 import toast from "react-hot-toast";
+import DeleteEbookModal from "@/components/admin/ebooks/DeleteEbookModal";
 
 export default function EbooksPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -18,6 +19,7 @@ export default function EbooksPage() {
     const [isLoading, setIsLoading] = useState(true);
 
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [deleteModal, setDeleteModal] = useState<{ id: string; title: string } | null>(null);
 
     // Fetch data
     useEffect(() => {
@@ -79,12 +81,8 @@ export default function EbooksPage() {
     };
 
     const handleDelete = async (id: string, title: string) => {
-        if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
-
         setIsDeleting(id);
         try {
-            await ebookService.deleteEbook(id);
-            toast.success("Ebook deleted successfully");
             await ebookService.deleteEbook(id);
             toast.success("Ebook deleted successfully");
             fetchEbooks();
@@ -92,6 +90,7 @@ export default function EbooksPage() {
             toast.error(error.message || "Failed to delete ebook");
         } finally {
             setIsDeleting(null);
+            setDeleteModal(null);
         }
     };
 
@@ -303,13 +302,13 @@ export default function EbooksPage() {
                                                         </svg>
                                                     </button>
                                                 </Link>
-                                                <button 
-                                                    onClick={() => handleDelete(book.id, book.title)}
+                                                <button
+                                                    onClick={() => setDeleteModal({ id: book.id, title: book.title })}
                                                     disabled={isDeleting === book.id}
-                                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600 disabled:opacity-50" 
+                                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600 disabled:opacity-50"
                                                     title="Delete ebook"
                                                 >
-                                                     {isDeleting === book.id ? (
+                                                    {isDeleting === book.id ? (
                                                         <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                                                     ) : (
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -317,6 +316,15 @@ export default function EbooksPage() {
                                                         </svg>
                                                     )}
                                                 </button>
+                                                        {/* Delete Modal */}
+                                                        <DeleteEbookModal
+                                                            isOpen={!!deleteModal}
+                                                            title="Delete Ebook"
+                                                            message={`Are you sure you want to delete "${deleteModal?.title}"? This action cannot be undone.`}
+                                                            onCancel={() => setDeleteModal(null)}
+                                                            onConfirm={() => deleteModal && handleDelete(deleteModal.id, deleteModal.title)}
+                                                            loading={isDeleting === deleteModal?.id}
+                                                        />
                                             </div>
                                         </td>
                                     </tr>

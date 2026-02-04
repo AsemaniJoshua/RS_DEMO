@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 export default function UploadMediaPage() {
     const router = useRouter();
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+    const [descriptions, setDescriptions] = useState<string[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState("");
     const [isUploading, setIsUploading] = useState(false);
@@ -42,7 +43,10 @@ export default function UploadMediaPage() {
         }
 
         if (validFiles.length > 0) {
-            setUploadedFiles([...uploadedFiles, ...validFiles]);
+            setUploadedFiles(prev => {
+                setDescriptions(d => [...d, ...Array(validFiles.length).fill("")]);
+                return [...prev, ...validFiles];
+            });
         }
     };
 
@@ -71,12 +75,19 @@ export default function UploadMediaPage() {
 
     const removeFile = (index: number) => {
         setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+        setDescriptions(descriptions.filter((_, i) => i !== index));
         setError(""); // Clear error when removing files
     };
 
     const handleUpload = async () => {
         if (uploadedFiles.length === 0) {
             toast.error('Please select at least one file to upload');
+            return;
+        }
+        // Validate descriptions
+        const missing = descriptions.findIndex(desc => !desc.trim());
+        if (missing !== -1) {
+            setError(`Please enter a description for all files before uploading.`);
             return;
         }
 
@@ -95,14 +106,13 @@ export default function UploadMediaPage() {
                 });
             }, 200);
 
-            const response = await mediaService.uploadMediaAdmin(uploadedFiles);
+            const response = await mediaService.uploadMediaAdmin(uploadedFiles, descriptions);
 
             clearInterval(progressInterval);
             setUploadProgress(100);
 
             if (response.status === 'success') {
                 toast.success(`Successfully uploaded ${uploadedFiles.length} file(s)`);
-                
                 // Wait a moment to show 100% progress
                 setTimeout(() => {
                     router.push("/admin/media");
@@ -170,7 +180,7 @@ export default function UploadMediaPage() {
             {error && (
                 <div className="max-w-4xl mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
                     <div className="flex items-start gap-3">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-red-500 flex-shrink-0 mt-0.5">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-red-500 shrink-0 mt-0.5">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
                             <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                         </svg>
@@ -250,15 +260,33 @@ export default function UploadMediaPage() {
                                             <div className="text-sm text-gray-500">{formatFileSize(file.size)}</div>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => removeFile(index)}
-                                        className="p-2 hover:bg-red-50 rounded-lg transition-colors ml-4"
-                                        disabled={isUploading}
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-600">
-                                            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2"/>
-                                        </svg>
-                                    </button>
+                                    <div className="flex flex-col items-end gap-2 ml-4">
+                                        <label className="block mb-1 text-gray-700 text-[15px] font-medium" htmlFor={`desc-${index}`}>
+                                            Description
+                                        </label>
+                                        <textarea
+                                            id={`desc-${index}`}
+                                            className="border border-gray-300 rounded-lg px-3 py-2 text-base w-72 min-h-[48px] bg-white text-gray-900 focus:outline-none focus:border-[#00d4aa] placeholder-gray-400 resize-y"
+                                            placeholder="Enter description"
+                                            value={descriptions[index] || ""}
+                                            onChange={e => {
+                                                const newDescs = [...descriptions];
+                                                newDescs[index] = e.target.value;
+                                                setDescriptions(newDescs);
+                                            }}
+                                            disabled={isUploading}
+                                            required
+                                        />
+                                        <button
+                                            onClick={() => removeFile(index)}
+                                            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                            disabled={isUploading}
+                                        >
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-600">
+                                                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -285,9 +313,9 @@ export default function UploadMediaPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleUpload}
-                        disabled={uploadedFiles.length === 0 || isUploading}
+                        disabled={uploadedFiles.length === 0 || isUploading || descriptions.some(desc => !desc.trim())}
                         className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                            uploadedFiles.length > 0 && !isUploading
+                            uploadedFiles.length > 0 && !isUploading && descriptions.every(desc => desc.trim())
                                 ? 'bg-[#00d4aa] text-white hover:bg-[#00bfa6]'
                                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}

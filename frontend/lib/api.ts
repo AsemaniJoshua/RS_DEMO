@@ -68,6 +68,15 @@ export async function apiFetch<T>(
         headers,
     });
 
+    // Handle 204 No Content
+    if (response.status === 204) {
+        return {
+            status: 'success',
+            message: 'No content',
+            data: undefined
+        } as ApiResponse<T>;
+    }
+
     const data: ApiResponse<T> = await response.json();
 
     if (!response.ok) {

@@ -96,9 +96,11 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
             data.append("price", formData.price.toString());
             data.append("categoryId", formData.category);
             data.append("status", formData.status);
-            
-            if (thumbnail) data.append("thumbnail", thumbnail);
-            if (courseFile) data.append("courseFile", courseFile);
+
+            // Only send new thumbnail if it's a File
+            if (thumbnail instanceof File) data.append("thumbnail", thumbnail);
+            // Only send new courseFile if it's a File
+            if (courseFile instanceof File) data.append("courseFile", courseFile);
 
             await courseService.updateCourse(id, data);
             toast.success("Course updated successfully!");

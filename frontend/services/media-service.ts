@@ -1,3 +1,24 @@
+    // Update media with file (Admin Route)
+    export async function updateMediaAdminWithFile(id: string, formData: FormData): Promise<{ status: string; message: string; data: MediaItem }> {
+        try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+            const headers: any = token ? { Authorization: `Bearer ${token}` } : {};
+            const response = await axios.put(
+                `${API_BASE_URL}/admin/media/${id}`,
+                formData,
+                {
+                    headers: {
+                        ...headers,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+            return response.data;
+        } catch (error: any) {
+            console.error('Error updating media (admin, file):', error);
+            throw new Error(error.response?.data?.message || 'Failed to update media');
+        }
+    }
 import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
@@ -13,6 +34,7 @@ export interface MediaItem {
     cloudinary_id: string;
     dimensions?: string;
     duration?: string;
+    description: string;
     created_at: string;
     updated_at: string;
     uploader?: {
@@ -145,11 +167,12 @@ class MediaService {
     }
 
     // Upload media (Admin Route)
-    async uploadMediaAdmin(files: File[]): Promise<{ status: string; message: string; data: MediaItem[] }> {
+    async uploadMediaAdmin(files: File[], descriptions: string[]): Promise<{ status: string; message: string; data: MediaItem[] }> {
         try {
             const formData = new FormData();
-            files.forEach(file => {
+            files.forEach((file, index) => {
                 formData.append('files', file);
+                formData.append('descriptions', descriptions[index]);
             });
 
             const response = await axios.post(
@@ -167,6 +190,21 @@ class MediaService {
         } catch (error: any) {
              console.error('Error uploading media (admin):', error);
              throw new Error(error.response?.data?.message || 'Failed to upload media');
+        }
+    }
+
+    // Update media details (Admin Route)
+    async updateMediaAdmin(id: string, data: { description: string }): Promise<{ status: string; message: string; data: MediaItem }> {
+        try {
+            const response = await axios.put(
+                `${API_BASE_URL}/admin/media/${id}`,
+                data,
+                this.getAuthHeader()
+            );
+            return response.data;
+        } catch (error: any) {
+             console.error('Error updating media (admin):', error);
+             throw new Error(error.response?.data?.message || 'Failed to update media');
         }
     }
 

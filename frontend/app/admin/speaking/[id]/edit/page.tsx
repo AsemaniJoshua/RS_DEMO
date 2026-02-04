@@ -67,9 +67,11 @@ export default function EditSpeakingEventPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // Track if a new image file is selected
+    const [imageFile, setImageFile] = useState<File | null>(null);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
         // Validation
         if (!formData.title.trim()) {
             toast.error("Event title is required");
@@ -83,11 +85,9 @@ export default function EditSpeakingEventPage() {
             toast.error("Event date is required");
             return;
         }
-
         const selectedDate = new Date(formData.date);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-
         if (selectedDate <= today) {
             toast.error("Event date must be in the future");
             return;
@@ -98,9 +98,20 @@ export default function EditSpeakingEventPage() {
         }
 
         setIsSubmitting(true);
-
         try {
-            await speakingService.updateEvent(eventId, formData);
+            const form = new FormData();
+            form.append('title', formData.title);
+            form.append('venue', formData.venue);
+            form.append('category', formData.category);
+            form.append('date', formData.date);
+            form.append('location', formData.location);
+            form.append('status', formData.status);
+            form.append('description', formData.description || '');
+            // Only append image if a new file is selected
+            if (imageFile) {
+                form.append('image', imageFile);
+            }
+            await speakingService.updateEvent(eventId, form);
             toast.success("Speaking event updated successfully!");
             router.push("/admin/speaking");
         } catch (error: any) {
@@ -126,7 +137,7 @@ export default function EditSpeakingEventPage() {
 
     if (isLoading) {
         return (
-            <div className="p-4 md:p-8 flex items-center justify-center min-h-[400px]">
+            <div className="p-4 md:p-8 flex items-center justify-center min-h-100">
                 <div className="text-center">
                     <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin mx-auto mb-4"/>
                     <p className="text-gray-600">Loading event...</p>
@@ -181,17 +192,14 @@ export default function EditSpeakingEventPage() {
                             Event Image <span className="text-red-500">*</span>
                         </label>
                         <ImageUpload
-                            value={formData.image}
-                            onChange={(url) => {
-                                if (typeof url === 'string') {
-                                    setFormData(prev => ({ ...prev, image: url }));
+                            value={imageFile || formData.image}
+                            onChange={(fileOrUrl) => {
+                                if (fileOrUrl instanceof File) {
+                                    setImageFile(fileOrUrl);
+                                } else if (!fileOrUrl) {
+                                    setImageFile(null);
                                 }
                             }}
-                            onUploadComplete={(data) => setFormData(prev => ({ 
-                                ...prev, 
-                                image: data.url,
-                                imagePublicId: data.public_id 
-                            }))}
                             label="Update Event Image"
                         />
                     </div>

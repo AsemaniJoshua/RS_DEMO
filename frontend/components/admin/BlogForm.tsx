@@ -107,10 +107,11 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
         setLoading(true);
 
         try {
-            const dataToSubmit = {
-                ...formData,
-                imageFile: imageFile || undefined
-            };
+            // Only include imageFile if a new file is selected (not a string URL)
+            let dataToSubmit: any = { ...formData };
+            if (imageFile && imageFile instanceof File) {
+                dataToSubmit.imageFile = imageFile;
+            }
 
             if (isEditing && initialData) {
                 await blogService.updateBlog(initialData.id, dataToSubmit);

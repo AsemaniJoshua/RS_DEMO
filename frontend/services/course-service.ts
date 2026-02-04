@@ -78,19 +78,23 @@ export const courseService = {
     downloadCourse: async (id: string) => {
         // We get the URL from the backend
         const response = await api.get<any>(`/admin/courses/${id}/download`);
-        
-        if (response.data.success && response.data.downloadUrl) {
-            // Initiate download by opening in new tab or creating link
-            // For zip files, direct window open might be best or a hidden anchor
-            
+        let url = response.data?.downloadUrl || response.downloadUrl;
+        if (url) {
+            // If Cloudinary raw file, force download with fl_attachment
+            if (url.includes('res.cloudinary.com') && url.includes('/raw/')) {
+                // Insert fl_attachment after /upload if not present
+                url = url.replace(/\/upload(?!\/fl_attachment)/, '/upload/fl_attachment');
+            }
             // Create a hidden anchor to force download
             const link = document.createElement('a');
-            link.href = response.data.downloadUrl;
+            link.href = url;
             link.setAttribute('download', ''); // hint to download
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            return { downloadUrl: url };
+        } else {
+            throw new Error('No download URL received');
         }
-        return response.data;
     }
 };

@@ -103,7 +103,11 @@ export default function SpeakingEventsPage() {
 
             <div className="flex justify-end mb-6">
                  <button 
-                    onClick={() => setShowCategoryModal(true)}
+                    onClick={async () => {
+                        const categoriesData = await speakingService.getAllCategories();
+                        setCategories(categoriesData);
+                        setShowCategoryModal(true);
+                    }}
                     className="text-sm text-[#00d4aa] hover:text-[#00bfa6] font-medium flex items-center gap-1 cursor-pointer"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -355,7 +359,10 @@ export default function SpeakingEventsPage() {
                 isOpen={showCategoryModal}
                 onClose={() => setShowCategoryModal(false)}
                 categories={categories}
-                onCategoryChange={fetchEventsAndCategories}
+                onCategoryChange={async () => {
+                    const categoriesData = await speakingService.getAllCategories();
+                    setCategories(categoriesData);
+                }}
             />
         </div>
     );

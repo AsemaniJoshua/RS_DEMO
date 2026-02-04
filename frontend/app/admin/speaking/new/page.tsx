@@ -6,6 +6,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { speakingService, Category } from "@/services/speaking-service";
 import ImageUpload from "@/components/admin/ImageUpload";
+import { blogService } from "@/services/blog-service";
 
 export default function NewSpeakingEventPage() {
     const router = useRouter();
@@ -20,6 +21,7 @@ export default function NewSpeakingEventPage() {
         description: "",
         status: "UPCOMING" as "UPCOMING" | "COMPLETED" | "CANCELLED"
     });
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -47,7 +49,6 @@ export default function NewSpeakingEventPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
         // Validation
         if (!formData.title.trim()) {
             toast.error("Event title is required");
@@ -65,11 +66,9 @@ export default function NewSpeakingEventPage() {
             toast.error("Event date is required");
             return;
         }
-
         const selectedDate = new Date(formData.date);
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Reset time to start of day for fair comparison
-
+        today.setHours(0, 0, 0, 0);
         if (selectedDate <= today) {
             toast.error("Event date must be in the future");
             return;
@@ -78,15 +77,24 @@ export default function NewSpeakingEventPage() {
             toast.error("Location is required");
             return;
         }
-        if (!formData.image) {
+        if (!imageFile) {
             toast.error("Event image is required");
             return;
         }
-
         setIsLoading(true);
-
         try {
-            await speakingService.createEvent(formData);
+            // Build FormData for backend upload
+            const form = new FormData();
+            form.append('title', formData.title);
+            form.append('venue', formData.venue);
+            form.append('category', formData.category);
+            form.append('date', formData.date);
+            form.append('location', formData.location);
+            form.append('status', formData.status);
+            form.append('description', formData.description || '');
+            form.append('image', imageFile);
+
+            await speakingService.createEvent(form);
             toast.success("Speaking event created successfully!");
             router.push("/admin/speaking");
         } catch (error: any) {
@@ -142,17 +150,14 @@ export default function NewSpeakingEventPage() {
                             Event Image <span className="text-red-500">*</span>
                         </label>
                         <ImageUpload
-                            value={formData.image}
-                            onChange={(url) => {
-                                if (typeof url === 'string') {
-                                    setFormData(prev => ({ ...prev, image: url }));
+                            value={imageFile}
+                            onChange={(file) => {
+                                if (file instanceof File) {
+                                    setImageFile(file);
+                                } else if (!file) {
+                                    setImageFile(null);
                                 }
                             }}
-                            onUploadComplete={(data) => setFormData(prev => ({ 
-                                ...prev, 
-                                image: data.url,
-                                imagePublicId: data.public_id 
-                            }))}
                             label="Upload Event Image"
                         />
                     </div>
