@@ -100,15 +100,14 @@ export default function LiveSessionDetailsPage() {
             <div className="mb-6">
                 <Link 
                     href="/admin/live-sessions"
-                    className="text-[#0066ff] hover:underline flex items-center gap-1 mb-4"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg shadow-sm transition-colors font-medium mb-4"
                 >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M19 12H5M5 12l7 7m-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    Back to Live Sessions
+                    Back to All Sessions
                 </Link>
-                
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">{session.title}</h1>
                         <div className="flex items-center gap-3 mt-2">

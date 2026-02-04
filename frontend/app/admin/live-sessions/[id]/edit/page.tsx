@@ -60,7 +60,7 @@ export default function EditLiveSessionPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+        // No date-in-the-future validation for scheduled_date
         try {
             setSaving(true);
             const updateData = {
@@ -93,19 +93,32 @@ export default function EditLiveSessionPage() {
 
     return (
         <div className="p-8 max-w-4xl mx-auto">
-            <div className="mb-6">
-                <Link 
-                    href={`/admin/live-sessions/${sessionId}`}
-                    className="text-[#0066ff] hover:underline flex items-center gap-1 mb-4"
-                >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 12H5M5 12l7 7m-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Back to Session Details
-                </Link>
-                
-                <h1 className="text-3xl font-bold text-gray-900">Edit Live Session</h1>
-                <p className="text-gray-600 mt-2">Update session information and settings</p>
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex gap-2">
+                    <Link 
+                        href={`/admin/live-sessions`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg shadow-sm transition-colors font-medium"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 12H5M5 12l7 7m-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Back to All Sessions
+                    </Link>
+                    <Link
+                                                href={`/admin/live-sessions/${sessionId}`}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg shadow-sm transition-colors font-medium"
+                                                title="View Session"
+                                        >
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z" fill="currentColor"/>
+                                                </svg>
+                                                View Session
+                                        </Link>
+                </div>
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Edit Live Session</h1>
+                    <p className="text-gray-600 mt-2">Update session information and settings</p>
+                </div>
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
@@ -163,15 +176,16 @@ export default function EditLiveSessionPage() {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">Meeting Link</label>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">Meeting Link <span className="text-red-500">*</span></label>
                     <input 
                         type="url" 
+                        required
                         placeholder="https://meet.google.com/..."
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none text-gray-900 placeholder-gray-500"
                         value={session.meeting_link}
                         onChange={e => setSession({...session, meeting_link: e.target.value})}
                     />
-                    <p className="text-xs text-gray-500 mt-1">Zoom, Google Meet, or any video conferencing link</p>
+                    <p className="text-xs text-gray-500 mt-1">Zoom, Google Meet, or any video conferencing link (required)</p>
                 </div>
 
                 <div className="border-t border-gray-200 pt-6">

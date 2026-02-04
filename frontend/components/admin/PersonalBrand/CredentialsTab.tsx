@@ -173,6 +173,7 @@ function CredentialItem({ credential, isEditing, onEdit, onCancelEdit, onUpdate,
         issueDate: credential.issueDate.split('T')[0]
     });
 
+    const [isSaving, setIsSaving] = useState(false);
     if (isEditing) {
         return (
             <div className="bg-white p-4 rounded-lg border border-gray-200">
@@ -198,14 +199,20 @@ function CredentialItem({ credential, isEditing, onEdit, onCancelEdit, onUpdate,
                 </div>
                 <div className="flex gap-2">
                     <button
-                        onClick={() => onUpdate(credential.id, formData)}
+                        onClick={async () => {
+                            setIsSaving(true);
+                            await onUpdate(credential.id, formData);
+                            setIsSaving(false);
+                        }}
                         className="px-4 py-2 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] text-sm"
+                        disabled={isSaving}
                     >
-                        Save
+                        {isSaving ? 'Saving...' : 'Save'}
                     </button>
                     <button
                         onClick={onCancelEdit}
                         className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                        disabled={isSaving}
                     >
                         Cancel
                     </button>

@@ -79,15 +79,7 @@ export default function EditAppointmentPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Validate date is in the future
-        const selectedDate = new Date(formData.date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        if (selectedDate <= today) {
-            toast.error("Appointment date must be in the future");
-            return;
-        }
+
         
         setIsSubmitting(true);
         try {

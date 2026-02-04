@@ -45,7 +45,7 @@ export default function SocialMediaTab({ personalBrand, onUpdate, isEditMode }: 
     if (!isEditMode) {
         const platformStyles: Record<string, string> = {
             'LinkedIn': 'px-4 py-2 bg-blue-50 text-blue-700 rounded-full border border-blue-200 hover:bg-blue-100 transition-colors flex items-center gap-2 text-sm font-medium',
-            'Twitter': 'px-4 py-2 bg-sky-50 text-sky-700 rounded-full border border-sky-200 hover:bg-sky-100 transition-colors flex items-center gap-2 text-sm font-medium',
+            'X': 'px-4 py-2 bg-sky-50 text-sky-700 rounded-full border border-sky-200 hover:bg-sky-100 transition-colors flex items-center gap-2 text-sm font-medium',
             'Facebook': 'px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200 hover:bg-indigo-100 transition-colors flex items-center gap-2 text-sm font-medium',
             'Instagram': 'px-4 py-2 bg-pink-50 text-pink-700 rounded-full border border-pink-200 hover:bg-pink-100 transition-colors flex items-center gap-2 text-sm font-medium',
             'YouTube': 'px-4 py-2 bg-red-50 text-red-700 rounded-full border border-red-200 hover:bg-red-100 transition-colors flex items-center gap-2 text-sm font-medium',
@@ -53,7 +53,7 @@ export default function SocialMediaTab({ personalBrand, onUpdate, isEditMode }: 
 
         const platforms = [
             { label: 'LinkedIn', value: socialMedia?.linkedin },
-            { label: 'Twitter', value: socialMedia?.twitter },
+            { label: 'X', value: socialMedia?.twitter },
             { label: 'Facebook', value: socialMedia?.facebook },
             { label: 'Instagram', value: socialMedia?.instagram },
             { label: 'YouTube', value: socialMedia?.youtube },

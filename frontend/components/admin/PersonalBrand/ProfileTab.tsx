@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { PersonalBrand, personalBrandService, UpdateProfileData } from '@/services/personal-brand-service';
@@ -16,6 +16,10 @@ export default function ProfileTab({ personalBrand, onUpdate, isEditMode }: Prof
     const [imagePreview, setImagePreview] = useState<string | null>(
         personalBrand.profile?.profile_image_url || null
     );
+    // Update image preview when personalBrand changes (after update)
+    useEffect(() => {
+        setImagePreview(personalBrand.profile?.profile_image_url || null);
+    }, [personalBrand.profile?.profile_image_url]);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [formData, setFormData] = useState<UpdateProfileData>({
         fullName: personalBrand.profile?.fullName || '',

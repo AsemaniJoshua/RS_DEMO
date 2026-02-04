@@ -137,17 +137,18 @@ export default function CreateLiveSessionPage() {
                         {/* Meeting Link */}
                         <div>
                             <label className="block text-sm font-medium text-gray-900 mb-2">
-                                Meeting Link
+                                Meeting Link <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="url"
                                 name="meeting_link"
                                 value={formData.meeting_link}
                                 onChange={handleChange}
+                                required
                                 placeholder="https://zoom.us/j/..."
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent text-gray-900 placeholder-gray-500"
                             />
-                            <p className="text-sm text-gray-500 mt-1">You can add this later if not available yet</p>
+                            <p className="text-sm text-gray-500 mt-1">This field is required</p>
                         </div>
 
                         {/* Recording Price and Max Participants */}
