@@ -52,12 +52,12 @@ export const speakingService = {
 
     async getAllEvents() {
         const response = await api.get<{ events: SpeakingEvent[] }>('/admin/speaking');
-        return response.data?.events || [];
+        return response.events || [];
     },
 
     async getEventById(id: string) {
         const response = await api.get<{ event: SpeakingEvent }>(`/admin/speaking/${id}`);
-        return response.data?.event;
+        return response.event;
     },
 
 

@@ -15,6 +15,7 @@ export default function AppointmentTypeModal({ isOpen, onClose, onUpdate }: Appo
     const [newTypeName, setNewTypeName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string | null; name: string }>({ open: false, id: null, name: "" });
 
     useEffect(() => {
         if (isOpen) {
@@ -52,15 +53,15 @@ export default function AppointmentTypeModal({ isOpen, onClose, onUpdate }: Appo
         }
     };
 
-    const handleDeleteType = async (id: string, name: string) => {
-        if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
-
-        setIsDeletingId(id);
+    const handleDeleteType = async () => {
+        if (!deleteModal.id) return;
+        setIsDeletingId(deleteModal.id);
         try {
-            await appointmentService.deleteType(id);
+            await appointmentService.deleteType(deleteModal.id);
             toast.success("Type deleted successfully");
             await fetchTypes();
             onUpdate();
+            setDeleteModal({ open: false, id: null, name: "" });
         } catch (error: any) {
             toast.error(error.message || "Failed to delete type");
         } finally {
@@ -126,7 +127,7 @@ export default function AppointmentTypeModal({ isOpen, onClose, onUpdate }: Appo
                             >
                                 <span className="text-gray-900 font-medium">{type.name}</span>
                                 <button
-                                    onClick={() => handleDeleteType(type.id, type.name)}
+                                    onClick={() => setDeleteModal({ open: true, id: type.id, name: type.name })}
                                     disabled={isDeletingId === type.id}
                                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                                 >
@@ -142,6 +143,31 @@ export default function AppointmentTypeModal({ isOpen, onClose, onUpdate }: Appo
                         ))
                     )}
                 </div>
+                {/* Delete Modal */}
+                {deleteModal.open && (
+                    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-xl shadow-xl p-8 max-w-sm w-full">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Delete Appointment Type</h3>
+                            <p className="text-gray-700 mb-6">Are you sure you want to delete <span className="font-semibold">{deleteModal.name}</span>? This action cannot be undone.</p>
+                            <div className="flex gap-4 justify-end">
+                                <button
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
+                                    onClick={() => setDeleteModal({ open: false, id: null, name: "" })}
+                                    disabled={isDeletingId === deleteModal.id}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50"
+                                    onClick={handleDeleteType}
+                                    disabled={isDeletingId === deleteModal.id}
+                                >
+                                    {isDeletingId === deleteModal.id ? "Deleting..." : "Delete"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
