@@ -4,15 +4,45 @@ import { useState, useEffect } from "react";
 import { profileService, UserProfile } from "@/services/profile-service";
 import toast from "react-hot-toast";
 
-const InputField = ({ label, ...props }: any) => (
-    <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-        <input
-            {...props}
-            className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none text-gray-900 bg-white disabled:bg-gray-50 disabled:text-gray-600 ${props.className || ''}`}
-        />
-    </div>
+import { useRef } from "react";
+
+const EyeIcon = ({ open }: { open: boolean }) => (
+    open ? (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+    ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m3.362-2.522A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.965 9.965 0 01-4.293 5.03M15 12a3 3 0 11-6 0 3 3 0 016 0zm-6.364 6.364L19.07 4.93" /></svg>
+    )
 );
+
+const InputField = ({ label, type, value, onChange, ...props }: any) => {
+    const [show, setShow] = useState(false);
+    const inputType = type === 'password' ? (show ? 'text' : 'password') : type;
+    return (
+        <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+            <div className="relative flex items-center">
+                <input
+                    {...props}
+                    type={inputType}
+                    value={value}
+                    onChange={onChange}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none text-gray-900 bg-white disabled:bg-gray-50 disabled:text-gray-600 ${props.className || ''}`}
+                />
+                {type === 'password' && (
+                    <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={() => setShow((s) => !s)}
+                        className="absolute right-3 flex items-center h-full top-0 focus:outline-none"
+                        style={{ height: '100%' }}
+                    >
+                        <EyeIcon open={show} />
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
 
 export default function ProfilePage() {
     const [user, setUser] = useState<UserProfile | null>(null);

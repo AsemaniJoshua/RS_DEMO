@@ -20,6 +20,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string>("");
     const [formData, setFormData] = useState<CreateBlogData>({
         title: "",
         slug: "",
@@ -47,6 +48,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                 categories: initialData.categories?.map(c => ({ name: c.name, slug: c.slug })) || [],
                 tags: initialData.tags?.map(t => ({ name: t.name })) || []
             });
+            setPreviewUrl(initialData.featured_image || "");
         }
     }, [initialData]);
 
@@ -82,8 +84,12 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
     const handleImageChange = (value: string | File | null) => {
         if (typeof value === 'string') {
             setFormData(prev => ({ ...prev, featured_image: value }));
+            setPreviewUrl(value);
+        } else if (value instanceof File) {
+            setPreviewUrl(URL.createObjectURL(value));
         } else if (value === null) {
-             setFormData(prev => ({ ...prev, featured_image: '' }));
+            setFormData(prev => ({ ...prev, featured_image: '' }));
+            setPreviewUrl("");
         }
     };
 
@@ -296,7 +302,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Featured Image</h3>
                         <ImageUpload 
-                            value={formData.featured_image}
+                            value={previewUrl || formData.featured_image}
                             onChange={handleImageChange}
                             onFileSelect={handleFileSelect}
                         />

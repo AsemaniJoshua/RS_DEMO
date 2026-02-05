@@ -10,17 +10,39 @@ import { Calendar, MapPin, ArrowLeft, Clock } from "lucide-react";
 import BackButton from "@/components/ui/BackButton";
 
 export default function SpeakingEventDetailsPage() {
-    const params = useParams();
+    const { id } = useParams();
     const router = useRouter();
     const [event, setEvent] = useState<SpeakingEvent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchEvent = async () => {
+            try {
+                const data = await speakingService.getSpeakingEventById(id as string);
+                if (!data) throw new Error('Event not found');
+                setEvent(data);
+            } catch (error) {
+                router.push('/dashboard/speaking');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        if (id) fetchEvent();
+    }, [id, router]);
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="w-12 h-12 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     if (!event) return null;
 
     return (
         <div className="p-4 md:p-8 max-w-5xl mx-auto">
             <BackButton label="Back to Events" />
-
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                 <div className="relative h-64 md:h-96 w-full bg-gray-100">
                     {event.image ? (
@@ -42,10 +64,8 @@ export default function SpeakingEventDetailsPage() {
                         </span>
                     </div>
                 </div>
-
                 <div className="p-6 md:p-10">
                     <h1 className="text-3xl font-bold text-gray-900 mb-6">{event.title}</h1>
-
                     <div className="flex flex-wrap gap-6 mb-8 p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-[#0066ff]">
@@ -63,7 +83,6 @@ export default function SpeakingEventDetailsPage() {
                                 </p>
                             </div>
                         </div>
-
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                                 <Clock className="w-5 h-5" />
@@ -78,7 +97,6 @@ export default function SpeakingEventDetailsPage() {
                                 </p>
                             </div>
                         </div>
-
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                                 <MapPin className="w-5 h-5" />
@@ -89,7 +107,6 @@ export default function SpeakingEventDetailsPage() {
                             </div>
                         </div>
                     </div>
-
                     <div className="prose max-w-none text-gray-600">
                         <h3 className="text-lg font-bold text-gray-900 mb-3">About this Event</h3>
                         <p className="whitespace-pre-line leading-relaxed">

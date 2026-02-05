@@ -56,7 +56,7 @@ export default function EbooksPage() {
                     {ebooks.map((book) => (
                         <Link key={book.id} href={`/dashboard/ebooks/${book.id}`} className="group">
                             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                                <div className="aspect-[3/4] bg-gray-100 relative">
+                                <div className="bg-gray-100 relative" style={{ aspectRatio: '1/1.3', maxHeight: 180 }}>
                                     {book.coverImage ? (
                                         <img 
                                             src={book.coverImage} 
@@ -72,7 +72,7 @@ export default function EbooksPage() {
                                         </div>
                                     )}
                                 </div>
-                                <div className="p-4">
+                                <div className="p-3">
                                     <h3 className="font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-[#0066ff] transition-colors">
                                         {book.title}
                                     </h3>
