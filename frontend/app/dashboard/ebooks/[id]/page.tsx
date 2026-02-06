@@ -61,19 +61,25 @@ export default function EbookDetailPage() {
 
     const handlePurchase = async () => {
         if (!ebook) return;
-        
         try {
             setProcessingPayment(true);
-            const callbackUrl = `${window.location.origin}/dashboard/ebooks/${id}`;
-            const response = await ebookService.purchaseEbook(id, callbackUrl);
-            
-            if (response.data?.authorization_url) {
-                window.location.href = response.data.authorization_url;
+            if (!ebook.price || Number(ebook.price) === 0) {
+                // Free ebook: call free purchase endpoint
+                await ebookService.freePurchaseEbook(id);
+                toast.success('Ebook added to your library!');
+                setIsPurchased(true);
             } else {
-                toast.error('Failed to initialize payment');
+                // Paid ebook: normal payment flow
+                const callbackUrl = `${window.location.origin}/dashboard/ebooks/${id}`;
+                const response = await ebookService.purchaseEbook(id, callbackUrl);
+                if (response.data?.authorization_url) {
+                    window.location.href = response.data.authorization_url;
+                } else {
+                    toast.error('Failed to initialize payment');
+                }
             }
         } catch (error: any) {
-            toast.error(error.message || 'Payment initialization failed');
+            toast.error(error.message || 'Purchase failed');
         } finally {
             setProcessingPayment(false);
         }
@@ -81,20 +87,28 @@ export default function EbookDetailPage() {
 
     const handleDownload = async () => {
         if (!isPurchased) {
-             toast.error('Please purchase the ebook first');
-             return;
+            toast.error('Please purchase the ebook first');
+            return;
         }
-
         try {
-            const toastId = toast.loading('Preparing download...');
+            setProcessingPayment(true);
             const response = await ebookService.downloadEbook(id);
-            toast.success('Download starting...', { id: toastId });
-            
             if (response.data?.downloadUrl) {
-                window.open(response.data.downloadUrl, '_blank');
+                // Force download using a temporary anchor element
+                const link = document.createElement('a');
+                link.href = response.data.downloadUrl;
+                link.download = ebook?.title?.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf' || 'ebook.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                toast.success('Download starting...');
+            } else {
+                toast.error('Download link not available.');
             }
         } catch (error: any) {
             toast.error(error.message || 'Failed to download ebook');
+        } finally {
+            setProcessingPayment(false);
         }
     };
 
@@ -179,35 +193,45 @@ export default function EbookDetailPage() {
                             {isPurchased ? (
                                 <button 
                                     onClick={handleDownload}
-                                    className="flex-1 bg-[#0066ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0052cc] transition-colors flex items-center justify-center gap-2"
+                                    disabled={processingPayment}
+                                    className="flex-1 bg-[#0066ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0052cc] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                                         <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                                         <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                                     </svg>
-                                    Download Ebook
+                                    {processingPayment ? 'Preparing Download...' : 'Download Ebook'}
                                 </button>
                             ) : (
-                                <button 
-                                    onClick={handlePurchase}
-                                    disabled={processingPayment}
-                                    className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                                >
-                                    {processingPayment ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </svg>
-                                            Buy Now {ebook.price > 0 ? `(GHS ${ebook.price})` : '(Free)'}
-                                        </>
-                                    )}
-                                </button>
+                                ebook.status !== 'PUBLISHED' ? (
+                                    <div className="flex-1 bg-yellow-100 text-yellow-800 px-6 py-3 rounded-lg font-semibold flex items-center justify-center gap-2">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                        This ebook is not available for purchase.
+                                    </div>
+                                ) : (
+                                    <button 
+                                        onClick={handlePurchase}
+                                        disabled={processingPayment}
+                                        className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    >
+                                        {processingPayment ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                Processing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </svg>
+                                                {(!ebook.price || Number(ebook.price) === 0) ? 'Get for Free' : `Buy Now (GHS ${ebook.price})`}
+                                            </>
+                                        )}
+                                    </button>
+                                )
                             )}
                         </div>
                     </div>

@@ -36,9 +36,13 @@ export default function EbooksPage() {
 
     return (
         <div className="p-4 md:p-8">
-            <div className="mb-6">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">My Ebooks</h1>
-                <p className="text-gray-600">Access your purchased ebooks and discover new ones</p>
+            <div className="mb-6 flex items-center justify-between">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-0">All Ebooks</h1>
+                <Link href="/dashboard/ebooks/my-library">
+                    <button className="bg-[#0066ff] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#0052cc] transition-colors text-sm">
+                        My Library
+                    </button>
+                </Link>
             </div>
 
             {ebooks.length === 0 ? (
@@ -56,20 +60,18 @@ export default function EbooksPage() {
                     {ebooks.map((book) => (
                         <Link key={book.id} href={`/dashboard/ebooks/${book.id}`} className="group">
                             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                                <div className="bg-gray-100 relative" style={{ aspectRatio: '1/1.3', maxHeight: 180 }}>
+                                <div className="bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center" style={{ height: 180, width: '100%' }}>
                                     {book.coverImage ? (
-                                        <img 
-                                            src={book.coverImage} 
-                                            alt={book.title} 
-                                            className="w-full h-full object-cover"
+                                        <img
+                                            src={book.coverImage}
+                                            alt={book.title}
+                                            style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'cover', margin: 'auto', display: 'block' }}
                                         />
                                     ) : (
-                                        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                                                <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="2"/>
-                                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" strokeWidth="2"/>
-                                            </svg>
-                                        </div>
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                            <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="2"/>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" strokeWidth="2"/>
+                                        </svg>
                                     )}
                                 </div>
                                 <div className="p-3">

@@ -1,6 +1,7 @@
-import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+  import axios from 'axios';
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
 
 export interface Appointment {
   id: string;
@@ -55,6 +56,50 @@ class AppointmentService {
         Authorization: `Bearer ${token}`
       }
     };
+  }
+
+  // USER DASHBOARD ENDPOINTS
+  // Get all appointments for the logged-in user
+  async getMyAppointments(): Promise<Appointment[]> {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/user/appointments`,
+        this.getAuthHeader()
+      );
+      return response.data.data.appointments;
+    } catch (error: any) {
+      console.error('Error fetching user appointments:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch your appointments');
+    }
+  }
+
+  // Get a specific appointment for the logged-in user
+  async getMyAppointmentById(id: string): Promise<Appointment> {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/user/appointments/${id}`,
+        this.getAuthHeader()
+      );
+      return response.data.data.appointment;
+    } catch (error: any) {
+      console.error('Error fetching user appointment:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch appointment');
+    }
+  }
+
+  // Create a new appointment for the logged-in user
+  async createMyAppointment(data: CreateAppointmentData): Promise<Appointment> {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/user/appointments`,
+        data,
+        this.getAuthHeader()
+      );
+      return response.data.data.appointment;
+    } catch (error: any) {
+      console.error('Error creating user appointment:', error);
+      throw new Error(error.response?.data?.message || 'Failed to create appointment');
+    }
   }
 
   // Get all appointments with optional filters
@@ -137,14 +182,13 @@ class AppointmentService {
     }
   }
 
-  // Get all appointment types
+  // Get all appointment types (user dashboard fetches from user endpoint)
   async getAllTypes(): Promise<AppointmentType[]> {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/admin/appointments/types`,
+        `${API_BASE_URL}/user/appointments/types`,
         this.getAuthHeader()
       );
-
       return response.data.types;
     } catch (error: any) {
       console.error('Error fetching appointment types:', error);

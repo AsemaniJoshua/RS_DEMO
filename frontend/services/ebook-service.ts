@@ -1,3 +1,4 @@
+   
 import { apiFetch } from '@/lib/api';
 
 export interface Ebook {
@@ -85,13 +86,35 @@ class EbookService {
         return apiFetch<{ ebooks: Ebook[] }>('/user/ebooks/my-library');
     }
 
+        /**
+     * Free purchase (add to library without payment)
+     */
+    async freePurchaseEbook(id: string) {
+        return apiFetch<{ message: string }>(`/user/ebooks/${id}/free-purchase`, {
+            method: 'POST'
+        });
+    }
+
     /**
      * Initialize purchase
      */
     async purchaseEbook(id: string, callbackUrl?: string) {
+        // Get user email from localStorage (as used in auth context)
+        let email = undefined;
+        if (typeof window !== 'undefined') {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    email = JSON.parse(userStr).email;
+                } catch {}
+            }
+        }
+        if (!email) {
+            throw new Error('User email not found. Please log in again.');
+        }
         return apiFetch<PaystackInitResponse>(`/user/ebooks/${id}/purchase`, {
             method: 'POST',
-            body: JSON.stringify({ callback_url: callbackUrl })
+            body: JSON.stringify({ callback_url: callbackUrl, email })
         });
     }
 

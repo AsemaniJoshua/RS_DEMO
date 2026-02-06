@@ -1,22 +1,41 @@
 "use client";
 
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import userData from "@/data/dashboard/user-profile.json";
+import { useRouter } from "next/navigation";
+import { appointmentService, Appointment } from "@/services/appointment-service";
+import toast from "react-hot-toast";
 
 export default function AppointmentsPage() {
-    const { upcomingAppointments, pastAppointments } = userData;
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [activeTab, setActiveTab] = useState("upcoming");
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-    const appointments = activeTab === "upcoming" ? upcomingAppointments : pastAppointments;
+    useEffect(() => {
+        fetchAppointments();
+    }, []);
+
+    const fetchAppointments = async () => {
+        try {
+            setLoading(true);
+            const data = await appointmentService.getMyAppointments();
+            setAppointments(data);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to load appointments");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case "Confirmed":
+            case "CONFIRMED":
                 return "bg-green-50 text-green-700";
-            case "Completed":
+            case "COMPLETED":
                 return "bg-blue-50 text-blue-700";
-            case "Cancelled":
+            case "CANCELLED":
                 return "bg-red-50 text-red-700";
             default:
                 return "bg-gray-100 text-gray-700";
@@ -31,6 +50,12 @@ export default function AppointmentsPage() {
             day: 'numeric'
         });
     };
+
+    // Split appointments into upcoming and past
+    const now = new Date();
+    const upcomingAppointments = appointments.filter(a => new Date(a.date) >= now);
+    const pastAppointments = appointments.filter(a => new Date(a.date) < now);
+    const displayedAppointments = activeTab === "upcoming" ? upcomingAppointments : pastAppointments;
 
     return (
         <div className="p-4 md:p-8">
@@ -89,7 +114,12 @@ export default function AppointmentsPage() {
 
                 {/* Appointments List */}
                 <div className="p-6 space-y-4">
-                    {appointments.length === 0 ? (
+                    {loading ? (
+                        <div className="text-center py-12">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff] mx-auto mb-4"></div>
+                            <p className="text-gray-600">Loading appointments...</p>
+                        </div>
+                    ) : displayedAppointments.length === 0 ? (
                         <div className="text-center py-12">
                             <div className="text-gray-400 mb-4">
                                 <svg className="mx-auto" width="64" height="64" viewBox="0 0 24 24" fill="none">
@@ -108,8 +138,10 @@ export default function AppointmentsPage() {
                             </p>
                         </div>
                     ) : (
-                        appointments.map((appointment) => (
-                            <div key={appointment.id} className="border border-gray-200 rounded-lg p-5 hover:border-[#0066ff] transition-colors">
+                        displayedAppointments.map((appointment) => (
+                            <div key={appointment.id} className="border border-gray-200 rounded-lg p-5 hover:border-[#0066ff] transition-colors cursor-pointer"
+                                onClick={() => router.push(`/dashboard/appointments/${appointment.id}`)}
+                            >
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                     <div className="flex items-start gap-4">
                                         <div className="w-12 h-12 bg-gradient-to-br from-[#0066ff] to-[#0052cc] rounded-lg flex items-center justify-center text-white flex-shrink-0">
@@ -120,7 +152,7 @@ export default function AppointmentsPage() {
                                             </svg>
                                         </div>
                                         <div className="flex-1">
-                                            <h3 className="font-bold text-gray-900 mb-1">{appointment.type}</h3>
+                                            <h3 className="font-bold text-gray-900 mb-1">{appointment.type?.name}</h3>
                                             <div className="space-y-1 text-sm text-gray-600">
                                                 <div className="flex items-center gap-2">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -136,9 +168,6 @@ export default function AppointmentsPage() {
                                                     {appointment.time}
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded">
-                                                        {appointment.mode}
-                                                    </span>
                                                     <span className={`text-xs px-2 py-0.5 rounded ${getStatusColor(appointment.status)}`}>
                                                         {appointment.status}
                                                     </span>
@@ -150,23 +179,6 @@ export default function AppointmentsPage() {
                                                 </p>
                                             )}
                                         </div>
-                                    </div>
-                                    <div className="flex flex-col gap-2 md:ml-auto">
-                                        {appointment.mode === "Virtual" && appointment.meetingLink && activeTab === "upcoming" && (
-                                            <button className="px-4 py-2 bg-[#00d4aa] text-white rounded-lg hover:bg-[#00bfa6] transition-colors text-sm font-medium">
-                                                Join Meeting
-                                            </button>
-                                        )}
-                                        {activeTab === "upcoming" && (
-                                            <>
-                                                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-                                                    Reschedule
-                                                </button>
-                                                <button className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium">
-                                                    Cancel
-                                                </button>
-                                            </>
-                                        )}
                                     </div>
                                 </div>
                             </div>

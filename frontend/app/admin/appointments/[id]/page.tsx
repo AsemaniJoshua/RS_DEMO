@@ -189,7 +189,7 @@ export default function ViewAppointmentPage() {
                                         {appointment.time}
                                     </div>
                                     <div className="text-sm text-gray-600 mt-0.5">
-                                        {appointment.duration} minutes
+                                        {appointment.duration}
                                     </div>
                                 </div>
                             </div>
