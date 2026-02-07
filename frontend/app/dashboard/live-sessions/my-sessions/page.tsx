@@ -1,23 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { liveSessionsService, type LiveSession, type SessionStatus } from "@/services/live-sessions-service";
 import toast from "react-hot-toast";
-import Link from "next/link";
-import BackButton from "@/components/ui/BackButton";
+import { 
+    ArrowLeft, 
+    Calendar, 
+    Clock, 
+    Users, 
+    Video, 
+    Play, 
+    ExternalLink,
+    AlertCircle
+} from "lucide-react";
 
     const getStatusColor = (status: SessionStatus) => {
         switch (status) {
             case 'LIVE':
-                return 'bg-red-100 text-red-800';
+                return 'bg-red-50 text-red-700 border-red-100';
             case 'UPCOMING':
-                return 'bg-blue-100 text-blue-800';
+                return 'bg-green-50 text-green-700 border-green-100';
             case 'COMPLETED':
-                return 'bg-green-100 text-green-800';
+                return 'bg-blue-50 text-blue-700 border-blue-100';
             case 'CANCELLED':
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-gray-50 text-gray-700 border-gray-100';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-gray-50 text-gray-700 border-gray-100';
         }
     };
 
@@ -65,37 +74,39 @@ export default function MySessionsPage() {
     // ...
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="p-4 md:p-8 max-w-6xl mx-auto">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <BackButton label="Back to All Sessions" href="/dashboard/live-sessions" />
+            <div className="mb-8">
+                <Link 
+                    href="/dashboard/live-sessions"
+                    className="inline-flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600 mb-6"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                </Link>
                     
-                    <h1 className="text-3xl font-bold text-gray-900">My Registered Sessions</h1>
-                    <p className="text-gray-600 mt-2">View and manage your session registrations</p>
-                </div>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">My Registered Sessions</h1>
+                <p className="text-gray-600">View and manage your session registrations</p>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div>
                 {registrations.length === 0 ? (
-                    <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-                        {/* ... empty state icon ... */}
-                         <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <h3 className="mt-4 text-lg font-medium text-gray-900">No Registered Sessions</h3>
-                        <p className="mt-2 text-gray-500 max-w-md mx-auto">
+                    <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center shadow-sm">
+                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Calendar className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">No Registered Sessions</h3>
+                        <p className="text-gray-500 mb-6 max-w-md mx-auto">
                             You haven't registered for any live sessions yet. Browse available sessions to get started.
                         </p>
                         <Link
                             href="/dashboard/live-sessions"
-                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors font-medium"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#00d4aa] text-white rounded-xl hover:bg-[#00bfa6] transition-colors font-semibold shadow-lg hover:shadow-xl"
                         >
                             Browse Sessions
                         </Link>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-6">
                         {registrations.map((registration) => {
                             const session = registration.session;
                             if (!session) return null;
@@ -104,71 +115,52 @@ export default function MySessionsPage() {
                             <Link
                                 key={session.id}
                                 href={`/dashboard/live-sessions/${session.id}`}
-                                className="block bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow overflow-hidden"
+                                className="block bg-white rounded-2xl border border-gray-100 hover:shadow-lg transition-all overflow-hidden group"
                             >
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(session.status)}`}>
+                                <div className="p-6 md:p-8">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-3 flex-wrap">
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(session.status)}`}>
+                                                    {session.status === 'LIVE' && <span className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></span>}
                                                     {session.status}
                                                 </span>
-                                                {session.status === 'LIVE' && (
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                        <span className="w-2 h-2 bg-red-600 rounded-full mr-1.5 animate-pulse"></span>
-                                                        Live Now
-                                                    </span>
-                                                )}
                                             </div>
                                             
-                                            <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-[#0066ff] transition-colors">
+                                            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 group-hover:text-[#00d4aa] transition-colors">
                                                 {session.title}
                                             </h3>
                                             
-                                            <p className="text-gray-600 mb-4 line-clamp-2">
+                                            <p className="text-gray-600 mb-6 line-clamp-2">
                                                 {session.description || 'No description provided'}
                                             </p>
 
-                                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                                                <div className="flex items-center gap-1.5">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                                        <line x1="16" y1="2" x2="16" y2="6"/>
-                                                        <line x1="8" y1="2" x2="8" y2="6"/>
-                                                        <line x1="3" y1="10" x2="21" y2="10"/>
-                                                    </svg>
-                                                    {formatDate(session.scheduled_date)}
+                                            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="w-4 h-4" />
+                                                    <span className="font-medium">{formatDate(session.scheduled_date)}</span>
                                                 </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <circle cx="12" cy="12" r="10"/>
-                                                        <polyline points="12 6 12 12 16 14"/>
-                                                    </svg>
-                                                    {formatTime(session.scheduled_date)}
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="w-4 h-4" />
+                                                    <span className="font-medium">{formatTime(session.scheduled_date)}</span>
                                                 </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <circle cx="12" cy="12" r="10"/>
-                                                        <polyline points="12 6 12 12 16 14"/>
-                                                    </svg>
-                                                    {session.duration_minutes} min
+                                                <div className="flex items-center gap-2">
+                                                    <Users className="w-4 h-4" />
+                                                    <span className="font-medium">{session.duration_minutes} min</span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="ml-6 flex-shrink-0">
-                                            {session.meeting_link && (session.status === 'UPCOMING' || session.status === 'LIVE') && (
+                                        <div className="flex-shrink-0">{session.meeting_link && (session.status === 'UPCOMING' || session.status === 'LIVE') && (
                                                 <a
                                                     href={session.meeting_link}
                                                     target="_blank"
                                                     rel="noreferrer"
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors text-sm font-medium"
+                                                    className="inline-flex items-center gap-2 px-4 py-3 bg-[#00d4aa] text-white rounded-xl hover:bg-[#00bfa6] transition-all shadow-lg hover:shadow-xl font-semibold"
                                                 >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                                    </svg>
-                                                    Join Meeting
+                                                    <ExternalLink className="w-4 h-4" />
+                                                    <span className="hidden sm:inline">Join Meeting</span>
                                                 </a>
                                             )}
                                             {session.status === 'COMPLETED' && session.recording_url && (
@@ -177,13 +169,10 @@ export default function MySessionsPage() {
                                                     target="_blank"
                                                     rel="noreferrer"
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                                                    className="inline-flex items-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold"
                                                 >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <circle cx="12" cy="12" r="10"/>
-                                                        <polygon points="10 8 16 12 10 16 10 8"/>
-                                                    </svg>
-                                                    Watch Recording
+                                                    <Play className="w-4 h-4" />
+                                                    <span className="hidden sm:inline">Watch Recording</span>
                                                 </a>
                                             )}
                                         </div>
@@ -191,8 +180,9 @@ export default function MySessionsPage() {
 
                                     {/* Registration Info */}
                                     {registration.registration_date && (
-                                        <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-                                            Registered on {formatDate(registration.registration_date)}
+                                        <div className="mt-6 pt-6 border-t border-gray-100 flex items-center gap-2 text-sm text-gray-500">
+                                            <Calendar className="w-4 h-4" />
+                                            <span>Registered on {formatDate(registration.registration_date)}</span>
                                         </div>
                                     )}
                                 </div>

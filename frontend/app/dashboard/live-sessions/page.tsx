@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function UserLiveSessionsPage() {
     const [sessions, setSessions] = useState<LiveSession[]>([]);
-    const [filter, setFilter] = useState<'all' | 'upcoming' | 'live'>('upcoming');
+    const [filter, setFilter] = useState<'all' | 'upcoming' | 'live' | 'past'>('upcoming');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -56,10 +56,17 @@ export default function UserLiveSessionsPage() {
         }
     };
 
+    // Calculate counts for each tab
+    const upcomingCount = sessions.filter(s => s.status === 'UPCOMING').length;
+    const liveCount = sessions.filter(s => s.status === 'LIVE').length;
+    const pastCount = sessions.filter(s => s.is_past || s.status === 'COMPLETED').length;
+    const allCount = sessions.filter(s => s.status !== 'CANCELLED').length;
+
     const filteredSessions = sessions.filter(session => {
         if (filter === 'all') return session.status !== 'CANCELLED';
         if (filter === 'upcoming') return session.status === 'UPCOMING';
         if (filter === 'live') return session.status === 'LIVE';
+        if (filter === 'past') return session.is_past || session.status === 'COMPLETED';
         return true;
     });
 
@@ -89,33 +96,71 @@ export default function UserLiveSessionsPage() {
                 <div className="flex gap-2 mb-6 bg-white p-1 rounded-lg border border-gray-200 inline-flex">
                     <button
                         onClick={() => setFilter('upcoming')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                             filter === 'upcoming'
                                 ? 'bg-[#0066ff] text-white'
                                 : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                         Upcoming
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            filter === 'upcoming'
+                                ? 'bg-white/20 text-white'
+                                : 'bg-gray-100 text-gray-700'
+                        }`}>
+                            {upcomingCount}
+                        </span>
                     </button>
                     <button
                         onClick={() => setFilter('live')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                             filter === 'live'
                                 ? 'bg-[#0066ff] text-white'
                                 : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                         Live Now
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            filter === 'live'
+                                ? 'bg-white/20 text-white'
+                                : 'bg-gray-100 text-gray-700'
+                        }`}>
+                            {liveCount}
+                        </span>
+                    </button>
+                    <button
+                        onClick={() => setFilter('past')}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                            filter === 'past'
+                                ? 'bg-[#0066ff] text-white'
+                                : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                    >
+                        Past Sessions
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            filter === 'past'
+                                ? 'bg-white/20 text-white'
+                                : 'bg-gray-100 text-gray-700'
+                        }`}>
+                            {pastCount}
+                        </span>
                     </button>
                     <button
                         onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                             filter === 'all'
                                 ? 'bg-[#0066ff] text-white'
                                 : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                         All Sessions
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            filter === 'all'
+                                ? 'bg-white/20 text-white'
+                                : 'bg-gray-100 text-gray-700'
+                        }`}>
+                            {allCount}
+                        </span>
                     </button>
                 </div>
 

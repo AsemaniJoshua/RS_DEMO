@@ -83,7 +83,7 @@ export default function AppointmentsPage() {
                 </div>
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="text-2xl font-bold text-blue-600">{pastAppointments.length}</div>
-                    <div className="text-sm text-gray-600">Completed</div>
+                    <div className="text-sm text-gray-600">Past or Completed</div>
                 </div>
             </div>
 
