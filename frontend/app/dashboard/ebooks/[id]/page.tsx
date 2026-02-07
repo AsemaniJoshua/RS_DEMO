@@ -1,9 +1,22 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { ebookService, type Ebook } from "@/services/ebook-service";
-import BackButton from "@/components/ui/BackButton";
 import toast from "react-hot-toast";
+import { 
+    ArrowLeft, 
+    Download, 
+    ShoppingCart, 
+    BookOpen, 
+    Calendar, 
+    FileText, 
+    Globe, 
+    Tag,
+    User,
+    CheckCircle,
+    AlertCircle
+} from "lucide-react";
 
 export default function EbookDetailPage() {
     const params = useParams();
@@ -114,10 +127,10 @@ export default function EbookDetailPage() {
 
     if (loading || verifying) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff] mx-auto"></div>
-                    <p className="mt-4 text-gray-600">{verifying ? 'Verifying payment...' : 'Loading ebook details...'}</p>
+            <div className="p-8 flex items-center justify-center min-h-[400px]">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-500 font-medium">{verifying ? 'Verifying payment...' : 'Loading ebook details...'}</p>
                 </div>
             </div>
         );
@@ -126,112 +139,245 @@ export default function EbookDetailPage() {
     if (!ebook) return null;
 
     return (
-        <div className="p-4 md:p-8 max-w-5xl mx-auto">
-            <BackButton href="/dashboard/ebooks" label="Back to Ebooks" />
+        <div className="p-4 md:p-8 max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="mb-8">
+                <Link 
+                    href="/dashboard/ebooks"
+                    className="inline-flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                </Link>
+            </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                <div className="flex flex-col md:flex-row">
-                    {/* Cover Image Section */}
-                    <div className="w-full md:w-1/3 bg-gray-100 min-h-[400px] flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-200 p-8">
-                         {ebook.coverImage ? (
-                            <img 
-                                src={ebook.coverImage} 
-                                alt={ebook.title} 
-                                className="w-48 h-auto shadow-xl rounded-sm"
-                            />
-                        ) : (
-                            <div className="w-48 h-64 bg-white shadow-xl flex items-center justify-center text-gray-400">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                                    <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="2"/>
-                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" strokeWidth="2"/>
-                                </svg>
+            {/* Cover Image Banner */}
+            <div className="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="relative h-64 md:h-[400px] w-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    {ebook.coverImage ? (
+                        <img 
+                            src={ebook.coverImage} 
+                            alt={ebook.title} 
+                            className="h-full w-auto object-contain shadow-2xl"
+                        />
+                    ) : (
+                        <div className="flex flex-col items-center text-gray-400">
+                            <BookOpen className="w-20 h-20 mb-3 opacity-50" />
+                            <span className="text-sm font-medium">No cover image available</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Content */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Title & Details */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="px-3 py-1 rounded-full text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-100 flex items-center gap-2">
+                                        <Tag className="w-4 h-4" />
+                                        {ebook.category?.name || 'Education'}
+                                    </span>
+                                    {isPurchased && (
+                                        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-green-50 text-green-700 border border-green-100 flex items-center gap-2">
+                                            <CheckCircle className="w-4 h-4" />
+                                            Purchased
+                                        </span>
+                                    )}
+                                </div>
+                                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{ebook.title}</h1>
+                                <div className="flex items-center gap-2 text-gray-600">
+                                    <User className="w-5 h-5" />
+                                    <span className="text-lg font-medium">by {ebook.author}</span>
+                                </div>
                             </div>
-                        )}
+                            <div className="text-3xl font-bold text-gray-900">
+                                {ebook.price > 0 ? `GHS ${ebook.price}` : <span className="text-green-600">Free</span>}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
+                            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                                <div className="p-3 bg-white rounded-lg shadow-sm text-blue-600">
+                                    <Calendar className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <div className="text-sm text-gray-500 font-medium mb-1">Published</div>
+                                    <div className="font-bold text-gray-900">
+                                        {ebook.created_at ? new Date(ebook.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                                <div className="p-3 bg-white rounded-lg shadow-sm text-purple-600">
+                                    <BookOpen className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <div className="text-sm text-gray-500 font-medium mb-1">Pages</div>
+                                    <div className="font-bold text-gray-900">{ebook.pages || 'N/A'}</div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                                <div className="p-3 bg-white rounded-lg shadow-sm text-orange-600">
+                                    <FileText className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <div className="text-sm text-gray-500 font-medium mb-1">Format</div>
+                                    <div className="font-bold text-gray-900">{ebook.format || 'PDF'}</div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                                <div className="p-3 bg-white rounded-lg shadow-sm text-green-600">
+                                    <Globe className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <div className="text-sm text-gray-500 font-medium mb-1">Language</div>
+                                    <div className="font-bold text-gray-900">English</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Details Section */}
-                    <div className="w-full md:w-2/3 p-8">
-                        <div className="flex justify-between items-start mb-4">
-                            <div>
-                                <div className="text-sm font-semibold text-[#0066ff] uppercase tracking-wide mb-2">
-                                    {ebook.category?.name || 'Education'}
-                                </div>
-                                <h1 className="text-3xl font-bold text-gray-900 mb-2">{ebook.title}</h1>
-                                <p className="text-xl text-gray-600 mb-4">by {ebook.author}</p>
-                            </div>
-                            <div className="text-2xl font-bold text-gray-900">
-                                {ebook.price > 0 ? `GHS ${ebook.price}` : 'Free'}
-                            </div>
+                    {/* Description */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <BookOpen className="w-5 h-5 text-[#00d4aa]" />
+                            About This Book
+                        </h3>
+                        <div className="prose prose-sm prose-blue max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
+                            {ebook.description || 'No description available.'}
                         </div>
+                    </div>
 
-                        <div className="prose max-w-none text-gray-600 mb-8 whitespace-pre-wrap">
-                            <p>{ebook.description}</p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-6 mb-8 bg-gray-50 p-6 rounded-xl">
-                            <div>
-                                <div className="text-sm text-gray-500 mb-1">Published</div>
-                                <div className="font-semibold text-gray-900">
-                                    {ebook.created_at ? new Date(ebook.created_at).toLocaleDateString() : 'N/A'}
-                                </div>
-                            </div>
-                            <div>
-                                <div className="text-sm text-gray-500 mb-1">Pages</div>
-                                <div className="font-semibold text-gray-900">{ebook.pages}</div>
-                            </div>
-                            <div>
-                                <div className="text-sm text-gray-500 mb-1">Format</div>
-                                <div className="font-semibold text-gray-900">{ebook.format || 'PDF'}</div>
-                            </div>
-                            <div>
-                                <div className="text-sm text-gray-500 mb-1">Language</div>
-                                <div className="font-semibold text-gray-900">English</div>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-4">
-                            {isPurchased ? (
+                    {/* Action Section */}
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 shadow-sm p-6 md:p-8">
+                        {isPurchased ? (
+                            <>
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Ready to Download</h3>
+                                <p className="text-gray-600 mb-6">
+                                    You own this ebook. Click below to download it to your device.
+                                </p>
                                 <button 
                                     onClick={handleDownload}
                                     disabled={processingPayment}
-                                    className="flex-1 bg-[#0066ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0052cc] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    className="w-full bg-[#00d4aa] text-white px-6 py-4 rounded-xl font-semibold hover:bg-[#00bfa6] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                        <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                        <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                    </svg>
+                                    <Download className="w-5 h-5" />
                                     {processingPayment ? 'Preparing Download...' : 'Download Ebook'}
                                 </button>
-                            ) : (
-                                ebook.status !== 'PUBLISHED' ? (
-                                    <div className="flex-1 bg-yellow-100 text-yellow-800 px-6 py-3 rounded-lg font-semibold flex items-center justify-center gap-2">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                            <path d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                        This ebook is not available for purchase.
+                            </>
+                        ) : ebook.status !== 'PUBLISHED' ? (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 flex items-start gap-4">
+                                <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+                                <div>
+                                    <h3 className="font-bold text-yellow-900 mb-2">Unavailable for Purchase</h3>
+                                    <p className="text-yellow-800">This ebook is currently not available for purchase.</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Get This Book</h3>
+                                <p className="text-gray-600 mb-6">
+                                    {(!ebook.price || Number(ebook.price) === 0) 
+                                        ? 'This ebook is free! Add it to your library now.' 
+                                        : `Purchase this ebook for GHS ${ebook.price} and download it instantly.`}
+                                </p>
+                                <button 
+                                    onClick={handlePurchase}
+                                    disabled={processingPayment}
+                                    className="w-full bg-gray-900 text-white px-6 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                                >
+                                    {processingPayment ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ShoppingCart className="w-5 h-5" />
+                                            {(!ebook.price || Number(ebook.price) === 0) ? 'Get for Free' : `Buy Now - GHS ${ebook.price}`}
+                                        </>
+                                    )}
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Sidebar */}
+                <div className="lg:col-span-1">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-6">
+                        <h3 className="text-lg font-bold text-gray-900 mb-6">Book Details</h3>
+
+                        <div className="space-y-6">
+                            <div>
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    Category
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <Tag className="w-4 h-4 text-blue-500" />
+                                    <span className="font-medium text-gray-900">{ebook.category?.name || 'Education'}</span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-gray-100"></div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    Author
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <User className="w-4 h-4 text-purple-500" />
+                                    <span className="font-medium text-gray-900">{ebook.author}</span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-gray-100"></div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    Format
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <FileText className="w-4 h-4 text-orange-500" />
+                                    <span className="font-medium text-gray-900">{ebook.format || 'PDF'}</span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-gray-100"></div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    Published
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4 text-gray-400" />
+                                    <span className="text-sm text-gray-900 font-medium">
+                                        {ebook.created_at ? new Date(ebook.created_at).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        }) : 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {isPurchased && (
+                                <>
+                                    <div className="h-px bg-gray-100"></div>
+                                    <div className="bg-green-50 border border-green-100 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 text-green-700 font-semibold mb-1">
+                                            <CheckCircle className="w-5 h-5" />
+                                            In Your Library
+                                        </div>
+                                        <p className="text-sm text-green-600">You own this ebook</p>
                                     </div>
-                                ) : (
-                                    <button 
-                                        onClick={handlePurchase}
-                                        disabled={processingPayment}
-                                        className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                                    >
-                                        {processingPayment ? (
-                                            <>
-                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                                Processing...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                </svg>
-                                                {(!ebook.price || Number(ebook.price) === 0) ? 'Get for Free' : `Buy Now (GHS ${ebook.price})`}
-                                            </>
-                                        )}
-                                    </button>
-                                )
+                                </>
                             )}
                         </div>
                     </div>

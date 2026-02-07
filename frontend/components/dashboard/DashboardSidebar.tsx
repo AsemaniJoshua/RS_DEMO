@@ -61,16 +61,6 @@ const menuItems = [
         href: "/dashboard/live-sessions"
     },
     {
-        label: "Bookmarks",
-        icon: (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-        ),
-        href: "/dashboard/bookmarks"
-    },
-    
-    {
         label: "Ebooks",
         icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

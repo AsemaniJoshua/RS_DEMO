@@ -25,14 +25,15 @@ export interface CreateAppointmentData {
   patientName: string;
   patientEmail: string;
   patientPhone: string;
-  typeId: string; // Send typeId instead of type name
-  status?: string; // Status can be any valid appointment status
+  typeId: string;
+  status?: string;
   date: string;
   time: string;
   duration: string;
   reason: string;
   notes?: string;
   cancellationReason?: string;
+  userId: string;
 }
 
 export interface AppointmentFilters {
@@ -62,9 +63,26 @@ class AppointmentService {
   // Get all appointments for the logged-in user
   async getMyAppointments(): Promise<Appointment[]> {
     try {
+      // Extract userId from localStorage (user object or user_id)
+      let userId = '';
+      if (typeof window !== 'undefined') {
+        const userRaw = localStorage.getItem('user');
+        if (userRaw) {
+          try {
+            const parsed = JSON.parse(userRaw);
+            userId = parsed.id || parsed.userId || userRaw;
+          } catch {
+            userId = userRaw;
+          }
+        }
+      }
+      if (!userId) throw new Error('User ID not found. Please log in again.');
       const response = await axios.get(
         `${API_BASE_URL}/user/appointments`,
-        this.getAuthHeader()
+        {
+          params: { userId },
+          ...this.getAuthHeader()
+        }
       );
       return response.data.data.appointments;
     } catch (error: any) {
@@ -74,11 +92,28 @@ class AppointmentService {
   }
 
   // Get a specific appointment for the logged-in user
-  async getMyAppointmentById(id: string): Promise<Appointment> {
+  async getMyAppointmentById(id: string, userEmail: string): Promise<Appointment> {
     try {
+      // Extract userId from localStorage (user object or user_id)
+      let userId = '';
+      if (typeof window !== 'undefined') {
+        const userRaw = localStorage.getItem('user');
+        if (userRaw) {
+          try {
+            const parsed = JSON.parse(userRaw);
+            userId = parsed.id || parsed.userId || userRaw;
+          } catch {
+            userId = userRaw;
+          }
+        }
+      }
+      if (!userId) throw new Error('User ID not found. Please log in again.');
       const response = await axios.get(
         `${API_BASE_URL}/user/appointments/${id}`,
-        this.getAuthHeader()
+        {
+          params: { userId },
+          ...this.getAuthHeader()
+        }
       );
       return response.data.data.appointment;
     } catch (error: any) {
@@ -90,9 +125,27 @@ class AppointmentService {
   // Create a new appointment for the logged-in user
   async createMyAppointment(data: CreateAppointmentData): Promise<Appointment> {
     try {
+      // Add userId from localStorage if not present
+      let userId = data.userId;
+      if (!userId) {
+        // Try to get userId from localStorage (either as a string or from a user object)
+        const userRaw = localStorage.getItem('user_id') || localStorage.getItem('user');
+        if (userRaw) {
+          try {
+            // If userRaw is a JSON object, parse and extract id; otherwise, use as string
+            const parsed = JSON.parse(userRaw);
+            userId = parsed.id || parsed.userId || userRaw;
+          } catch {
+            userId = userRaw;
+          }
+        } else {
+          userId = '';
+        }
+      }
+      const payload = { ...data, userId };
       const response = await axios.post(
         `${API_BASE_URL}/user/appointments`,
-        data,
+        payload,
         this.getAuthHeader()
       );
       return response.data.data.appointment;

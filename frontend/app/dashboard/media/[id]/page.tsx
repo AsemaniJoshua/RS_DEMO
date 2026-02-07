@@ -5,8 +5,17 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { mediaService, MediaItem } from "@/services/media-service";
 import toast from "react-hot-toast";
-
-import BackButton from "@/components/ui/BackButton";
+import { 
+    ArrowLeft, 
+    Download, 
+    Calendar, 
+    File, 
+    HardDrive, 
+    Image as ImageIcon, 
+    Video, 
+    FileText,
+    Clock
+} from "lucide-react";
 
 export default function MediaDetailPage() {
     const params = useParams();
@@ -22,7 +31,7 @@ export default function MediaDetailPage() {
             } catch (error: any) {
                 console.error(error);
                 toast.error("Failed to load media details");
-                router.push("/dashboard/media"); // Redirect on error
+                router.push("/dashboard/media");
             } finally {
                 setIsLoading(false);
             }
@@ -33,113 +42,256 @@ export default function MediaDetailPage() {
         }
     }, [params.id, router]);
 
+    const handleDownload = async () => {
+        if (!item) return;
+        try {
+            const response = await fetch(item.url);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = item.description || item.name || 'media-file';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+            toast.success('Download started');
+        } catch (err) {
+            toast.error('Failed to download file');
+        }
+    };
+
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+            <div className="p-8 flex items-center justify-center min-h-[400px]">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-500 font-medium">Loading media...</p>
+                </div>
             </div>
         );
     }
 
     if (!item) return null;
 
+    const getFileTypeIcon = (type: string) => {
+        switch (type) {
+            case 'IMAGE': return <ImageIcon className="w-5 h-5" />;
+            case 'VIDEO': return <Video className="w-5 h-5" />;
+            case 'DOCUMENT': return <FileText className="w-5 h-5" />;
+            default: return <File className="w-5 h-5" />;
+        }
+    };
+
+    const getFileTypeColor = (type: string) => {
+        switch (type) {
+            case 'IMAGE': return 'bg-purple-50 text-purple-700 border-purple-100';
+            case 'VIDEO': return 'bg-red-50 text-red-700 border-red-100';
+            case 'DOCUMENT': return 'bg-blue-50 text-blue-700 border-blue-100';
+            default: return 'bg-gray-50 text-gray-700 border-gray-100';
+        }
+    };
+
     return (
-        <div className="p-4 md:p-8 max-w-5xl mx-auto">
-            <BackButton label="Back to Library" />
+        <div className="p-4 md:p-8 max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="mb-8">
+                <Link 
+                    href="/dashboard/media"
+                    className="inline-flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                </Link>
+            </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col shadow-sm">
-                 {/* Media Preview / Player */}
-                <div className="w-full bg-gray-900 relative">
-                    {/* Banner: Always show the event file as banner */}
-                    {item.file_type === 'IMAGE' ? (
-                        <div className="bg-checkered min-h-[300px] flex items-center justify-center p-4">
-                            <img src={item.url} alt={item.description || item.name} className="w-full max-h-[70vh] object-cover rounded" />
-                        </div>
-                    ) : item.file_type === 'VIDEO' ? (
-                        <div className="aspect-video flex items-center justify-center bg-black">
-                            <video 
-                                src={item.url} 
-                                controls 
-                                className="w-full h-full max-h-[60vh]" 
-                                poster={item.url.replace(/\.[^/.]+$/, ".jpg")} // Try to get thumb from cloudinary by changing ext
-                            />
-                        </div>
-                    ) : (
-                        <div className="min-h-[300px] flex flex-col items-center justify-center p-6 text-white">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-4 opacity-80">
-                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                                <polyline points="14 2 14 8 20 8" />
-                            </svg>
-                            <p className="text-lg font-medium opacity-90">{item.description || item.original_name}</p>
-                            <p className="text-sm opacity-60 mt-1">Preview not available for documents</p>
-                        </div>
-                    )}
+            {/* Media Preview Banner */}
+            {item.file_type === 'IMAGE' ? (
+                <div className="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="relative h-64 md:h-[400px] w-full bg-gray-50">
+                        <img 
+                            src={item.url} 
+                            alt={item.description || item.name} 
+                            className="w-full h-full object-contain"
+                        />
+                    </div>
                 </div>
+            ) : item.file_type === 'VIDEO' ? (
+                <div className="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="relative aspect-video w-full bg-black">
+                        <video 
+                            src={item.url} 
+                            controls 
+                            className="w-full h-full" 
+                            poster={item.url.replace(/\.[^/.]+$/, ".jpg")}
+                        />
+                    </div>
+                </div>
+            ) : (
+                <div className="mb-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-100 shadow-sm h-48 flex flex-col items-center justify-center text-gray-400">
+                    <FileText className="w-12 h-12 mb-2 opacity-50" />
+                    <span className="text-sm font-medium">Document Preview Not Available</span>
+                </div>
+            )}
 
-                <div className="p-8 flex flex-col md:flex-row gap-8">
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                                item.file_type === 'VIDEO' ? 'bg-red-50 text-red-600' :
-                                item.file_type === 'DOCUMENT' ? 'bg-blue-50 text-blue-600' :
-                                'bg-purple-50 text-purple-600'
-                            }`}>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Content */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Title & Type */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                            <div className="flex-1">
+                                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                                    {item.description || item.name}
+                                </h1>
+                                <p className="text-gray-500 text-sm">
+                                    {item.original_name || item.name}
+                                </p>
+                            </div>
+                            <span className={`px-4 py-1.5 rounded-full text-sm font-semibold border flex items-center gap-2 ${getFileTypeColor(item.file_type)}`}>
+                                {getFileTypeIcon(item.file_type)}
                                 {item.file_type}
                             </span>
-                            {item.duration && <span className="text-xs text-gray-500">• {item.duration}</span>}
-                            <span className="text-xs text-gray-500">• {mediaService.formatFileSize(item.size)}</span>
                         </div>
 
-                        <h1 className="text-3xl font-bold text-gray-900 mb-4">{item.description || item.name}</h1>
-                        
-                        <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm text-gray-600 mb-6 bg-gray-50 p-4 rounded-lg">
-                            <div>
-                                <span className="block text-gray-400 text-xs uppercase tracking-wider mb-1">Uploaded Date</span>
-                                {new Date(item.created_at).toLocaleDateString()}
-                            </div>
-                            <div>
-                                <span className="block text-gray-400 text-xs uppercase tracking-wider mb-1">File Type</span>
-                                {item.mime_type}
-                            </div>
-                             {item.dimensions && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                                <div className="p-3 bg-white rounded-lg shadow-sm text-blue-600">
+                                    <Calendar className="w-6 h-6" />
+                                </div>
                                 <div>
-                                    <span className="block text-gray-400 text-xs uppercase tracking-wider mb-1">Dimensions</span>
-                                    {item.dimensions}
+                                    <div className="text-sm text-gray-500 font-medium mb-1">Upload Date</div>
+                                    <div className="font-bold text-gray-900 text-lg">
+                                        {new Date(item.created_at).toLocaleDateString(undefined, { 
+                                            year: 'numeric', 
+                                            month: 'long', 
+                                            day: 'numeric' 
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                                <div className="p-3 bg-white rounded-lg shadow-sm text-purple-600">
+                                    <HardDrive className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <div className="text-sm text-gray-500 font-medium mb-1">File Size</div>
+                                    <div className="font-bold text-gray-900 text-lg">
+                                        {mediaService.formatFileSize(item.size)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {item.duration && (
+                                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                                    <div className="p-3 bg-white rounded-lg shadow-sm text-green-600">
+                                        <Clock className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-500 font-medium mb-1">Duration</div>
+                                        <div className="font-bold text-gray-900 text-lg">
+                                            {item.duration}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {item.dimensions && (
+                                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                                    <div className="p-3 bg-white rounded-lg shadow-sm text-orange-600">
+                                        <ImageIcon className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-500 font-medium mb-1">Dimensions</div>
+                                        <div className="font-bold text-gray-900 text-lg">
+                                            {item.dimensions}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="w-full md:w-1/3 flex flex-col justify-start">
+                    {/* Download Section */}
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 shadow-sm p-6 md:p-8">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Download File</h3>
+                        <p className="text-gray-600 mb-6">
+                            Download this file to your device for offline access.
+                        </p>
                         <button
-                            onClick={async () => {
-                                try {
-                                    const response = await fetch(item.url);
-                                    const blob = await response.blob();
-                                    const url = window.URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = item.description || item.name || 'media-file';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    a.remove();
-                                    window.URL.revokeObjectURL(url);
-                                } catch (err) {
-                                    toast.error('Failed to download file');
-                                }
-                            }}
-                            className="bg-[#0066ff] text-white px-6 py-4 rounded-xl font-semibold hover:bg-[#0052cc] transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-200 flex items-center justify-center gap-2 mb-4"
+                            onClick={handleDownload}
+                            className="w-full bg-[#00d4aa] text-white px-6 py-4 rounded-xl font-semibold hover:bg-[#00bfa6] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3"
                         >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                            <Download className="w-5 h-5" />
                             Download File
                         </button>
-                        <p className="text-xs text-gray-400 text-center">
-                            Secure download provided by RxWithDrGeorge
-                        </p>
+                    </div>
+                </div>
+
+                {/* Sidebar */}
+                <div className="lg:col-span-1">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-6">
+                        <h3 className="text-lg font-bold text-gray-900 mb-6">File Details</h3>
+
+                        <div className="space-y-6">
+                            <div>
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    File Name
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <File className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                    <span className="font-medium text-gray-900 text-sm break-all">
+                                        {item.original_name || item.name}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-gray-100"></div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    MIME Type
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <FileText className="w-4 h-4 text-blue-500" />
+                                    <span className="font-medium text-gray-900 text-sm">
+                                        {item.mime_type}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-gray-100"></div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    File Type
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    {getFileTypeIcon(item.file_type)}
+                                    <span className="font-medium text-gray-900">
+                                        {item.file_type}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-gray-100"></div>
+
+                            <div>
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
+                                    Uploaded
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4 text-gray-400" />
+                                    <span className="text-sm text-gray-900 font-medium">
+                                        {new Date(item.created_at).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric'
+                                        })}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
