@@ -16,6 +16,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
     const [error, setError] = useState("");
     const [showEnrollModal, setShowEnrollModal] = useState(false);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+    const [downloading, setDownloading] = useState(false);
 
     useEffect(() => {
         setLoading(true);
@@ -23,7 +24,11 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         courseService.getUserCourseById(id)
             .then((data) => {
                 // Backend returns { course, isPurchased }
-                setCourse(data.course || data);
+                if (data && data.course) {
+                    setCourse({ ...data.course, isPurchased: data.isPurchased });
+                } else {
+                    setCourse(data);
+                }
                 setLoading(false);
             })
             .catch(() => {
@@ -58,6 +63,19 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
             toast.error(errorMessage);
             setIsProcessingPayment(false);
             setShowEnrollModal(false);
+        }
+    };
+
+    const handleDownload = async () => {
+        if (!course) return;
+        setDownloading(true);
+        try {
+            await courseService.downloadUserCourse(course.id);
+            toast.success('Download started!');
+        } catch (error: any) {
+            toast.error(error?.message || 'Failed to download course');
+        } finally {
+            setDownloading(false);
         }
     };
 
@@ -222,15 +240,34 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                 <div className="space-y-6">
                     {/* Enrollment Card */}
                     <div className="bg-white rounded-xl p-6 border border-gray-200 sticky top-6">
-                        <div className="text-xl font-bold text-gray-900 mb-4">
-                            GHS {typeof course.price === 'number' ? course.price.toLocaleString() : parseFloat(course.price).toLocaleString()}
-                        </div>
-                        <button
-                            onClick={() => setShowEnrollModal(true)}
-                            className="w-full px-6 py-3 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors font-medium mb-4"
-                        >
-                            Enroll Now
-                        </button>
+                        {course.isPurchased ? (
+                            <button
+                                onClick={handleDownload}
+                                disabled={downloading}
+                                className="w-full px-6 py-3 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors font-medium mb-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {downloading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                        Downloading...
+                                    </>
+                                ) : (
+                                    'Download Course'
+                                )}
+                            </button>
+                        ) : (
+                            <>
+                                <div className="text-xl font-bold text-gray-900 mb-4">
+                                    GHS {typeof course.price === 'number' ? course.price.toLocaleString() : parseFloat(course.price).toLocaleString()}
+                                </div>
+                                <button
+                                    onClick={() => setShowEnrollModal(true)}
+                                    className="w-full px-6 py-3 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors font-medium mb-4"
+                                >
+                                    Enroll Now
+                                </button>
+                            </>
+                        )}
                         <div className="space-y-3 text-sm">
                             {course.duration && (
                                 <div className="flex items-center justify-between">

@@ -7,7 +7,6 @@ import { courseService } from "@/services/course-service";
 export default function BrowseCoursesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All Categories");
-    const [selectedLevel, setSelectedLevel] = useState("All Levels");
     const [courses, setCourses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState<string[]>(["All Categories"]);
@@ -25,13 +24,13 @@ export default function BrowseCoursesPage() {
         setLoading(true);
         courseService.getUserCourses(
             selectedCategory,
-            selectedLevel,
+            undefined, // removed selectedLevel
             searchQuery
         ).then((data) => {
             setCourses(Array.isArray(data) ? data : []);
             setLoading(false);
         }).catch(() => setLoading(false));
-    }, [selectedCategory, selectedLevel, searchQuery]);
+    }, [selectedCategory, searchQuery]);
 
     const getLevelColor = (level: string) => {
         switch (level) {
@@ -50,8 +49,7 @@ export default function BrowseCoursesPage() {
     const filteredCourses = courses.filter(course => {
         const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesCategory = selectedCategory === "All Categories" || (course.category?.name || course.category) === selectedCategory;
-        const matchesLevel = selectedLevel === "All Levels" || course.level === selectedLevel;
-        return matchesSearch && matchesCategory && matchesLevel;
+        return matchesSearch && matchesCategory;
     });
 
     return (
@@ -89,18 +87,6 @@ export default function BrowseCoursesPage() {
                         {categories.map((category) => (
                             <option key={category} value={category}>{category}</option>
                         ))}
-                    </select>
-
-                    {/* Level Filter */}
-                    <select
-                        value={selectedLevel}
-                        onChange={(e) => setSelectedLevel(e.target.value)}
-                        className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none"
-                    >
-                        <option value="All Levels">All Levels</option>
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Advanced">Advanced</option>
                     </select>
                 </div>
             </div>
@@ -208,7 +194,6 @@ export default function BrowseCoursesPage() {
                             onClick={() => {
                                 setSearchQuery("");
                                 setSelectedCategory("All Categories");
-                                setSelectedLevel("All Levels");
                             }}
                             className="px-4 py-2 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors"
                         >

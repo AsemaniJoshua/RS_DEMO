@@ -33,9 +33,10 @@ export default function AdminLayout({
               {/* Hamburger Menu Button - visible on mobile only */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="lg:hidden p-3 border-2 border-[#0066ff] bg-white text-[#0066ff] shadow-md rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#0066ff]"
+                style={{ boxShadow: '0 2px 8px rgba(0,102,255,0.15)' }}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="3" y1="12" x2="21" y2="12" strokeLinecap="round"/>
                   <line x1="3" y1="6" x2="21" y2="6" strokeLinecap="round"/>
                   <line x1="3" y1="18" x2="21" y2="18" strokeLinecap="round"/>

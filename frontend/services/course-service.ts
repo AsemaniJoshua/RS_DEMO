@@ -1,4 +1,3 @@
-
 import { api } from "@/lib/api";
 
 export interface CourseCategory {
@@ -98,17 +97,26 @@ export const courseService = {
      */
     downloadUserCourse: async (id: string) => {
         const response = await api.get<any>(`/user/courses/${id}/download`);
-        let url = response.data?.fileUrl || response.fileUrl;
+        let url = response.data?.downloadUrl || response.data?.fileUrl || response.fileUrl;
         if (url) {
             if (url.includes('res.cloudinary.com') && url.includes('/raw/')) {
                 url = url.replace(/\/upload(?!\/fl_attachment)/, '/upload/fl_attachment');
             }
+            // Try to extract filename from url
+            let filename = url.split('/').pop()?.split('?')[0] || 'course.zip';
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', '');
+            link.setAttribute('download', filename);
+            link.style.display = 'none';
             document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+            // Fallback: open in new tab if download attribute is ignored
+            setTimeout(() => {
+                window.open(url, '_blank');
+            }, 500);
             return { fileUrl: url };
         } else {
             throw new Error('No file URL received');
@@ -154,20 +162,28 @@ export const courseService = {
     downloadCourse: async (id: string) => {
         // We get the URL from the backend
         const response = await api.get<any>(`/admin/courses/${id}/download`);
-        let url = response.data?.downloadUrl || response.downloadUrl;
+        let url = response.data?.downloadUrl || response.data?.fileUrl || response.fileUrl;
         if (url) {
             // If Cloudinary raw file, force download with fl_attachment
             if (url.includes('res.cloudinary.com') && url.includes('/raw/')) {
                 // Insert fl_attachment after /upload if not present
                 url = url.replace(/\/upload(?!\/fl_attachment)/, '/upload/fl_attachment');
             }
-            // Create a hidden anchor to force download
+            // Try to extract filename from url
+            let filename = url.split('/').pop()?.split('?')[0] || 'course.zip';
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', ''); // hint to download
+            link.setAttribute('download', filename);
+            link.style.display = 'none';
             document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+            // Fallback: open in new tab if download attribute is ignored
+            setTimeout(() => {
+                window.open(url, '_blank');
+            }, 500);
             return { downloadUrl: url };
         } else {
             throw new Error('No download URL received');

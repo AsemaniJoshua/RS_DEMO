@@ -1,12 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import userData from "@/data/dashboard/user-profile.json";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function DashboardHome() {
-    const { user, enrolledCourses, upcomingAppointments } = userData;
+    const [localName, setLocalName] = useState<string | null>(null);
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+                try {
+                    const parsed = JSON.parse(storedUser);
+                    setLocalName(parsed.first_name || parsed.name || null);
+                } catch {}
+            }
+        }
+    }, []);
+
+    const { user: authUser } = useAuth();
+    const { user, enrolledCourses, upcomingAppointments, bookmarks } = userData;
     const { stats } = user;
+    // Count purchased ebooks (mock: resources in bookmarks)
+    const purchasedEbooks = bookmarks?.resources?.length || 0;
+    // Count registered live sessions (mock: appointmentsBooked)
+    // Count registered live sessions (mock: pastAppointments length)
+    const registeredLiveSessions = userData.pastAppointments?.length || 0;
+
+    // Use authenticated user's name if available
+    const displayName = localName || authUser?.first_name || user.name.split(' ')[0];
 
     // Get in-progress courses
     const inProgressCourses = enrolledCourses.filter(c => c.status === "in-progress").slice(0, 3);
@@ -19,7 +42,7 @@ export default function DashboardHome() {
             {/* Welcome Section */}
             <div className="mb-8">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                    Welcome back, {user.name.split(' ')[0]}!
+                    Welcome back, {displayName}!
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-yellow-500">
                         <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" fill="currentColor"/>
                         <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -46,12 +69,11 @@ export default function DashboardHome() {
                         </div>
                     </div>
                 </div>
-
                 <div className="bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] text-white rounded-xl p-6 shadow-lg">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <div className="text-3xl font-bold">{stats.appointmentsBooked}</div>
-                            <div className="text-sm opacity-90">Appointments</div>
+                            <div className="text-3xl font-bold">{upcomingAppointments.length}</div>
+                            <div className="text-sm opacity-90">Scheduled Appointments</div>
                         </div>
                         <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -62,12 +84,11 @@ export default function DashboardHome() {
                         </div>
                     </div>
                 </div>
-
                 <div className="bg-gradient-to-br from-[#f59e0b] to-[#d97706] text-white rounded-xl p-6 shadow-lg">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <div className="text-3xl font-bold">{stats.totalLearningHours}h</div>
-                            <div className="text-sm opacity-90">Learning Hours</div>
+                            <div className="text-3xl font-bold">{purchasedEbooks}</div>
+                            <div className="text-sm opacity-90">Purchased Ebooks</div>
                         </div>
                         <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -77,16 +98,18 @@ export default function DashboardHome() {
                         </div>
                     </div>
                 </div>
-
                 <div className="bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] text-white rounded-xl p-6 shadow-lg">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <div className="text-3xl font-bold">{stats.savedItems}</div>
-                            <div className="text-sm opacity-90">Saved Items</div>
+                            <div className="text-3xl font-bold">{registeredLiveSessions}</div>
+                            <div className="text-sm opacity-90">Registered Live Sessions</div>
                         </div>
                         <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M19 2v4c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2H11c-1.1 0-2 .9-2 2z" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M11 2v4c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2H11c-1.1 0-2 .9-2 2z" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M11 2v4c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2H11c-1.1 0-2 .9-2 2z" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M11 2v4c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2H11c-1.1 0-2 .9-2 2z" stroke="currentColor" strokeWidth="2"/>
                             </svg>
                         </div>
                     </div>
@@ -95,40 +118,33 @@ export default function DashboardHome() {
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                {/* Continue Learning */}
+                {/* Recent Activity Section */}
                 <div className="lg:col-span-2 bg-white rounded-xl p-6 border border-gray-200">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-bold text-gray-900">Continue Learning</h2>
-                        <Link href="/dashboard/courses" className="text-sm text-[#0066ff] hover:underline">
+                        <h2 className="text-lg font-bold text-gray-900">Recent Activity</h2>
+                        <Link href="/dashboard/activity" className="text-sm text-[#0066ff] hover:underline">
                             View All →
                         </Link>
                     </div>
                     <div className="space-y-4">
-                        {inProgressCourses.map((course) => (
-                            <div key={course.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-[#0066ff] transition-colors">
-                                <div className="w-16 h-16 bg-gradient-to-br from-[#0066ff] to-[#0052cc] rounded-lg flex items-center justify-center text-white font-bold">
-                                    {course.progress}%
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className="font-semibold text-gray-900 mb-1">{course.title}</h3>
-                                    <p className="text-sm text-gray-600 mb-2">{course.instructor}</p>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div 
-                                            className="bg-[#0066ff] h-2 rounded-full transition-all" 
-                                            style={{ width: `${course.progress}%` }}
-                                        ></div>
+                        {userData.recentActivity?.length ? (
+                            userData.recentActivity.slice(0, 5).map((activity) => (
+                                <div key={activity.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-[#0066ff] transition-colors">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-[#0066ff] to-[#0052cc] rounded-lg flex items-center justify-center text-white font-bold">
+                                        {/* Icon placeholder, can be replaced with actual icons */}
+                                        <span>{activity.icon === 'check' ? '✔️' : activity.icon === 'book' ? '📚' : activity.icon === 'calendar' ? '📅' : activity.icon === 'bookmark' ? '🔖' : activity.icon === 'award' ? '🏆' : '📝'}</span>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-gray-900 mb-1">{activity.title}</h3>
+                                        <p className="text-sm text-gray-600 mb-2">{activity.date?.split('T')[0]}</p>
                                     </div>
                                 </div>
-                                <Link href={`/dashboard/courses/${course.id}`}>
-                                    <button className="px-4 py-2 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors text-sm font-medium">
-                                        Continue
-                                    </button>
-                                </Link>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="text-gray-500 text-sm">No recent activity found.</p>
+                        )}
                     </div>
                 </div>
-
                 {/* Next Appointment */}
                 <div className="bg-white rounded-xl p-6 border border-gray-200">
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Next Appointment</h2>
