@@ -26,7 +26,9 @@
       "lastAccessed": "2024-02-20",
       "totalLessons": 20,
       "completedLessons": 13,
-      "enrolledDate": "2023-08-10"
+      "enrolledDate": "2023-08-10",
+      "level": "Beginner",
+      "category": "Pharmacology"
     },
     {
       "id": 2,
@@ -39,7 +41,9 @@
       "totalLessons": 15,
       "completedLessons": 15,
       "enrolledDate": "2023-07-05",
-      "completedDate": "2024-01-15"
+      "completedDate": "2024-01-15",
+      "level": "Intermediate",
+      "category": "Safety"
     },
     {
       "id": 3,
@@ -51,7 +55,9 @@
       "lastAccessed": "2024-02-18",
       "totalLessons": 18,
       "completedLessons": 5,
-      "enrolledDate": "2024-01-20"
+      "enrolledDate": "2024-01-20",
+      "level": "Beginner",
+      "category": "Prevention"
     },
     {
       "id": 4,
@@ -63,7 +69,9 @@
       "lastAccessed": null,
       "totalLessons": 12,
       "completedLessons": 0,
-      "enrolledDate": "2024-02-10"
+      "enrolledDate": "2024-02-10",
+      "level": "Advanced",
+      "category": "Counseling"
     },
     {
       "id": 5,
@@ -76,7 +84,9 @@
       "totalLessons": 10,
       "completedLessons": 10,
       "enrolledDate": "2023-09-01",
-      "completedDate": "2023-12-20"
+      "completedDate": "2023-12-20",
+      "level": "Intermediate",
+      "category": "Medication"
     }
   ],
   "upcomingAppointments": [

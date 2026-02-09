@@ -8,6 +8,12 @@ export default function MyCoursesPage() {
     const { enrolledCourses } = userData;
     const [filter, setFilter] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
+    const [level, setLevel] = useState("all");
+    const [category, setCategory] = useState("all");
+
+    // Get unique levels and categories
+    const levels = ["all", ...Array.from(new Set(enrolledCourses.map(c => c.level).filter(Boolean)))];
+    const categories = ["all", ...Array.from(new Set(enrolledCourses.map(c => c.category).filter(Boolean)))];
 
     // Filter courses
     const filteredCourses = enrolledCourses.filter(course => {
@@ -17,7 +23,9 @@ export default function MyCoursesPage() {
             (filter === "in-progress" && course.status === "in-progress") ||
             (filter === "completed" && course.status === "completed") ||
             (filter === "not-started" && course.status === "not-started");
-        return matchesSearch && matchesFilter;
+        const matchesLevel = level === "all" || course.level === level;
+        const matchesCategory = category === "all" || course.category === category;
+        return matchesSearch && matchesFilter && matchesLevel && matchesCategory;
     });
 
     const getStatusColor = (status: string) => {
@@ -47,6 +55,29 @@ export default function MyCoursesPage() {
     };
 
     return (
+        <>
+        <style jsx global>{`
+            #course-search, #level-select, #category-select {
+                color: #111 !important;
+                -webkit-text-fill-color: #111 !important;
+                font-weight: 600 !important;
+            }
+            #level-select option, #category-select option {
+                color: #111 !important;
+                -webkit-text-fill-color: #111 !important;
+                font-weight: 600 !important;
+                background: #e0edff !important;
+            }
+            #category-select option {
+                background: #f3e8ff !important;
+            }
+            #course-search::placeholder {
+                color: #1e40af !important;
+                -webkit-text-fill-color: #1e40af !important;
+                font-weight: 600 !important;
+                opacity: 1 !important;
+            }
+        `}</style>
         <div className="p-4 md:p-8">
             {/* Header */}
             <div className="mb-6">
@@ -76,34 +107,71 @@ export default function MyCoursesPage() {
 
             {/* Search and Filters */}
             <div className="bg-white rounded-xl p-4 border border-gray-200 mb-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 relative">
-                        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <div className="flex flex-col md:flex-row gap-4 flex-wrap items-end">
+                    <div className="flex-1 relative min-w-[220px]">
+                        <label className="block text-sm font-bold text-gray-800 mb-1" htmlFor="course-search">Search</label>
+                        <svg className="absolute left-3 top-9 text-blue-500" width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
                             <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                         </svg>
                         <input
+                            id="course-search"
                             type="text"
-                            placeholder="Search courses..."
+                            placeholder="Type to search courses..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none"
+                            className="w-full pl-10 pr-4 py-2 border-2 border-blue-400 rounded-lg focus:border-blue-600 focus:outline-none bg-blue-50"
+                            style={{ color: '#000', fontWeight: '600', WebkitTextFillColor: '#000' }}
                         />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-1 min-w-[160px]">
+                        <label className="block text-sm font-bold text-black mb-1" htmlFor="level-select">Level</label>
+                        <div style={{ position: 'relative' }}>
+                            <select
+                                id="level-select"
+                                value={level}
+                                onChange={e => setLevel(e.target.value)}
+                                className="px-4 py-2 rounded-lg border-2 border-blue-400 text-sm font-bold bg-blue-50 focus:border-blue-600 focus:outline-none"
+                                style={{ color: '#000', fontWeight: '700', WebkitTextFillColor: '#000', appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none' }}
+                            >
+                                {levels.map(l => (
+                                    <option key={l} value={l} style={{ color: '#000', fontWeight: '600', background: '#fff' }}>{l === "all" ? "All Levels" : l}</option>
+                                ))}
+                            </select>
+                            <span style={{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:'#1e40af',fontWeight:700}}>&#9660;</span>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-1 min-w-[160px]">
+                        <label className="block text-sm font-bold text-black mb-1" htmlFor="category-select">Category</label>
+                        <div style={{ position: 'relative' }}>
+                            <select
+                                id="category-select"
+                                value={category}
+                                onChange={e => setCategory(e.target.value)}
+                                className="px-4 py-2 rounded-lg border-2 border-purple-400 text-sm font-bold bg-purple-50 focus:border-purple-600 focus:outline-none"
+                                style={{ color: '#000', fontWeight: '700', WebkitTextFillColor: '#000', appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none' }}
+                            >
+                                {categories.map(c => (
+                                    <option key={c} value={c} style={{ color: '#000', fontWeight: '600', background: '#fff' }}>{c === "all" ? "All Categories" : c}</option>
+                                ))}
+                            </select>
+                            <span style={{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:'#9333ea',fontWeight:700}}>&#9660;</span>
+                        </div>
+                    </div>
+                    <div className="flex gap-2 flex-wrap mt-6">
                         <button
                             onClick={() => setFilter("all")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
                                 filter === "all" 
                                     ? "bg-[#0066ff] text-white" 
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                         >
-                            All
+                            All Statuses
                         </button>
                         <button
                             onClick={() => setFilter("in-progress")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
                                 filter === "in-progress" 
                                     ? "bg-[#0066ff] text-white" 
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -113,13 +181,23 @@ export default function MyCoursesPage() {
                         </button>
                         <button
                             onClick={() => setFilter("completed")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
                                 filter === "completed" 
                                     ? "bg-[#0066ff] text-white" 
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                         >
                             Completed
+                        </button>
+                        <button
+                            onClick={() => setFilter("not-started")}
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                                filter === "not-started" 
+                                    ? "bg-[#0066ff] text-white" 
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            Not Started
                         </button>
                     </div>
                 </div>
@@ -143,6 +221,10 @@ export default function MyCoursesPage() {
                                 <div>
                                     <h3 className="font-bold text-gray-900 mb-1">{course.title}</h3>
                                     <p className="text-sm text-gray-600">{course.instructor}</p>
+                                    <div className="flex gap-2 mt-1">
+                                        <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-semibold">{course.level}</span>
+                                        <span className="inline-block px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-xs font-semibold">{course.category}</span>
+                                    </div>
                                 </div>
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(course.status)}`}>
                                     {getStatusLabel(course.status)}
@@ -193,5 +275,6 @@ export default function MyCoursesPage() {
                 </div>
             )}
         </div>
+        </>
     );
 }

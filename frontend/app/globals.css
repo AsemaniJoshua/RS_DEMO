@@ -112,3 +112,24 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
+
+/* Force course search/filter inputs to always be visible */
+#course-search,
+#level-select,
+#category-select {
+  color: #111 !important;
+  -webkit-text-fill-color: #111 !important;
+}
+
+#course-search::placeholder {
+  color: #1e40af !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #1e40af !important;
+}
+
+#level-select option,
+#category-select option {
+  color: #111 !important;
+  -webkit-text-fill-color: #111 !important;
+  background: #e0edff !important;
+}
