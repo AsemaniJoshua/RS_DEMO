@@ -6,8 +6,37 @@ import Link from "next/link";
 import { dashboardService } from "@/services/dashboard-service";
 import { useAuth } from "@/contexts/auth-context";
 
+interface DashboardStats {
+    coursesEnrolled: number;
+    scheduledAppointments: number;
+    purchasedEbooks: number;
+    registeredLiveSessions: number;
+}
+
+interface RecentActivity {
+    type: string;
+    title?: string;
+    status?: string;
+    date: string;
+}
+
+interface NextAppointment {
+    type: string;
+    mode?: string;
+    date: string;
+    time: string;
+    status: string;
+    meetingLink?: string;
+}
+
+interface DashboardData {
+    stats: DashboardStats;
+    recentActivity: RecentActivity[];
+    nextAppointment: NextAppointment | null;
+}
+
 export default function DashboardHome() {
-    const [dashboard, setDashboard] = useState<any>(null);
+    const [dashboard, setDashboard] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [localName, setLocalName] = useState<string | null>(null);
@@ -31,9 +60,10 @@ export default function DashboardHome() {
             setError(null);
             try {
                 const data = await dashboardService.fetchUserDashboard();
-                setDashboard(data);
-            } catch (err: any) {
-                setError(err?.message || "Failed to load dashboard");
+                setDashboard(data as DashboardData);
+            } catch (err) {
+                const error = err as Error;
+                setError(error?.message || "Failed to load dashboard");
             } finally {
                 setLoading(false);
             }
@@ -147,7 +177,7 @@ export default function DashboardHome() {
                     </div>
                     <div className="space-y-3">
                         {recentActivity.length ? (
-                            recentActivity.slice(0, 5).map((activity, idx) => {
+                            recentActivity.slice(0, 5).map((activity: RecentActivity, idx: number) => {
                                 const getActivityIcon = (type: string) => {
                                     switch(type) {
                                         case 'course':

@@ -33,8 +33,9 @@ export default function VerifyCoursePaymentPage() {
                     router.push('/dashboard/courses');
                 }, 3000);
             })
-            .catch((error) => {
+            .catch((err: unknown) => {
                 setStatus('failed');
+                const error = err as { message?: string; response?: { data?: { message?: string } } };
                 const errorMessage = error?.message || error?.response?.data?.message || 'Payment verification failed';
                 setMessage(errorMessage);
                 toast.error(errorMessage);

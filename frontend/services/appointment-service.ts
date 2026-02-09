@@ -33,7 +33,21 @@ export interface CreateAppointmentData {
   reason: string;
   notes?: string;
   cancellationReason?: string;
-  userId: string;
+  userId?: string;
+}
+
+export interface UpdateAppointmentData {
+  patientName: string;
+  patientEmail: string;
+  patientPhone: string;
+  typeId: string;
+  status?: string;
+  date: string;
+  time: string;
+  duration: string;
+  reason: string;
+  notes?: string;
+  cancellationReason?: string;
 }
 
 export interface AppointmentFilters {
@@ -92,7 +106,7 @@ class AppointmentService {
   }
 
   // Get a specific appointment for the logged-in user
-  async getMyAppointmentById(id: string, userEmail: string): Promise<Appointment> {
+  async getMyAppointmentById(id: string, userEmail?: string): Promise<Appointment> {
     try {
       // Extract userId from localStorage (user object or user_id)
       let userId = '';
@@ -207,7 +221,7 @@ class AppointmentService {
   }
 
   // Update appointment
-  async updateAppointment(id: string, data: CreateAppointmentData): Promise<Appointment> {
+  async updateAppointment(id: string, data: UpdateAppointmentData): Promise<Appointment> {
     try {
       const response = await axios.put(
         `${API_BASE_URL}/admin/appointments/${id}`,

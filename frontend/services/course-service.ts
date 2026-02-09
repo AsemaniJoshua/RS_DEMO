@@ -28,12 +28,12 @@ export interface Course {
 export const courseService = {
     // Categories
     getCategories: async () => {
-        const response = await api.get<any[]>('/admin/courses/categories');
-        return response.data;
+        const response = await api.get<CourseCategory[]>('/admin/courses/categories');
+        return response.data || [];
     },
 
     createCategory: async (name: string) => {
-        const response = await api.post('/admin/courses/categories', { name });
+        const response = await api.post<CourseCategory>('/admin/courses/categories', { name });
         return response.data;
     },
 
@@ -51,7 +51,7 @@ export const courseService = {
         if (level && level !== 'All Levels') params.append('level', level);
         if (search) params.append('search', search);
         const queryString = params.toString() ? `?${params.toString()}` : '';
-        const response = await api.get<any>(`/user/courses${queryString}`);
+        const response = await api.get<{ courses: Course[] }>(`/user/courses${queryString}`);
         return response.data?.courses || [];
     },
 
@@ -60,7 +60,7 @@ export const courseService = {
      * GET /api/v1/user/courses/:id
      */
     getUserCourseById: async (id: string) => {
-        const response = await api.get<any>(`/user/courses/${id}`);
+        const response = await api.get<Course>(`/user/courses/${id}`);
         return response.data;
     },
 
@@ -69,7 +69,7 @@ export const courseService = {
      * GET /api/v1/user/courses/my-library
      */
     getMyCourses: async () => {
-        const response = await api.get<any>(`/user/courses/my-library`);
+        const response = await api.get<{ courses: Course[] }>(`/user/courses/my-library`);
         return response.data?.courses || [];
     },
 
@@ -78,7 +78,7 @@ export const courseService = {
      * POST /api/v1/user/courses/:id/purchase
      */
     purchaseCourse: async (id: string, email: string, callback_url: string) => {
-        const response = await api.post<any>(`/user/courses/${id}/purchase`, { email, callback_url });
+        const response = await api.post<{ authorization_url: string; reference: string }>(`/user/courses/${id}/purchase`, { email, callback_url });
         return response.data;
     },
 
@@ -87,7 +87,7 @@ export const courseService = {
      * GET /api/v1/user/courses/verify/:reference
      */
     verifyCoursePayment: async (reference: string) => {
-        const response = await api.get<any>(`/user/courses/verify/${reference}`);
+        const response = await api.get<{ verified: boolean; purchase?: any }>(`/user/courses/verify/${reference}`);
         return response.data;
     },
 
@@ -96,8 +96,8 @@ export const courseService = {
      * GET /api/v1/user/courses/:id/download
      */
     downloadUserCourse: async (id: string) => {
-        const response = await api.get<any>(`/user/courses/${id}/download`);
-        let url = response.data?.downloadUrl || response.data?.fileUrl || response.fileUrl;
+        const response = await api.get<{ downloadUrl?: string; fileUrl?: string }>(`/user/courses/${id}/download`);
+        let url = response.data?.downloadUrl || response.data?.fileUrl;
         if (url) {
             if (url.includes('res.cloudinary.com') && url.includes('/raw/')) {
                 url = url.replace(/\/upload(?!\/fl_attachment)/, '/upload/fl_attachment');
@@ -123,7 +123,7 @@ export const courseService = {
         }
     },
     deleteCategory: async (id: string) => {
-        const response = await api.delete(`/admin/courses/categories/${id}`);
+        const response = await api.delete<{ message: string }>(`/admin/courses/categories/${id}`);
         return response.data;
     },
 
@@ -135,34 +135,34 @@ export const courseService = {
         if (search) params.append('search', search);
         
         const queryString = params.toString() ? `?${params.toString()}` : '';
-        const response = await api.get<any[]>(`/admin/courses${queryString}`);
-        return response.data;
+        const response = await api.get<Course[]>(`/admin/courses${queryString}`);
+        return response.data || [];
     },
 
     getCourseById: async (id: string) => {
-        const response = await api.get(`/admin/courses/${id}`);
+        const response = await api.get<Course>(`/admin/courses/${id}`);
         return response.data;
     },
 
-    createCourse: async (formData: FormData): Promise<any> => {
-        const response = await api.post('/admin/courses', formData);
+    createCourse: async (formData: FormData): Promise<Course | undefined> => {
+        const response = await api.post<Course>('/admin/courses', formData);
         return response.data;
     },
 
-    updateCourse: async (id: string, formData: FormData): Promise<any> => {
-        const response = await api.put(`/admin/courses/${id}`, formData);
+    updateCourse: async (id: string, formData: FormData): Promise<Course | undefined> => {
+        const response = await api.put<Course>(`/admin/courses/${id}`, formData);
         return response.data;
     },
 
     deleteCourse: async (id: string) => {
-        const response = await api.delete(`/admin/courses/${id}`);
+        const response = await api.delete<{ message: string }>(`/admin/courses/${id}`);
         return response.data;
     },
 
     downloadCourse: async (id: string) => {
         // We get the URL from the backend
-        const response = await api.get<any>(`/admin/courses/${id}/download`);
-        let url = response.data?.downloadUrl || response.data?.fileUrl || response.fileUrl;
+        const response = await api.get<{ downloadUrl?: string; fileUrl?: string }>(`/admin/courses/${id}/download`);
+        let url = response.data?.downloadUrl || response.data?.fileUrl;
         if (url) {
             // If Cloudinary raw file, force download with fl_attachment
             if (url.includes('res.cloudinary.com') && url.includes('/raw/')) {

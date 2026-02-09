@@ -41,7 +41,8 @@ export default function LiveSessionDetailsPage() {
             if (response.data) {
                 setSession(response.data);
             }
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { message?: string };
             toast.error(error.message || 'Failed to load session');
             router.push('/dashboard/live-sessions');
         } finally {
@@ -55,7 +56,8 @@ export default function LiveSessionDetailsPage() {
             await liveSessionsService.registerForSession(sessionId);
             toast.success('Successfully registered for the session!');
             fetchSession(); // Refresh to update registration status
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { message?: string };
             toast.error(error.message || 'Failed to register for session');
         } finally {
             setRegistering(false);
@@ -70,7 +72,8 @@ export default function LiveSessionDetailsPage() {
             await liveSessionsService.cancelRegistration(sessionId);
             toast.success('Registration cancelled successfully');
             fetchSession();
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { message?: string };
             toast.error(error.message || 'Failed to cancel registration');
         } finally {
             setCancelling(false);
@@ -88,7 +91,8 @@ export default function LiveSessionDetailsPage() {
             } else {
                 toast.error('Failed to initialize payment');
             }
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { message?: string };
             toast.error(error.message || 'Failed to purchase recording');
             setPurchasing(false);
         }

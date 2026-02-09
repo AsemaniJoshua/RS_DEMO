@@ -52,29 +52,27 @@ export const speakingService = {
 
     async getAllEvents() {
         const response = await api.get<{ events: SpeakingEvent[] }>('/admin/speaking');
-        return response.events || [];
+        return response.data?.events || [];
     },
 
     async getEventById(id: string) {
         const response = await api.get<{ event: SpeakingEvent }>(`/admin/speaking/${id}`);
-        return response.event;
+        return response.data?.event;
     },
 
 
     async createEvent(data: FormData | Partial<SpeakingEvent>) {
-        const body = data instanceof FormData ? data : undefined;
-        const response = await api.post('/admin/speaking', body || data);
+        const response = await api.post<SpeakingEvent>('/admin/speaking', data);
         return response.data;
     },
 
     async updateEvent(id: string, data: FormData | Partial<SpeakingEvent>) {
-        const body = data instanceof FormData ? data : undefined;
-        const response = await api.put(`/admin/speaking/${id}`, body || data);
+        const response = await api.put<SpeakingEvent>(`/admin/speaking/${id}`, data);
         return response.data;
     },
 
     async deleteEvent(id: string) {
-        const response = await api.delete(`/admin/speaking/${id}`);
+        const response = await api.delete<{ message: string }>(`/admin/speaking/${id}`);
         return response.data;
     },
 
@@ -84,16 +82,16 @@ export const speakingService = {
 
     async getAllCategories() {
         const response = await api.get<{ categories: Category[] }>('/admin/speaking/categories');
-        return response.categories || [];
+        return response.data?.categories || [];
     },
 
     async createCategory(name: string) {
-        const response = await api.post('/admin/speaking/categories', { name });
+        const response = await api.post<Category>('/admin/speaking/categories', { name });
         return response.data;
     },
 
     async deleteCategory(id: string) {
-        const response = await api.delete(`/admin/speaking/categories/${id}`);
+        const response = await api.delete<{ message: string }>(`/admin/speaking/categories/${id}`);
         return response.data;
     }
 };
