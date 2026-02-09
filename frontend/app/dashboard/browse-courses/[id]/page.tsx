@@ -23,12 +23,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         setError("");
         courseService.getUserCourseById(id)
             .then((data) => {
-                // Backend returns { course, isPurchased }
-                if (data && data.course) {
-                    setCourse({ ...data.course, isPurchased: data.isPurchased });
-                } else {
-                    setCourse(data);
-                }
+                setCourse(data);
                 setLoading(false);
             })
             .catch(() => {

@@ -18,7 +18,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         // Fetch course from backend (purchased course from my library)
         courseService.getUserCourseById(id)
             .then((data) => {
-                setCourse(data.course || data);
+                setCourse(data);
                 setLoading(false);
             })
             .catch(() => {

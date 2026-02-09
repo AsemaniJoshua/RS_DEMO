@@ -25,7 +25,7 @@ export default function VerifyCoursePaymentPage() {
         courseService.verifyCoursePayment(reference)
             .then((data) => {
                 setStatus('success');
-                setMessage(data?.message || 'Course purchased successfully!');
+                setMessage('Course purchased successfully!');
                 toast.success('Payment verified successfully!');
                 
                 // Redirect to my courses after 3 seconds

@@ -41,6 +41,7 @@ export interface LiveSession {
     registration_count?: number;
     is_registered?: boolean;
     is_full?: boolean;
+    is_past?: boolean;
     user_attended?: boolean;
     has_purchased_recording?: boolean;
 }
