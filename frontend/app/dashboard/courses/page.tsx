@@ -1,30 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import userData from "@/data/dashboard/user-profile.json";
 
-export default function MyCoursesPage() {
-    const { enrolledCourses } = userData;
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { courseService } from "@/services/course-service";
+
+export default function CoursesPage() {
+    const [courses, setCourses] = useState<any[]>([]);
     const [filter, setFilter] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [level, setLevel] = useState("all");
     const [category, setCategory] = useState("all");
+    const [loading, setLoading] = useState(true);
+    const [levels, setLevels] = useState<string[]>(["all"]);
+    const [categories, setCategories] = useState<string[]>(["all"]);
 
-    // Get unique levels and categories
-    const levels = ["all", ...Array.from(new Set(enrolledCourses.map(c => c.level).filter(Boolean)))];
-    const categories = ["all", ...Array.from(new Set(enrolledCourses.map(c => c.category).filter(Boolean)))];
+    useEffect(() => {
+        setLoading(true);
+        courseService.getMyCourses().then((data) => {
+            const coursesArr = Array.isArray(data) ? data : [];
+            setCourses(coursesArr);
+            // Extract unique levels and categories
+            const uniqueLevels = Array.from(new Set(coursesArr.map((c: any) => c.level || "").filter(l => !!l)));
+            setLevels(["all", ...uniqueLevels]);
+            const uniqueCategories = Array.from(new Set(coursesArr.map((c: any) => c.category?.name || c.category || "").filter(cat => !!cat)));
+            setCategories(["all", ...uniqueCategories]);
+            setLoading(false);
+        }).catch(() => setLoading(false));
+    }, []);
 
     // Filter courses
-    const filteredCourses = enrolledCourses.filter(course => {
+    const filteredCourses = courses.filter(course => {
         const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFilter = 
+        const matchesFilter =
             filter === "all" ||
             (filter === "in-progress" && course.status === "in-progress") ||
             (filter === "completed" && course.status === "completed") ||
             (filter === "not-started" && course.status === "not-started");
         const matchesLevel = level === "all" || course.level === level;
-        const matchesCategory = category === "all" || course.category === category;
+        const matchesCategory = category === "all" || (course.category?.name || course.category) === category;
         return matchesSearch && matchesFilter && matchesLevel && matchesCategory;
     });
 
@@ -88,18 +102,18 @@ export default function MyCoursesPage() {
             {/* Stats Summary */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
-                    <div className="text-2xl font-bold text-gray-900">{enrolledCourses.length}</div>
+                    <div className="text-2xl font-bold text-gray-900">{courses.length}</div>
                     <div className="text-sm text-gray-600">Total Enrolled</div>
                 </div>
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="text-2xl font-bold text-blue-600">
-                        {enrolledCourses.filter(c => c.status === "in-progress").length}
+                        {courses.filter(c => c.status === "in-progress").length}
                     </div>
                     <div className="text-sm text-gray-600">In Progress</div>
                 </div>
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="text-2xl font-bold text-green-600">
-                        {enrolledCourses.filter(c => c.status === "completed").length}
+                        {courses.filter(c => c.status === "completed").length}
                     </div>
                     <div className="text-sm text-gray-600">Completed</div>
                 </div>
@@ -208,11 +222,19 @@ export default function MyCoursesPage() {
                 {filteredCourses.map((course) => (
                     <div key={course.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                         {/* Course Thumbnail */}
-                        <div className="aspect-video bg-gradient-to-br from-[#0066ff] to-[#0052cc] flex items-center justify-center text-white">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
+                        <div className="aspect-video bg-gradient-to-br from-[#0066ff] to-[#0052cc] flex items-center justify-center text-white relative">
+                            {course.thumbnailUrl ? (
+                                <img 
+                                    src={course.thumbnailUrl} 
+                                    alt={course.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" strokeWidth="2"/>
+                                    <path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" strokeWidth="2"/>
+                                </svg>
+                            )}
                         </div>
 
                         {/* Course Info */}
@@ -220,10 +242,16 @@ export default function MyCoursesPage() {
                             <div className="flex items-start justify-between mb-3">
                                 <div>
                                     <h3 className="font-bold text-gray-900 mb-1">{course.title}</h3>
-                                    <p className="text-sm text-gray-600">{course.instructor}</p>
+                                    {course.instructor && (
+                                        <p className="text-sm text-gray-600">{typeof course.instructor === 'object' ? course.instructor?.name : course.instructor}</p>
+                                    )}
                                     <div className="flex gap-2 mt-1">
-                                        <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-semibold">{course.level}</span>
-                                        <span className="inline-block px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-xs font-semibold">{course.category}</span>
+                                        {course.level && (
+                                            <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-semibold">{typeof course.level === 'object' ? course.level?.name : course.level}</span>
+                                        )}
+                                        {course.category && (
+                                            <span className="inline-block px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-xs font-semibold">{typeof course.category === 'object' ? course.category?.name : course.category}</span>
+                                        )}
                                     </div>
                                 </div>
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(course.status)}`}>

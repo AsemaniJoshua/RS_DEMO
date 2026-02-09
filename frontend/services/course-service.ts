@@ -38,6 +38,82 @@ export const courseService = {
         return response.data;
     },
 
+    // =====================
+    // USER DASHBOARD ENDPOINTS
+    // =====================
+
+    /**
+     * Get all published courses (user dashboard)
+     * GET /api/v1/user/courses
+     */
+    getUserCourses: async (category?: string, level?: string, search?: string) => {
+        const params = new URLSearchParams();
+        if (category && category !== 'All Categories') params.append('category', category);
+        if (level && level !== 'All Levels') params.append('level', level);
+        if (search) params.append('search', search);
+        const queryString = params.toString() ? `?${params.toString()}` : '';
+        const response = await api.get<any>(`/user/courses${queryString}`);
+        return response.data?.courses || [];
+    },
+
+    /**
+     * Get single course details (user dashboard)
+     * GET /api/v1/user/courses/:id
+     */
+    getUserCourseById: async (id: string) => {
+        const response = await api.get<any>(`/user/courses/${id}`);
+        return response.data;
+    },
+
+    /**
+     * Get user's purchased/enrolled courses (user dashboard)
+     * GET /api/v1/user/courses/my-library
+     */
+    getMyCourses: async () => {
+        const response = await api.get<any>(`/user/courses/my-library`);
+        return response.data?.courses || [];
+    },
+
+    /**
+     * Purchase/initiate payment for a course (user dashboard)
+     * POST /api/v1/user/courses/:id/purchase
+     */
+    purchaseCourse: async (id: string, email: string, callback_url: string) => {
+        const response = await api.post<any>(`/user/courses/${id}/purchase`, { email, callback_url });
+        return response.data;
+    },
+
+    /**
+     * Verify course payment (user dashboard)
+     * GET /api/v1/user/courses/verify/:reference
+     */
+    verifyCoursePayment: async (reference: string) => {
+        const response = await api.get<any>(`/user/courses/verify/${reference}`);
+        return response.data;
+    },
+
+    /**
+     * Download purchased course (user dashboard)
+     * GET /api/v1/user/courses/:id/download
+     */
+    downloadUserCourse: async (id: string) => {
+        const response = await api.get<any>(`/user/courses/${id}/download`);
+        let url = response.data?.fileUrl || response.fileUrl;
+        if (url) {
+            if (url.includes('res.cloudinary.com') && url.includes('/raw/')) {
+                url = url.replace(/\/upload(?!\/fl_attachment)/, '/upload/fl_attachment');
+            }
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', '');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return { fileUrl: url };
+        } else {
+            throw new Error('No file URL received');
+        }
+    },
     deleteCategory: async (id: string) => {
         const response = await api.delete(`/admin/courses/categories/${id}`);
         return response.data;
