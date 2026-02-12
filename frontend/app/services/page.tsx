@@ -252,9 +252,9 @@ interface ServiceItem {
                                     <button 
                                         onClick={() => {
                                             if (isAuthenticated) {
-                                                router.push(`/dashboard/courses/${item.id}`);
+                                                router.push(`/dashboard/browse-courses/${item.id}`);
                                             } else {
-                                                router.push(`/login?redirect=/dashboard/courses/${item.id}`);
+                                                router.push(`/login?redirect=/dashboard/browse-courses/${item.id}`);
                                             }
                                         }}
                                         className="w-full h-12 rounded-full bg-white border-2 border-[#0066ff] text-[#0066ff] hover:bg-[#0066ff] hover:text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"

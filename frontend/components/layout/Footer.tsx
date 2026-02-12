@@ -1,10 +1,15 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
+import { publicService, PublicPersonalBrand } from "@/services/public-service";
 
-// Social Media Icons
-const TwitterIcon = () => (
+// Social Media Icons - X (Twitter) Icon
+const XIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" 
+              fill="currentColor" />
     </svg>
 );
 
@@ -30,6 +35,12 @@ const LinkedInIcon = () => (
     </svg>
 );
 
+const FacebookIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
 const MailIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -52,6 +63,22 @@ const GlobeIcon = () => (
 );
 
 export default function Footer() {
+    const [brandData, setBrandData] = useState<PublicPersonalBrand | null>(null);
+
+    useEffect(() => {
+        const fetchBrandData = async () => {
+            try {
+                const response = await publicService.getPersonalBrand();
+                if (response.data) {
+                    setBrandData(response.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch brand data", error);
+            }
+        };
+        fetchBrandData();
+    }, []);
+
     const quickLinks = [
         { label: "Home", href: "/" },
         { label: "About", href: "/about" },
@@ -81,18 +108,56 @@ export default function Footer() {
                         </p>
                         {/* Social Icons */}
                         <div className="flex gap-3">
-                            <a href="#" className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200">
-                                <TwitterIcon />
-                            </a>
-                            <a href="#" className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200">
-                                <InstagramIcon />
-                            </a>
-                            <a href="#" className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200">
-                                <YouTubeIcon />
-                            </a>
-                            <a href="#" className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200">
-                                <LinkedInIcon />
-                            </a>
+                            {brandData?.socialMedia?.twitter && (
+                                <a 
+                                    href={brandData.socialMedia.twitter} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200"
+                                >
+                                    <XIcon />
+                                </a>
+                            )}
+                            {brandData?.socialMedia?.instagram && (
+                                <a 
+                                    href={brandData.socialMedia.instagram} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200"
+                                >
+                                    <InstagramIcon />
+                                </a>
+                            )}
+                            {brandData?.socialMedia?.youtube && (
+                                <a 
+                                    href={brandData.socialMedia.youtube} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200"
+                                >
+                                    <YouTubeIcon />
+                                </a>
+                            )}
+                            {brandData?.socialMedia?.linkedin && (
+                                <a 
+                                    href={brandData.socialMedia.linkedin} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200"
+                                >
+                                    <LinkedInIcon />
+                                </a>
+                            )}
+                            {brandData?.socialMedia?.facebook && (
+                                <a 
+                                    href={brandData.socialMedia.facebook} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center hover:bg-[#0066ff] hover:text-white transition-all duration-200"
+                                >
+                                    <FacebookIcon />
+                                </a>
+                            )}
                         </div>
                     </div>
 
@@ -128,18 +193,28 @@ export default function Footer() {
                     <div>
                         <h3 className="text-white font-bold mb-4">Contact</h3>
                         <ul className="space-y-4">
-                            <li className="flex items-center gap-3 text-sm">
-                                <MailIcon />
-                                <a href="mailto:contact@rxwithdrgeorge.com" className="hover:text-[#0066ff] transition-colors duration-200">
-                                    contact@rxwithdrgeorge.com
-                                </a>
-                            </li>
-                            <li className="flex items-center gap-3 text-sm">
-                                <PhoneIcon />
-                                <a href="tel:+15551234567" className="hover:text-[#0066ff] transition-colors duration-200">
-                                    +1 (555) 123-4567
-                                </a>
-                            </li>
+                            {brandData?.profile?.email && (
+                                <li className="flex items-center gap-3 text-sm">
+                                    <MailIcon />
+                                    <a 
+                                        href={`mailto:${brandData.profile.email}`} 
+                                        className="hover:text-[#0066ff] transition-colors duration-200"
+                                    >
+                                        {brandData.profile.email}
+                                    </a>
+                                </li>
+                            )}
+                            {brandData?.profile?.phoneNumber && (
+                                <li className="flex items-center gap-3 text-sm">
+                                    <PhoneIcon />
+                                    <a 
+                                        href={`tel:${brandData.profile.phoneNumber}`} 
+                                        className="hover:text-[#0066ff] transition-colors duration-200"
+                                    >
+                                        {brandData.profile.phoneNumber}
+                                    </a>
+                                </li>
+                            )}
                             <li className="flex items-start gap-3 text-sm">
                                 <GlobeIcon />
                                 <span className="text-gray-400">

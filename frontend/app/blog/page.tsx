@@ -3,20 +3,62 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import blogPostsData from "@/data/blogPosts.json";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { publicService, PublicBlog } from "@/services/public-service";
+import { useAuth } from "@/contexts/auth-context";
 
 // Note: Metadata export not possible in client components
 // Consider moving to a server component wrapper if SEO is critical
 
 export default function BlogPage() {
+    const router = useRouter();
+    const { isAuthenticated } = useAuth();
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState("All");
     const [visiblePosts, setVisiblePosts] = useState(6);
+    const [blogPosts, setBlogPosts] = useState<PublicBlog[]>([]);
+    const [categories, setCategories] = useState<string[]>(["All"]);
+    const [loading, setLoading] = useState(true);
+    const [subscriptionEmail, setSubscriptionEmail] = useState("");
+    const [isSubscribing, setIsSubscribing] = useState(false);
 
-    const categories = ["All", "Drug Safety", "Supplements", "Diabetes", "Teen Drug Abuse", "Wellness"];
+    // Fetch categories on mount
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await publicService.getBlogCategories();
+                if (response.data && Array.isArray(response.data)) {
+                    setCategories(["All", ...response.data]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch categories", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
-    const blogPosts = blogPostsData;
+    // Fetch blog posts when category or search changes
+    useEffect(() => {
+        const fetchBlogs = async () => {
+            try {
+                setLoading(true);
+                const response = await publicService.getPublicBlogs(
+                    activeCategory === "All" ? undefined : activeCategory,
+                    debouncedSearch || undefined
+                );
+                if (response.data?.blogs) {
+                    setBlogPosts(response.data.blogs);
+                }
+            } catch (error) {
+                console.error("Failed to fetch blogs", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBlogs();
+    }, [activeCategory, debouncedSearch]);
 
     // Debounce search query
     useEffect(() => {
@@ -27,24 +69,100 @@ export default function BlogPage() {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    const filteredPosts = blogPosts.filter(post => {
-        const matchesCategory = activeCategory === "All" || post.category === activeCategory;
-        const matchesSearch = debouncedSearch === "" ||
-            post.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-            post.excerpt.toLowerCase().includes(debouncedSearch.toLowerCase());
-        return matchesCategory && matchesSearch;
-    });
+    const filteredPosts = blogPosts;
 
     // Get featured post or first post
-    const featuredPost = filteredPosts.find(post => post.featured) || filteredPosts[0];
-    const otherPosts = featuredPost
-        ? filteredPosts.filter(post => post !== featuredPost).slice(0, visiblePosts - 1)
-        : filteredPosts.slice(1, visiblePosts);
+    const featuredPost = filteredPosts[0];
+    const otherPosts = filteredPosts.slice(1, visiblePosts);
 
     const hasMorePosts = filteredPosts.length > visiblePosts;
 
     const handleLoadMore = () => {
         setVisiblePosts(prev => prev + 3);
+    };
+
+    // Format author name
+    const getAuthorName = (author: PublicBlog['author']) => {
+        return `${author.first_name} ${author.last_name}`;
+    };
+
+    // Format date
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+    };
+
+    // Get first category name
+    const getFirstCategory = (blog: PublicBlog) => {
+        return blog.categories[0]?.name || 'Uncategorized';
+    };
+
+    // Handle blog navigation with authentication check
+    const handleBlogNavigation = (blogId: string, slug?: string) => {
+        if (!isAuthenticated) {
+            router.push(`/login?redirect=/dashboard/blog/${blogId}`);
+        } else {
+            router.push(`/dashboard/blog/${blogId}`);
+        }
+    };
+
+    // Handle share functionality
+    const handleShare = (platform: 'twitter' | 'linkedin' | 'whatsapp', post: PublicBlog) => {
+        const url = `${window.location.origin}/blog/${post.id}`;
+        const text = `${post.title} - ${post.excerpt}`;
+        
+        let shareUrl = '';
+        
+        switch (platform) {
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+                break;
+        }
+        
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    };
+
+    // Handle email subscription
+    const handleSubscription = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!subscriptionEmail) {
+            toast.error('Please enter your email address');
+            return;
+        }
+        
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(subscriptionEmail)) {
+            toast.error('Please enter a valid email address');
+            return;
+        }
+        
+        setIsSubscribing(true);
+        
+        try {
+            const response = await publicService.subscribeToNewsletter(subscriptionEmail);
+            if (response.status === 'success') {
+                toast.success('Successfully subscribed to our newsletter!');
+                setSubscriptionEmail('');
+            } else {
+                toast.error(response.message || 'Failed to subscribe');
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to subscribe. Please try again.');
+        } finally {
+            setIsSubscribing(false);
+        }
     };
 
     return (
@@ -100,7 +218,20 @@ export default function BlogPage() {
                 </div>
             </section>
 
+            {/* Loading State */}
+            {loading && (
+                <section className="py-20 bg-gray-50">
+                    <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                        <div className="text-center">
+                            <div className="w-16 h-16 mx-auto mb-4 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+                            <p className="text-gray-600">Loading articles...</p>
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* Blog Content with Sidebar */}
+            {!loading && (
             <section className="py-20 bg-gray-50">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid lg:grid-cols-3 gap-8">
@@ -111,16 +242,25 @@ export default function BlogPage() {
                                 <article className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 mb-8">
                                     {/* Featured Image */}
                                     <div className="relative h-80 bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff] flex items-center justify-center">
-                                        <div className="w-24 h-24 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
-                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        </div>
+                                        {featuredPost.featured_image ? (
+                                            <Image
+                                                src={featuredPost.featured_image}
+                                                alt={featuredPost.title}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-24 h-24 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
+                                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            </div>
+                                        )}
                                         <div className="absolute top-4 left-4 px-3 py-1 bg-[#0066ff] rounded-full text-white text-xs font-bold">
-                                            {featuredPost.category}
+                                            {getFirstCategory(featuredPost)}
                                         </div>
                                         {/* Featured Badge */}
                                         <div className="absolute top-4 right-4 px-3 py-1 bg-[#00bfa6] rounded-full text-white text-xs font-bold flex items-center gap-1">
@@ -145,37 +285,49 @@ export default function BlogPage() {
                                             <div className="flex items-center gap-4 text-sm text-gray-500">
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0066ff] to-[#00bfa6] flex items-center justify-center text-white text-sm font-bold">
-                                                        DG
+                                                        {featuredPost.author?.first_name?.[0] || 'D'}{featuredPost.author?.last_name?.[0] || 'G'}
                                                     </div>
-                                                    <span className="font-medium text-gray-700">{featuredPost.author}</span>
+                                                    <span className="font-medium text-gray-700">{getAuthorName(featuredPost.author)}</span>
                                                 </div>
                                                 <span>•</span>
-                                                <span>{featuredPost.date}</span>
+                                                <span>{formatDate(featuredPost.published_at)}</span>
                                                 <span>•</span>
                                                 <div className="flex items-center gap-1">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                                                         <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                                     </svg>
-                                                    <span>{featuredPost.readTime}</span>
+                                                    <span>{featuredPost.reading_time || '5 min read'}</span>
                                                 </div>
                                             </div>
 
                                             {/* Social Share Buttons */}
                                             <div className="flex items-center gap-2">
                                                 <span className="text-sm text-gray-500 mr-2">Share:</span>
-                                                <button className="w-8 h-8 rounded-full bg-gray-100 hover:bg-[#1DA1F2] hover:text-white text-gray-600 transition-all duration-200 flex items-center justify-center">
+                                                <button 
+                                                    onClick={() => handleShare('twitter', featuredPost)}
+                                                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-[#1DA1F2] hover:text-white text-gray-600 transition-all duration-200 flex items-center justify-center"
+                                                    aria-label="Share on Twitter"
+                                                >
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
                                                     </svg>
                                                 </button>
-                                                <button className="w-8 h-8 rounded-full bg-gray-100 hover:bg-[#0A66C2] hover:text-white text-gray-600 transition-all duration-200 flex items-center justify-center">
+                                                <button 
+                                                    onClick={() => handleShare('linkedin', featuredPost)}
+                                                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-[#0A66C2] hover:text-white text-gray-600 transition-all duration-200 flex items-center justify-center"
+                                                    aria-label="Share on LinkedIn"
+                                                >
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
                                                         <circle cx="4" cy="4" r="2" />
                                                     </svg>
                                                 </button>
-                                                <button className="w-8 h-8 rounded-full bg-gray-100 hover:bg-[#25D366] hover:text-white text-gray-600 transition-all duration-200 flex items-center justify-center">
+                                                <button 
+                                                    onClick={() => handleShare('whatsapp', featuredPost)}
+                                                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-[#25D366] hover:text-white text-gray-600 transition-all duration-200 flex items-center justify-center"
+                                                    aria-label="Share on WhatsApp"
+                                                >
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                                                     </svg>
@@ -183,22 +335,23 @@ export default function BlogPage() {
                                             </div>
                                         </div>
 
-                                    <Link href={`/blog/${featuredPost.slug}`}>
-                                        <button className="text-[#0066ff] font-medium hover:underline flex items-center gap-2 cursor-pointer">
-                                            Read Full Article
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </svg>
-                                        </button>
-                                    </Link>
+                                    <button 
+                                        onClick={() => handleBlogNavigation(featuredPost.id, featuredPost.slug)}
+                                        className="text-[#0066ff] font-medium hover:underline flex items-center gap-2 cursor-pointer"
+                                    >
+                                        Read Full Article
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                            <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </button>
                                     </div>
                                 </article>
                             )}
 
                             {/* Other Posts - List View */}
                             <div className="space-y-6">
-                                {otherPosts.map((post, index) => (
-                                    <article key={index} className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-lg transition-all duration-300">
+                                {otherPosts.map((post) => (
+                                    <article key={post.id} className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-lg transition-all duration-300">
                                         <div className="flex gap-6">
                                             {/* Icon */}
                                             <div className="flex-shrink-0">
@@ -213,7 +366,7 @@ export default function BlogPage() {
                                             {/* Content */}
                                             <div className="flex-1">
                                                 <div className="text-xs font-semibold text-[#0066ff] uppercase mb-2">
-                                                    {post.category}
+                                                    {getFirstCategory(post)}
                                                 </div>
                                                 <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-[#0066ff] transition-colors duration-200">
                                                     {post.title}
@@ -222,11 +375,11 @@ export default function BlogPage() {
                                                     {post.excerpt}
                                                 </p>
                                                 <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                    <span>{post.author}</span>
+                                                    <span>{getAuthorName(post.author)}</span>
                                                     <span>•</span>
-                                                    <span>{post.date}</span>
+                                                    <span>{formatDate(post.published_at)}</span>
                                                     <span>•</span>
-                                                    <span>{post.readTime}</span>
+                                                    <span>{post.reading_time || '5 min read'}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -312,27 +465,35 @@ export default function BlogPage() {
                                 <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
                                     <h3 className="text-lg font-bold text-gray-900 mb-4">Featured Newsroom</h3>
                                     <div className="space-y-4">
-                                        {blogPosts.slice(0, 3).map((post, index) => (
-                                            <div key={index} className="flex items-start justify-between gap-3 pb-4 border-b border-gray-100 last:border-0">
+                                        {blogPosts.slice(0, 3).map((post) => (
+                                            <div key={post.id} className="flex items-start justify-between gap-3 pb-4 border-b border-gray-100 last:border-0">
                                                 <div className="flex-1">
                                                     <h4 className="text-sm font-semibold text-gray-900 hover:text-[#0066ff] transition-colors duration-200 cursor-pointer mb-1">
-                                                        {post.category}
+                                                        {getFirstCategory(post)}
                                                     </h4>
-                                                    <p className="text-xs text-gray-500">{post.date}</p>
+                                                    <p className="text-xs text-gray-500">{formatDate(post.published_at)}</p>
                                                 </div>
-                                                <Link href={`/blog/${post.slug}`}>
-                                                    <button className="text-[#0066ff] text-xs font-medium hover:underline whitespace-nowrap cursor-pointer">
-                                                        View
-                                                    </button>
-                                                </Link>
+                                                <button 
+                                                    onClick={() => handleBlogNavigation(post.id, post.slug)}
+                                                    className="text-[#0066ff] text-xs font-medium hover:underline whitespace-nowrap cursor-pointer"
+                                                >
+                                                    View
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
-                                    <Link href="/blog">
-                                        <button className="w-full mt-4 h-10 rounded-full border-2 border-[#0066ff] text-[#0066ff] text-sm font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer">
-                                            View Full Newsroom
-                                        </button>
-                                    </Link>
+                                    <button 
+                                        onClick={() => {
+                                            if (!isAuthenticated) {
+                                                router.push('/login?redirect=/dashboard/blog');
+                                            } else {
+                                                router.push('/dashboard/blog');
+                                            }
+                                        }}
+                                        className="w-full mt-4 h-10 rounded-full border-2 border-[#0066ff] text-[#0066ff] text-sm font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer"
+                                    >
+                                        View Full Newsroom
+                                    </button>
                                 </div>
 
                                 {/* Need Personal Guidance CTA */}
@@ -371,6 +532,7 @@ export default function BlogPage() {
                     </div>
                 </div>
             </section>
+            )}
 
             {/* Newsletter Section */}
             <section className="py-20 bg-white">
@@ -379,19 +541,27 @@ export default function BlogPage() {
                         <h2 className="text-4xl font-bold text-white mb-4">
                             Get Health Insights Delivered
                         </h2>
-                        <p className="text-white/90 mb-8">
-                            Subscribe to receive evidence-based health articles and updates directly to your inbox.
+                        <p className="text-lg text-white/90 mb-8">
+                            Stay informed with the latest health research, tips, and exclusive insights.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                        <form onSubmit={handleSubscription} className="flex items-center gap-3 max-w-md mx-auto">
                             <input
                                 type="email"
                                 placeholder="Enter your email"
-                                className="flex-1 h-12 px-4 rounded-full border-2 border-white/20 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:border-white"
+                                value={subscriptionEmail}
+                                onChange={(e) => setSubscriptionEmail(e.target.value)}
+                                disabled={isSubscribing}
+                                className="flex-1 h-12 px-6 rounded-full border-2 border-white/20 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:border-white disabled:opacity-50"
+                                required
                             />
-                            <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 transition-all duration-200 cursor-pointer">
-                                Subscribe
+                            <button 
+                                type="submit"
+                                disabled={isSubscribing}
+                                className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubscribing ? 'Subscribing...' : 'Subscribe'}
                             </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </section>
@@ -411,11 +581,18 @@ export default function BlogPage() {
                                 Book a Consultation
                             </button>
                         </Link>
-                        <Link href="/blog">
-                            <button className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer">
-                                Browse All Articles
-                            </button>
-                        </Link>
+                        <button 
+                            onClick={() => {
+                                if (!isAuthenticated) {
+                                    router.push('/login?redirect=/dashboard/blog');
+                                } else {
+                                    router.push('/dashboard/blog');
+                                }
+                            }}
+                            className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer"
+                        >
+                            Browse All Articles
+                        </button>
                     </div>
                 </div>
             </section>

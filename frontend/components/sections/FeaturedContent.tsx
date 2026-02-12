@@ -2,13 +2,29 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { publicService, PublicMedia } from "@/services/public-service";
 
 // Icons
 const PlayIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
         <path d="M10 8l6 4-6 4V8z" fill="currentColor" />
+    </svg>
+);
+
+const DocumentIcon = () => (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const ArrowRightIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
 );
 
@@ -19,41 +35,8 @@ const BookIcon = () => (
     </svg>
 );
 
-const CalendarIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
-
-const DocumentIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <polyline points="10 9 9 9 8 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
-
-const ArrowRightIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
-
-interface ContentCard {
-    icon: React.ReactNode;
-    category: string;
-    title: string;
-    description: string;
-    link: string;
-}
-
 export default function FeaturedContent() {
-    const [contentCards, setContentCards] = useState<ContentCard[]>([]);
+    const [mediaItems, setMediaItems] = useState<PublicMedia[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -61,20 +44,13 @@ export default function FeaturedContent() {
             try {
                 const response = await publicService.getFeaturedMedia();
                 if (response.data && response.data.media && response.data.media.length > 0) {
-                    const mappedMedia = response.data.media.slice(0, 3).map((item) => ({
-                        icon: getIconForType(item.file_type),
-                        category: item.file_type,
-                        title: item.name,
-                        description: "Click to view this resource on our products page.", 
-                        link: "/products"
-                    }));
-                    setContentCards(mappedMedia);
+                    setMediaItems(response.data.media.slice(0, 3));
                 } else {
-                    setContentCards([]);
+                    setMediaItems([]);
                 }
             } catch (error) {
                 console.error("Failed to fetch featured content", error);
-                setContentCards([]);
+                setMediaItems([]);
             } finally {
                 setLoading(false);
             }
@@ -83,16 +59,26 @@ export default function FeaturedContent() {
         fetchData();
     }, []);
 
-    const getIconForType = (type: string) => {
+    const getCategoryLabel = (type: string) => {
         switch (type) {
-            case 'VIDEO': return <PlayIcon />;
-            case 'DOCUMENT': return <DocumentIcon />;
-            case 'IMAGE': return <BookIcon />; // Or specific image icon
-            default: return <BookIcon />;
+            case 'VIDEO': return 'Video';
+            case 'DOCUMENT': return 'Document';
+            case 'IMAGE': return 'Image';
+            default: return 'Media';
         }
     };
 
-    if (loading) return <div className="py-20 text-center"><div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-blue-600 rounded-full"></div></div>;
+    if (loading) {
+        return (
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                    <div className="text-center py-20">
+                        <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-blue-600 rounded-full"></div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="py-12 sm:py-16 lg:py-20 bg-white">
@@ -110,43 +96,64 @@ export default function FeaturedContent() {
                 </div>
 
                 {/* Content */}
-                {contentCards.length > 0 ? (
+                {mediaItems.length > 0 ? (
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {contentCards.map((card, index) => (
+                        {mediaItems.map((item) => (
                             <div
-                                key={index}
+                                key={item.id}
                                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group border border-gray-100"
                             >
-                                {/* Card Header with Icon */}
-                                <div className="h-32 bg-linear-to-br from-[#E0F2FE] to-[#BAE6FD] flex items-center justify-center">
-                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-[#0066ff] group-hover:scale-110 transition-transform duration-300">
-                                        {card.icon}
-                                    </div>
+                                {/* Media Preview */}
+                                <div className="h-48 bg-linear-to-br from-[#E0F2FE] to-[#BAE6FD] relative overflow-hidden">
+                                    {item.file_type === 'IMAGE' && (
+                                        <Image
+                                            src={item.url}
+                                            alt={item.original_name}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    )}
+                                    {item.file_type === 'VIDEO' && (
+                                        <div className="relative w-full h-full">
+                                            <video
+                                                src={item.url}
+                                                className="w-full h-full object-cover"
+                                                muted
+                                            />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                                <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center text-[#0066ff] group-hover:scale-110 transition-transform duration-300">
+                                                    <PlayIcon />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {item.file_type === 'DOCUMENT' && (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-[#0066ff] group-hover:scale-110 transition-transform duration-300">
+                                                <DocumentIcon />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Card Content */}
                                 <div className="p-6">
                                     {/* Category Badge */}
-                                    <span className="text-xs font-bold text-[#0066ff] tracking-wider mb-3 block">
-                                        {card.category}
+                                    <span className="text-xs font-bold text-[#0066ff] tracking-wider mb-3 block uppercase">
+                                        {getCategoryLabel(item.file_type)}
                                     </span>
 
-                                    {/* Title */}
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2 truncate">
-                                        {card.title}
-                                    </h3>
-
                                     {/* Description */}
-                                    <p className="text-gray-600 mb-4 leading-relaxed line-clamp-2">
-                                        {card.description}
+                                    <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3">
+                                        {item.description || "Explore this resource to discover valuable insights and information."}
                                     </p>
 
                                     {/* Learn More Link */}
                                     <Link
-                                        href={card.link}
+                                        href="/media"
                                         className="inline-flex items-center gap-2 text-[#0066ff] font-medium hover:gap-3 transition-all duration-200"
                                     >
-                                        Learn More
+                                        View All Media
                                         <ArrowRightIcon />
                                     </Link>
                                 </div>

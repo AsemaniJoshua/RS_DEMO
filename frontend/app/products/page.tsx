@@ -1,23 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import productsData from "@/data/products.json";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { publicService, PublicEbook, PublicCourse } from "@/services/public-service";
 
 // Note: Metadata export not possible in client components
 // SEO handled through layout.tsx or consider server component wrapper
 
+type ProductItem = (PublicEbook & { type: 'eBook' }) | (PublicCourse & { type: 'Course' });
+
 export default function ProductsPage() {
     const [activeFilter, setActiveFilter] = useState("All");
+    const [ebooks, setEbooks] = useState<PublicEbook[]>([]);
+    const [courses, setCourses] = useState<PublicCourse[]>([]);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+    const { isAuthenticated } = useAuth();
 
-    const filters = ["All", "eBook", "Guide", "Course"];
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const [ebooksResponse, coursesResponse] = await Promise.all([
+                    publicService.getPublicEbooks(6),
+                    publicService.getPublicCourses(6)
+                ]);
+                
+                if (ebooksResponse.data && Array.isArray(ebooksResponse.data)) {
+                    setEbooks(ebooksResponse.data);
+                }
+                if (coursesResponse.data && Array.isArray(coursesResponse.data)) {
+                    setCourses(coursesResponse.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch products", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
 
-    const products = productsData;
+    const filters = ["All", "eBook", "Course"];
+
+    // Interleave ebooks and courses (1 ebook, 1 course pattern)
+    const combinedProducts: ProductItem[] = [];
+    const maxLength = Math.max(ebooks.length, courses.length);
+    
+    for (let i = 0; i < maxLength; i++) {
+        if (i < ebooks.length) {
+            combinedProducts.push({ ...ebooks[i], type: 'eBook' as const });
+        }
+        if (i < courses.length) {
+            combinedProducts.push({ ...courses[i], type: 'Course' as const });
+        }
+    }
 
     const filteredProducts = activeFilter === "All"
-        ? products
-        : products.filter(product => product.category === activeFilter);
+        ? combinedProducts
+        : combinedProducts.filter(product => product.type === activeFilter);
+
+    const handleProductClick = (product: ProductItem) => {
+        if (!isAuthenticated) {
+            const redirectPath = product.type === 'eBook' 
+                ? `/dashboard/ebooks/${product.id}`
+                : `/dashboard/browse-courses/${product.id}`;
+            router.push(`/login?redirect=${redirectPath}`);
+        } else {
+            if (product.type === 'eBook') {
+                router.push(`/dashboard/ebooks/${product.id}`);
+            } else {
+                router.push(`/dashboard/browse-courses/${product.id}`);
+            }
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -67,101 +125,153 @@ export default function ProductsPage() {
             {/* Products Grid */}
             <section className="py-20 bg-gray-50">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredProducts.map((product, index) => (
-                            <div key={index} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 group">
-                                {/* Product Image/Icon Area */}
-                                <div className="relative h-48 bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff] flex items-center justify-center">
-                                    {/* Bestseller Badge */}
-                                    {index < 2 && (
-                                        <div className="absolute top-4 left-4 px-3 py-1 bg-[#00bfa6] rounded-full text-white text-xs font-bold">
-                                            Bestseller
-                                        </div>
-                                    )}
-
-                                    {/* Icon */}
-                                    <div className="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
-                                        {product.category === "eBooks" && (
-                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                                                <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        )}
-                                        {product.category === "Guides" && (
-                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        )}
-                                        {product.category === "Courses" && (
-                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Product Content */}
-                                <div className="p-6">
-                                    {/* Category */}
-                                    <div className="text-xs font-semibold text-[#0066ff] uppercase mb-2">
-                                        {product.category}
-                                    </div>
-
-                                    {/* Title */}
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">{product.name}</h3>
-
-                                    {/* Description */}
-                                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                                        {product.description}
-                                    </p>
-
-                                    {/* Features */}
-                                    <ul className="space-y-2 mb-4">
-                                        {product.features.map((feature, idx) => (
-                                            <li key={idx} className="flex items-center gap-2 text-xs text-gray-600">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
-
-                                    {/* Rating */}
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="flex gap-0.5">
-                                            {[...Array(5)].map((_, i) => (
-                                                <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#0066ff">
-                                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-                                                </svg>
-                                            ))}
-                                        </div>
-                                        <span className="text-xs text-gray-600">(92 reviews)</span>
-                                    </div>
-
-                                    {/* Price & CTA */}
-                                    <div className="flex items-center justify-between">
-                                        <div className="text-2xl font-bold text-gray-900">{product.price}</div>
-                                    <Link href="/products">
-                                        <button className="h-10 px-6 rounded-full bg-[#0066ff] text-white text-sm font-medium hover:bg-[#0052cc] transition-all duration-200 cursor-pointer">
-                                            View Details
-                                        </button>
-                                    </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* No results message */}
-                    {filteredProducts.length === 0 && (
+                    {loading ? (
                         <div className="text-center py-20">
-                            <p className="text-gray-600 text-lg">No products found in this category.</p>
+                            <div className="animate-spin inline-block w-12 h-12 border-4 border-current border-t-transparent text-[#0066ff] rounded-full"></div>
+                            <p className="text-gray-600 mt-4">Loading products...</p>
                         </div>
+                    ) : (
+                        <>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {filteredProducts.map((product, index) => (
+                                    <div 
+                                        key={product.id} 
+                                        onClick={() => handleProductClick(product)}
+                                        className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                                    >
+                                        {/* Product Image/Icon Area */}
+                                        <div className="relative h-48 bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff] flex items-center justify-center">
+                                            {index < 2 && (
+                                                <div className="absolute top-4 left-4 px-3 py-1 bg-[#00bfa6] rounded-full text-white text-xs font-bold">
+                                                    Featured
+                                                </div>
+                                            )}
+
+                                            {/* Icon */}
+                                            <div className="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
+                                                {product.type === "eBook" ? (
+                                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                                        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                        <path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Product Content */}
+                                        <div className="p-6">
+                                            {/* Category */}
+                                            <div className="text-xs font-semibold text-[#0066ff] uppercase mb-2">
+                                                {product.type}
+                                            </div>
+
+                                            {/* Title */}
+                                            <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{product.title}</h3>
+
+                                            {/* Description */}
+                                            <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3">
+                                                {product.description}
+                                            </p>
+
+                                            {/* Features */}
+                                            <ul className="space-y-2 mb-4">
+                                                {product.type === 'eBook' ? (
+                                                    <>
+                                                        <li className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                            {(product as PublicEbook).pages} pages
+                                                        </li>
+                                                        <li className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                            Instant Download
+                                                        </li>
+                                                        <li className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                            Lifetime Access
+                                                        </li>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <li className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                            {(product as PublicCourse).duration || 'Self-paced'}
+                                                        </li>
+                                                        <li className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                            Expert-led instruction
+                                                        </li>
+                                                        <li className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                            Lifetime Access
+                                                        </li>
+                                                    </>
+                                                )}
+                                            </ul>
+
+                                            {/* Price & CTA */}
+                                            <div className="flex items-center justify-between">
+                                                <div className="text-2xl font-bold text-gray-900">
+                                                    GHS {typeof product.price === 'number' ? product.price : product.price}
+                                                </div>
+                                                <button className="h-10 px-6 rounded-full bg-[#0066ff] text-white text-sm font-medium hover:bg-[#0052cc] transition-all duration-200">
+                                                    View Details
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Login/Signup CTA Banner */}
+                            {!isAuthenticated && filteredProducts.length > 0 && (
+                                <div className="mt-12 bg-gradient-to-r from-[#0066ff] to-[#00bfa6] rounded-2xl p-8 text-center text-white">
+                                    <div className="max-w-2xl mx-auto">
+                                        <h3 className="text-2xl font-bold mb-3">
+                                            Want Access to All {ebooks.length + courses.length}+ Resources?
+                                        </h3>
+                                        <p className="text-white/90 mb-6">
+                                            You're viewing a limited selection. Sign up or log in to access our complete library of health education resources, courses, and exclusive content.
+                                        </p>
+                                        <div className="flex flex-wrap items-center justify-center gap-4">
+                                            <Link href="/signup">
+                                                <button className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 hover:shadow-xl shadow-lg transition-all duration-200">
+                                                    Create Free Account
+                                                </button>
+                                            </Link>
+                                            <Link href="/login">
+                                                <button className="h-12 px-8 rounded-full border-2 border-white text-white font-medium hover:bg-white/10 transition-all duration-200">
+                                                    Log In
+                                                </button>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* No results message */}
+                            {filteredProducts.length === 0 && (
+                                <div className="text-center py-20">
+                                    <p className="text-gray-600 text-lg">No products found in this category.</p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </section>
