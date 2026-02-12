@@ -42,7 +42,7 @@ export default function ContactPage() {
         try {
             const response = await publicService.submitContactForm(formData);
             
-            if (response.success) {
+            if (response.status === 'success') {
                 toast.success(response.data?.message || "Message sent successfully!");
                 setFormData({
                     name: "",

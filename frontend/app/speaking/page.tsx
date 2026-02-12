@@ -28,7 +28,7 @@ export default function SpeakingPage() {
                     undefined,
                     "UPCOMING"
                 );
-                if (response.success && response.data?.events) {
+                if (response.status === 'success' && response.data?.events) {
                     setEvents(response.data.events);
                 }
             } catch (error) {
@@ -51,7 +51,7 @@ export default function SpeakingPage() {
                     undefined,
                     "COMPLETED"
                 );
-                if (response.success && response.data?.events) {
+                if (response.status === 'success' && response.data?.events) {
                     setCompletedEvents(response.data.events);
                 }
             } catch (error) {
@@ -73,7 +73,7 @@ export default function SpeakingPage() {
                     publicService.getPersonalBrand()
                 ]);
                 
-                if (categoriesResponse.success && categoriesResponse.data?.categories) {
+                if (categoriesResponse.status === 'success' && categoriesResponse.data?.categories) {
                     const categoryNames = categoriesResponse.data.categories.map(cat => cat.name);
                     setCategories(["All Categories", ...categoryNames]);
                 }
