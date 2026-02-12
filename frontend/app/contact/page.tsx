@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import contactFAQsData from "@/data/contactFAQs.json";
 import { publicService, PublicPersonalBrand } from "@/services/public-service";
 
@@ -142,7 +142,7 @@ export default function ContactPage() {
                                                 value={formData.name}
                                                 onChange={handleChange}
                                                 required
-                                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                                 placeholder="John Doe"
                                             />
                                         </div>
@@ -157,7 +157,7 @@ export default function ContactPage() {
                                                 value={formData.email}
                                                 onChange={handleChange}
                                                 required
-                                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                                 placeholder="john@example.com"
                                             />
                                         </div>
@@ -175,7 +175,7 @@ export default function ContactPage() {
                                                 name="phone"
                                                 value={formData.phone}
                                                 onChange={handleChange}
-                                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                                 placeholder="(555) 123-4567"
                                             />
                                         </div>
@@ -189,7 +189,7 @@ export default function ContactPage() {
                                                 value={formData.subject}
                                                 onChange={handleChange}
                                                 required
-                                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors"
+                                                className="w-full h-12 px-4 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors text-gray-900"
                                             >
                                                 <option value="">Select a subject</option>
                                                 <option value="consultation">Book a Consultation</option>
@@ -213,7 +213,7 @@ export default function ContactPage() {
                                             onChange={handleChange}
                                             required
                                             rows={6}
-                                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors resize-none"
+                                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors resize-none text-gray-900"
                                             placeholder="Tell me how I can help you..."
                                         />
                                     </div>
