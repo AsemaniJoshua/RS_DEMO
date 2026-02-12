@@ -1,9 +1,111 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { publicService, PublicSpeaking, PublicPersonalBrand } from "@/services/public-service";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function SpeakingPage() {
+    const router = useRouter();
+    const { isAuthenticated } = useAuth();
+    const [events, setEvents] = useState<PublicSpeaking[]>([]);
+    const [completedEvents, setCompletedEvents] = useState<PublicSpeaking[]>([]);
+    const [categories, setCategories] = useState<string[]>(["All Categories"]);
+    const [personalBrand, setPersonalBrand] = useState<PublicPersonalBrand | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [loadingCompleted, setLoadingCompleted] = useState(true);
+    const [activeCategory, setActiveCategory] = useState<string>("All Categories");
+
+    // Fetch upcoming events based on active category
+    useEffect(() => {
+        const fetchEvents = async () => {
+            setLoading(true);
+            try {
+                const response = await publicService.getSpeakingEvents(
+                    activeCategory === "All Categories" ? undefined : activeCategory,
+                    undefined,
+                    "UPCOMING"
+                );
+                if (response.success && response.data?.events) {
+                    setEvents(response.data.events);
+                }
+            } catch (error) {
+                console.error("Failed to fetch upcoming speaking events:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEvents();
+    }, [activeCategory]);
+
+    // Fetch completed events for Past Engagements section
+    useEffect(() => {
+        const fetchCompletedEvents = async () => {
+            setLoadingCompleted(true);
+            try {
+                const response = await publicService.getSpeakingEvents(
+                    undefined,
+                    undefined,
+                    "COMPLETED"
+                );
+                if (response.success && response.data?.events) {
+                    setCompletedEvents(response.data.events);
+                }
+            } catch (error) {
+                console.error("Failed to fetch completed speaking events:", error);
+            } finally {
+                setLoadingCompleted(false);
+            }
+        };
+
+        fetchCompletedEvents();
+    }, []);
+
+    // Fetch categories and personal brand on mount
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                const [categoriesResponse, brandResponse] = await Promise.all([
+                    publicService.getSpeakingCategories(),
+                    publicService.getPersonalBrand()
+                ]);
+                
+                if (categoriesResponse.success && categoriesResponse.data?.categories) {
+                    const categoryNames = categoriesResponse.data.categories.map(cat => cat.name);
+                    setCategories(["All Categories", ...categoryNames]);
+                }
+                
+                if (brandResponse.data) {
+                    setPersonalBrand(brandResponse.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch categories or personal brand:", error);
+            }
+        };
+
+        fetchInitialData();
+    }, []);
+
+    const handleEventClick = (eventId: string) => {
+        if (!isAuthenticated) {
+            router.push(`/login?redirect=/dashboard/speaking/${eventId}`);
+        } else {
+            router.push(`/dashboard/speaking/${eventId}`);
+        }
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
@@ -51,17 +153,18 @@ export default function SpeakingPage() {
 
                             {/* Category Tags */}
                             <div className="flex flex-wrap gap-3">
-                                {[
-                                    "Corporate keynotes",
-                                    "Healthcare conferences",
-                                    "University lectures",
-                                    "Community workshops",
-                                    "Media appearances",
-                                    "Podcast interviews"
-                                ].map((tag, index) => (
-                                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-                                        {tag}
-                                    </span>
+                                {categories.map((category, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setActiveCategory(category)}
+                                        className={`px-3 py-1 text-sm rounded-full transition-all duration-200 cursor-pointer ${
+                                            activeCategory === category
+                                                ? "bg-[#0066ff] text-white"
+                                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        }`}
+                                    >
+                                        {category}
+                                    </button>
                                 ))}
                             </div>
                         </div>
@@ -77,15 +180,113 @@ export default function SpeakingPage() {
                                     priority
                                 />
                                 {/* LinkedIn badge */}
-                                <div className="absolute bottom-6 right-6 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#0A66C2">
-                                        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
-                                        <circle cx="4" cy="4" r="2"/>
-                                    </svg>
-                                </div>
+                                {personalBrand?.socialMedia?.linkedin && (
+                                    <a
+                                        href={personalBrand.socialMedia.linkedin}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="absolute bottom-6 right-6 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform duration-300"
+                                    >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="#0A66C2">
+                                            <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+                                            <circle cx="4" cy="4" r="2"/>
+                                        </svg>
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* Upcoming Events Section */}
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                            Upcoming <span className="text-[#0066ff]">Events</span>
+                        </h2>
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+                            {activeCategory === "All Categories" 
+                                ? "View all scheduled speaking engagements and events."
+                                : `Filtered by: ${activeCategory}`}
+                        </p>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex items-center justify-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff]"></div>
+                        </div>
+                    ) : events.length === 0 ? (
+                        <div className="text-center py-20">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="mx-auto mb-4 text-gray-400">
+                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                            <p className="text-gray-600 text-lg">No upcoming events found for this category.</p>
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {events.map((event) => (
+                                <div 
+                                    key={event.id} 
+                                    onClick={() => handleEventClick(event.id)}
+                                    className="bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-[#0066ff] transition-all duration-300 cursor-pointer"
+                                >
+                                    {event.image && (
+                                        <div className="relative w-full h-40 mb-4 rounded-xl overflow-hidden">
+                                            <Image
+                                                src={event.image}
+                                                alt={event.title}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                    <div className="flex items-start gap-3 mb-4">
+                                        <div className="w-10 h-10 bg-[#0066ff] rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-gray-900 mb-1">{event.title}</h3>
+                                            <p className="text-sm text-[#0066ff] font-medium">{event.venue}</p>
+                                        </div>
+                                    </div>
+                                    {event.description && (
+                                        <p className="text-sm text-gray-700 mb-3 line-clamp-2">{event.description}</p>
+                                    )}
+                                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                                        <span className="flex items-center gap-1">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                                                <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                            {formatDate(event.date)}
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/>
+                                                <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                            {event.location}
+                                        </span>
+                                    </div>
+                                    {event.category && (
+                                        <div className="mt-3 pt-3 border-t border-gray-200">
+                                            <span className="text-xs text-gray-600 font-medium">Category: {event.category}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -203,86 +404,80 @@ export default function SpeakingPage() {
                         </p>
                     </div>
 
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[
-                            {
-                                event: "Annual Healthcare Summit",
-                                organization: "National Health Association",
-                                date: "December 2024",
-                                location: "New York, NY",
-                                topic: "Medication Safety in Modern Healthcare"
-                            },
-                            {
-                                event: "Pharmacy Leadership Conference",
-                                organization: "State Pharmacists Association",
-                                date: "November 2024",
-                                location: "Chicago, IL",
-                                topic: "Innovation in Patient Care"
-                            },
-                            {
-                                event: "Community Health Workshop",
-                                organization: "City Health Department",
-                                date: "October 2024",
-                                location: "Los Angeles, CA",
-                                topic: "Chronic Disease Prevention"
-                            },
-                            {
-                                event: "University Health Sciences Seminar",
-                                organization: "State University",
-                                date: "September 2024",
-                                location: "Austin, TX",
-                                topic: "Pharmacy Practice Evolution"
-                            },
-                            {
-                                event: "Corporate Wellness Program",
-                                organization: "Fortune 500 Company",
-                                date: "August 2024",
-                                location: "San Francisco, CA",
-                                topic: "Employee Health & Medication Management"
-                            },
-                            {
-                                event: "Teen Health Education Summit",
-                                organization: "Youth Services Coalition",
-                                date: "July 2024",
-                                location: "Seattle, WA",
-                                topic: "Preventing Prescription Drug Abuse"
-                            }
-                        ].map((engagement, index) => (
-                            <div key={index} className="bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-[#0066ff] transition-all duration-300">
-                                <div className="flex items-start gap-3 mb-4">
-                                    <div className="w-10 h-10 bg-[#0066ff] rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-                                            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
-                                        </svg>
+                    {loadingCompleted ? (
+                        <div className="flex items-center justify-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff]"></div>
+                        </div>
+                    ) : completedEvents.length === 0 ? (
+                        <div className="text-center py-20">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="mx-auto mb-4 text-gray-400">
+                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                            <p className="text-gray-600 text-lg">No past engagements available.</p>
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {completedEvents.map((event) => (
+                                <div 
+                                    key={event.id} 
+                                    onClick={() => handleEventClick(event.id)}
+                                    className="bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-[#0066ff] transition-all duration-300 cursor-pointer"
+                                >
+                                    {event.image && (
+                                        <div className="relative w-full h-40 mb-4 rounded-xl overflow-hidden">
+                                            <Image
+                                                src={event.image}
+                                                alt={event.title}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                    <div className="flex items-start gap-3 mb-4">
+                                        <div className="w-10 h-10 bg-[#0066ff] rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-gray-900 mb-1">{event.title}</h3>
+                                            <p className="text-sm text-[#0066ff] font-medium">{event.venue}</p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-bold text-gray-900 mb-1">{engagement.event}</h3>
-                                        <p className="text-sm text-[#0066ff] font-medium">{engagement.organization}</p>
+                                    {event.description && (
+                                        <p className="text-sm text-gray-700 mb-3 line-clamp-2">{event.description}</p>
+                                    )}
+                                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                                        <span className="flex items-center gap-1">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                                                <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                            {formatDate(event.date)}
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/>
+                                                <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                            {event.location}
+                                        </span>
                                     </div>
+                                    {event.category && (
+                                        <div className="mt-3 pt-3 border-t border-gray-200">
+                                            <span className="text-xs text-gray-600 font-medium">Category: {event.category}</span>
+                                        </div>
+                                    )}
                                 </div>
-                                <p className="text-sm text-gray-700 mb-3 italic">"{engagement.topic}"</p>
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
-                                    <span className="flex items-center gap-1">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                                            <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2"/>
-                                        </svg>
-                                        {engagement.date}
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/>
-                                            <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
-                                        </svg>
-                                        {engagement.location}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 

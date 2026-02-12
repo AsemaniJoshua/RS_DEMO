@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import contactFAQsData from "@/data/contactFAQs.json";
+import { publicService, PublicPersonalBrand } from "@/services/public-service";
 
 export default function ContactPage() {
+    const [personalBrand, setPersonalBrand] = useState<PublicPersonalBrand | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -12,10 +17,47 @@ export default function ContactPage() {
         message: ""
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Fetch personal brand data
+    useEffect(() => {
+        const fetchPersonalBrand = async () => {
+            try {
+                const response = await publicService.getPersonalBrand();
+                if (response.data) {
+                    setPersonalBrand(response.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch personal brand:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPersonalBrand();
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle form submission
-        console.log("Form submitted:", formData);
+        
+        setSubmitting(true);
+        try {
+            const response = await publicService.submitContactForm(formData);
+            
+            if (response.success) {
+                toast.success(response.data?.message || "Message sent successfully!");
+                setFormData({
+                    name: "",
+                    email: "",
+                    phone: "",
+                    subject: "",
+                    message: ""
+                });
+            }
+        } catch (error: any) {
+            console.error("Failed to submit contact form:", error);
+            toast.error(error.response?.data?.message || "Failed to send message. Please try again.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -24,6 +66,9 @@ export default function ContactPage() {
             [e.target.name]: e.target.value
         });
     };
+
+    const profile = personalBrand?.profile;
+    const socialMedia = personalBrand?.socialMedia;
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -52,18 +97,22 @@ export default function ContactPage() {
 
                         {/* Quick Contact Methods */}
                         <div className="flex flex-wrap items-center justify-center gap-6">
-                            <a href="mailto:contact@drgeorge.com" className="flex items-center gap-2 text-gray-700 hover:text-[#0066ff] transition-colors">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                                <span className="font-medium">contact@drgeorge.com</span>
-                            </a>
-                            <a href="tel:+15551234567" className="flex items-center gap-2 text-gray-700 hover:text-[#0066ff] transition-colors">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                                <span className="font-medium">(555) 123-4567</span>
-                            </a>
+                            {profile?.email && (
+                                <a href={`mailto:${profile.email}`} className="flex items-center gap-2 text-gray-700 hover:text-[#0066ff] transition-colors">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    <span className="font-medium">{profile.email}</span>
+                                </a>
+                            )}
+                            {profile?.phoneNumber && (
+                                <a href={`tel:${profile.phoneNumber}`} className="flex items-center gap-2 text-gray-700 hover:text-[#0066ff] transition-colors">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    <span className="font-medium">{profile.phoneNumber}</span>
+                                </a>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -172,9 +221,10 @@ export default function ContactPage() {
                                     {/* Submit Button */}
                                     <button
                                         type="submit"
-                                        className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] transition-all duration-200 flex items-center gap-2"
+                                        disabled={submitting}
+                                        className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Send Message
+                                        {submitting ? "Sending..." : "Send Message"}
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                             <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                         </svg>
@@ -197,9 +247,13 @@ export default function ContactPage() {
                                         </div>
                                         <div>
                                             <p className="text-sm font-medium text-gray-600">Email</p>
-                                            <a href="mailto:contact@drgeorge.com" className="text-gray-900 hover:text-[#0066ff] transition-colors">
-                                                contact@drgeorge.com
-                                            </a>
+                                            {profile?.email ? (
+                                                <a href={`mailto:${profile.email}`} className="text-gray-900 hover:text-[#0066ff] transition-colors">
+                                                    {profile.email}
+                                                </a>
+                                            ) : (
+                                                <p className="text-gray-500">Loading...</p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -211,9 +265,13 @@ export default function ContactPage() {
                                         </div>
                                         <div>
                                             <p className="text-sm font-medium text-gray-600">Phone</p>
-                                            <a href="tel:+15551234567" className="text-gray-900 hover:text-[#0066ff] transition-colors">
-                                                (555) 123-4567
-                                            </a>
+                                            {profile?.phoneNumber ? (
+                                                <a href={`tel:${profile.phoneNumber}`} className="text-gray-900 hover:text-[#0066ff] transition-colors">
+                                                    {profile.phoneNumber}
+                                                </a>
+                                            ) : (
+                                                <p className="text-gray-500">Loading...</p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -226,7 +284,11 @@ export default function ContactPage() {
                                         </div>
                                         <div>
                                             <p className="text-sm font-medium text-gray-600">Office</p>
-                                            <p className="text-gray-900">123 Health Street<br/>Medical Plaza, Suite 400<br/>New York, NY 10001</p>
+                                            {profile?.location ? (
+                                                <p className="text-gray-900">{profile.location}</p>
+                                            ) : (
+                                                <p className="text-gray-500">Loading...</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -259,23 +321,46 @@ export default function ContactPage() {
                             {/* Social Media */}
                             <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">Connect With Me</h3>
-                                <div className="flex gap-3">
-                                    <a href="#" className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center text-[#0066ff] hover:bg-[#0066ff] hover:text-white transition-all">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
-                                            <circle cx="4" cy="4" r="2"/>
-                                        </svg>
-                                    </a>
-                                    <a href="#" className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center text-[#0066ff] hover:bg-[#0066ff] hover:text-white transition-all">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                                        </svg>
-                                    </a>
-                                    <a href="#" className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center text-[#0066ff] hover:bg-[#0066ff] hover:text-white transition-all">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
-                                        </svg>
-                                    </a>
+                                <div className="flex flex-wrap gap-3">
+                                    {socialMedia?.linkedin && (
+                                        <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center text-[#0066ff] hover:bg-[#0066ff] hover:text-white transition-all">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+                                                <circle cx="4" cy="4" r="2"/>
+                                            </svg>
+                                        </a>
+                                    )}
+                                    {socialMedia?.twitter && (
+                                        <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center text-[#0066ff] hover:bg-[#0066ff] hover:text-white transition-all">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                                            </svg>
+                                        </a>
+                                    )}
+                                    {socialMedia?.facebook && (
+                                        <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center text-[#0066ff] hover:bg-[#0066ff] hover:text-white transition-all">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                                            </svg>
+                                        </a>
+                                    )}
+                                    {socialMedia?.instagram && (
+                                        <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center text-[#0066ff] hover:bg-[#0066ff] hover:text-white transition-all">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                                                <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+                                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                                            </svg>
+                                        </a>
+                                    )}
+                                    {socialMedia?.youtube && (
+                                        <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-[#E0F2FE] rounded-lg flex items-center justify-center text-[#0066ff] hover:bg-[#0066ff] hover:text-white transition-all">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"/>
+                                                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="white"/>
+                                            </svg>
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -330,18 +415,28 @@ export default function ContactPage() {
                     <div className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100">
                         {/* Map Placeholder */}
                         <div className="h-96 bg-linear-to-br from-[#f0f9ff] to-[#e0f2fe] flex items-center justify-center">
-                            <div className="text-center">
+                            <div className="text-center px-6">
                                 <div className="w-16 h-16 mx-auto mb-4 bg-white rounded-full flex items-center justify-center">
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
                                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/>
                                         <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
                                     </svg>
                                 </div>
-                                <p className="text-gray-600 font-medium">123 Health Street, Medical Plaza, Suite 400</p>
-                                <p className="text-gray-500">New York, NY 10001</p>
-                                <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="inline-block mt-4 text-[#0066ff] font-medium hover:underline">
-                                    Get Directions →
-                                </a>
+                                {profile?.location ? (
+                                    <>
+                                        <p className="text-gray-900 font-medium text-lg mb-2">{profile.location}</p>
+                                        <a 
+                                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile.location)}`} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="inline-block mt-4 text-[#0066ff] font-medium hover:underline"
+                                        >
+                                            Get Directions →
+                                        </a>
+                                    </>
+                                ) : (
+                                    <p className="text-gray-500">Loading location...</p>
+                                )}
                             </div>
                         </div>
                     </div>

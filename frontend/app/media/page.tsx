@@ -1,24 +1,92 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import mediaItemsData from "@/data/mediaItems.json";
-import pressMentionsData from "@/data/pressMentions.json";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { publicService, PublicMedia, PublicBlog } from "@/services/public-service";
+import { useAuth } from "@/contexts/auth-context";
 
 // Note: Metadata export not possible in client components
 // SEO handled through layout.tsx or consider server component wrapper
 
 export default function MediaPage() {
+    const router = useRouter();
+    const { isAuthenticated } = useAuth();
     const [activeFilter, setActiveFilter] = useState("All");
+    const [mediaItems, setMediaItems] = useState<PublicMedia[]>([]);
+    const [featuredBlogs, setFeaturedBlogs] = useState<PublicBlog[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const filters = ["All", "TV", "Radio", "Press", "Explainers"];
+    const filters = ["All", "Image", "Video", "Document"];
 
-    const mediaItems = mediaItemsData;
-    const pressMentions = pressMentionsData;
+    // Fetch media on mount and when filter changes
+    useEffect(() => {
+        const fetchMedia = async () => {
+            setLoading(true);
+            try {
+                const response = await publicService.getAllMedia(activeFilter);
+                if (response.status === 'success' && response.data) {
+                    setMediaItems(response.data.media || []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch media:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const filteredMedia = activeFilter === "All"
-        ? mediaItems
-        : mediaItems.filter(item => item.category === activeFilter);
+        fetchMedia();
+    }, [activeFilter]);
+
+    // Fetch featured blogs for press section
+    useEffect(() => {
+        const fetchBlogs = async () => {
+            try {
+                const response = await publicService.getPublicBlogs();
+                if (response.status === 'success' && response.data?.blogs) {
+                    setFeaturedBlogs(response.data.blogs.slice(0, 3));
+                }
+            } catch (error) {
+                console.error('Failed to fetch blogs:', error);
+            }
+        };
+
+        fetchBlogs();
+    }, []);
+
+    // Handle media click with authentication check
+    const handleMediaClick = (mediaId: string) => {
+        if (!isAuthenticated) {
+            router.push(`/login?redirect=/dashboard/media/${mediaId}`);
+        } else {
+            router.push(`/dashboard/media/${mediaId}`);
+        }
+    };
+
+    // Handle blog navigation with authentication check
+    const handleBlogNavigation = (blogId: string) => {
+        if (!isAuthenticated) {
+            router.push(`/login?redirect=/dashboard/blog/${blogId}`);
+        } else {
+            router.push(`/dashboard/blog/${blogId}`);
+        }
+    };
+
+    // Format date
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+    };
+
+    // Get first category
+    const getFirstCategory = (blog: PublicBlog) => {
+        return blog.categories[0]?.name || 'Health';
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -65,82 +133,111 @@ export default function MediaPage() {
                 </div>
             </section>
 
+            {/* Loading State */}
+            {loading && (
+                <section className="py-20 bg-gray-50">
+                    <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                        <div className="text-center">
+                            <div className="w-16 h-16 mx-auto mb-4 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+                            <p className="text-gray-600">Loading media...</p>
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* Media Grid */}
+            {!loading && (
             <section className="py-20 bg-gray-50">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {filteredMedia.map((item, index) => (
-                            <article key={index} className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 group">
+                        {mediaItems.map((item) => (
+                            <article 
+                                key={item.id} 
+                                onClick={() => handleMediaClick(item.id)}
+                                className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                            >
                                 {/* Thumbnail Area */}
                                 <div className="relative h-48 bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe]">
-                                    {/* Category Icon - Top */}
-                                    <div className="absolute top-4 left-4 w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center">
-                                        {item.category === "TV" && (
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
-                                                <rect x="2" y="7" width="20" height="15" rx="2" stroke="currentColor" strokeWidth="2" />
-                                                <polyline points="17 2 12 7 7 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        )}
-                                        {item.category === "Radio" && (
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
-                                                <path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z" stroke="currentColor" strokeWidth="2" />
-                                                <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                            </svg>
-                                        )}
-                                        {item.category === "Press" && (
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
-                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        )}
-                                        {item.category === "Explainers" && (
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
-                                                <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" strokeWidth="2" />
-                                                <rect x="8" y="2" width="8" height="20" fill="currentColor" opacity="0.2" />
-                                            </svg>
-                                        )}
-                                    </div>
-
-                                    {/* Large Play Button - Center */}
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                            {item.category === "Press" ? (
-                                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                            ) : (
-                                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-[#0066ff] ml-1">
-                                                    <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" />
-                                                </svg>
+                                    {/* Media Preview */}
+                                    {item.file_type === 'IMAGE' && (
+                                        <Image
+                                            src={item.url}
+                                            alt={item.original_name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    )}
+                                    {item.file_type === 'VIDEO' && (
+                                        <>
+                                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe]">
+                                                <div className="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-[#0066ff] ml-1">
+                                                        <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            {item.duration && (
+                                                <div className="absolute bottom-4 right-4 px-2 py-1 bg-gray-900/80 rounded text-white text-xs font-medium">
+                                                    {item.duration}
+                                                </div>
                                             )}
-                                        </div>
-                                    </div>
-
-                                    {/* Duration Badge - Bottom Right */}
-                                    {item.category !== "Press" && (
-                                        <div className="absolute bottom-4 right-4 px-2 py-1 bg-gray-900/80 rounded text-white text-xs font-medium">
-                                            {item.duration}
+                                        </>
+                                    )}
+                                    {item.file_type === 'DOCUMENT' && (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center">
+                                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
+                                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            </div>
                                         </div>
                                     )}
+
+                                    {/* Category Icon - Top */}
+                                    <div className="absolute top-4 left-4 w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center">
+                                        {item.file_type === 'VIDEO' && (
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
+                                                <polygon points="23 7 16 12 23 17 23 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        )}
+                                        {item.file_type === 'IMAGE' && (
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" />
+                                                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+                                                <polyline points="21 15 16 10 5 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        )}
+                                        {item.file_type === 'DOCUMENT' && (
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
+                                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Content */}
                                 <div className="p-5">
                                     {/* Category Label */}
                                     <div className="text-xs font-bold text-[#0066ff] uppercase mb-2 tracking-wide">
-                                        {item.category}
+                                        {item.file_type}
                                     </div>
 
-                                    {/* Title */}
-                                    <h3 className="text-base font-bold text-gray-900 mb-3 line-clamp-2 leading-snug">
-                                        {item.title}
-                                    </h3>
+                                    {/* Description */}
+                                    {item.description && (
+                                        <p className="text-sm text-gray-600 line-clamp-3 mb-3">
+                                            {item.description}
+                                        </p>
+                                    )}
 
                                     {/* Meta Info */}
                                     <div className="flex items-center justify-between text-xs text-gray-500">
-                                        <span>{item.platform}</span>
-                                        <span>{item.date}</span>
+                                        <span>{formatDate(item.created_at)}</span>
+                                        {item.dimensions && <span>{item.dimensions}</span>}
                                     </div>
                                 </div>
                             </article>
@@ -148,15 +245,16 @@ export default function MediaPage() {
                     </div>
 
                     {/* No results message */}
-                    {filteredMedia.length === 0 && (
+                    {mediaItems.length === 0 && (
                         <div className="text-center py-20">
                             <p className="text-gray-600 text-lg">No media items found in this category.</p>
                         </div>
                     )}
                 </div>
             </section>
+            )}
 
-            {/* Press Mentions */}
+            {/* Featured Press - Blog Posts */}
             <section className="py-20 bg-white">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="text-center mb-12">
@@ -164,22 +262,27 @@ export default function MediaPage() {
                             Featured <span className="text-[#0066ff]">Press</span>
                         </h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Dr. George has been featured in leading health publications and media outlets.
+                            Read the latest articles and insights from Dr. George on health and wellness.
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
-                        {pressMentions.map((press, index) => (
-                            <div key={index} className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 hover:border-[#0066ff] transition-all duration-300">
+                        {featuredBlogs.map((blog) => (
+                            <div 
+                                key={blog.id} 
+                                onClick={() => handleBlogNavigation(blog.id)}
+                                className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 hover:border-[#0066ff] transition-all duration-300 cursor-pointer"
+                            >
                                 <div className="w-12 h-12 bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-xl flex items-center justify-center text-white mb-4">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" />
                                         <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" />
                                     </svg>
                                 </div>
-                                <h3 className="text-sm font-semibold text-[#0066ff] mb-2">{press.publication}</h3>
-                                <h4 className="text-lg font-bold text-gray-900 mb-2">{press.title}</h4>
-                                <p className="text-sm text-gray-500">{press.date}</p>
+                                <h3 className="text-sm font-semibold text-[#0066ff] mb-2">{getFirstCategory(blog)}</h3>
+                                <h4 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{blog.title}</h4>
+                                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{blog.excerpt}</p>
+                                <p className="text-sm text-gray-500">{formatDate(blog.published_at)}</p>
                             </div>
                         ))}
                     </div>

@@ -59,6 +59,8 @@ export interface PublicMedia {
     url: string;
     cloudinary_id: string;
     description: string | null;
+    duration?: string | null;
+    dimensions?: string | null;
     created_at: string;
 }
 
@@ -117,6 +119,19 @@ export interface PublicBlog {
     }>;
 }
 
+export interface PublicSpeaking {
+    id: string;
+    title: string;
+    venue: string;
+    category: string;
+    date: string;
+    location: string;
+    image?: string;
+    description?: string;
+    status: 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
+    created_at: string;
+}
+
 export const publicService = {
     /**
      * Get public personal brand data
@@ -133,6 +148,19 @@ export const publicService = {
     async getFeaturedMedia(): Promise<ApiResponse<{ media: PublicMedia[] }>> {
         // We can request a limit if backend supports it, backend defaults to 20 which is fine, we slice 3 on frontend
         return api.get<{ media: PublicMedia[] }>('/public/media?limit=3');
+    },
+
+    /**
+     * Get all public media with optional type filter
+     * GET /api/v1/public/media
+     */
+    async getAllMedia(fileType?: string): Promise<ApiResponse<{ media: PublicMedia[] }>> {
+        const params = new URLSearchParams();
+        if (fileType && fileType !== 'All') {
+            params.append('file_type', fileType.toUpperCase());
+        }
+        const queryString = params.toString() ? `?${params.toString()}` : '';
+        return api.get<{ media: PublicMedia[] }>(`/public/media${queryString}`);
     },
 
     /**
@@ -185,6 +213,43 @@ export const publicService = {
      */
     async unsubscribeFromNewsletter(email: string): Promise<ApiResponse<{ message: string }>> {
         return api.post<{ message: string }>('/public/unsubscribe', { email });
+    },
+
+    /**
+     * Get public speaking events
+     * GET /api/v1/public/speaking
+     */
+    async getSpeakingEvents(category?: string, search?: string, status?: string): Promise<ApiResponse<{ events: PublicSpeaking[] }>> {
+        const params = new URLSearchParams();
+        if (category && category !== 'All Categories') params.append('category', category);
+        if (search) params.append('search', search);
+        if (status) params.append('status', status);
+        const queryString = params.toString() ? `?${params.toString()}` : '';
+        return api.get<{ events: PublicSpeaking[] }>(`/public/speaking${queryString}`);
+    },
+
+    /**
+     * Get single speaking event by ID
+     * GET /api/v1/public/speaking/:id
+     */
+    async getSpeakingEventById(id: string): Promise<ApiResponse<{ event: PublicSpeaking }>> {
+        return api.get<{ event: PublicSpeaking }>(`/public/speaking/${id}`);
+    },
+
+    /**
+     * Get speaking event categories
+     * GET /api/v1/public/speaking-categories
+     */
+    async getSpeakingCategories(): Promise<ApiResponse<{ categories: Array<{ id: string; name: string }> }>> {
+        return api.get<{ categories: Array<{ id: string; name: string }> }>('/public/speaking-categories');
+    },
+
+    /**
+     * Submit contact form
+     * POST /api/v1/public/contact
+     */
+    async submitContactForm(data: { name: string; email: string; phone?: string; subject: string; message: string }): Promise<ApiResponse<{ message: string }>> {
+        return api.post<{ message: string }>('/public/contact', data);
     }
 };
 
