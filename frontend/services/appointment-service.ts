@@ -263,6 +263,19 @@ class AppointmentService {
     }
   }
 
+  // Get all appointment types (public - for booking page without authentication)
+  async getPublicTypes(): Promise<AppointmentType[]> {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/public/appointment-types`
+      );
+      return response.data.types;
+    } catch (error: any) {
+      console.error('Error fetching public appointment types:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch appointment types');
+    }
+  }
+
   // Create new appointment type
   async createType(name: string): Promise<void> {
     try {
