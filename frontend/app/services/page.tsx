@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { courseService, Course } from "@/services/course-service";
@@ -112,7 +113,8 @@ export default function ServicesPage() {
     };
 
 interface ServiceItem {
-    icon: React.ReactNode;
+    icon?: React.ReactNode;
+    thumbnailUrl?: string;
     title: string;
     price: string;
     duration: string;
@@ -127,12 +129,11 @@ interface ServiceItem {
         // ...staticServices, // Removed static services as requested ("remove old day")
         ...courses.map(course => ({
             id: course.id,
+            thumbnailUrl: course.thumbnailUrl,
             icon: (
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                     <path d="M12 14l9-5-9-5-9 5 9 5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M12 14l9-5-9-5-9 5 9 5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /> 
                     <path d="M12 14v7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             ), 
@@ -142,7 +143,6 @@ interface ServiceItem {
             description: course.description,
             features: [
                "Lifetime Access",
-               // "Certificate of Completion", // Removed as requested
                "Expert-led instruction",
                course.category?.name || "Educational Course"
             ],
@@ -213,12 +213,26 @@ interface ServiceItem {
                     <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                         {combinedItems.map((item, index) => (
                             <div key={index} className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 group flex flex-col h-full">
+                                {/* Image or Icon */}
+                                {item.thumbnailUrl ? (
+                                    <div className="relative h-48 w-full mb-6 rounded-xl overflow-hidden">
+                                        <Image 
+                                            src={item.thumbnailUrl}
+                                            alt={item.title}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    </div>
+                                ) : null}
+
                                 {/* Header */}
                                 <div className="flex items-start justify-between mb-6">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 bg-linear-to-br from-[#0066ff] to-[#00bfa6] rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 shrink-0">
-                                            {item.icon}
-                                        </div>
+                                        {!item.thumbnailUrl && (
+                                            <div className="w-14 h-14 bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 shrink-0">
+                                                {item.icon}
+                                            </div>
+                                        )}
                                         <div>
                                             <h3 className="text-xl font-bold text-gray-900 line-clamp-1">{item.title}</h3>
                                             <p className="text-sm text-gray-600">{item.duration}</p>
@@ -250,13 +264,7 @@ interface ServiceItem {
                                 {/* CTA Button */}
                                 {'isCourse' in item ? (
                                     <button 
-                                        onClick={() => {
-                                            if (isAuthenticated) {
-                                                router.push(`/dashboard/browse-courses/${item.id}`);
-                                            } else {
-                                                router.push(`/login?redirect=/dashboard/browse-courses/${item.id}`);
-                                            }
-                                        }}
+                                        onClick={() => router.push(`/services/${item.id}`)}
                                         className="w-full h-12 rounded-full bg-white border-2 border-[#0066ff] text-[#0066ff] hover:bg-[#0066ff] hover:text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
                                     >
                                         View Course Details

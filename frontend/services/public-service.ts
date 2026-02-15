@@ -208,6 +208,14 @@ export const publicService = {
     },
 
     /**
+     * Get single public blog by ID
+     * GET /api/v1/public/blog/:id
+     */
+    async getPublicBlogById(id: string): Promise<ApiResponse<PublicBlog>> {
+        return api.get<PublicBlog>(`/public/blog/${id}`);
+    },
+
+    /**
      * Get blog categories
      * GET /api/v1/public/blog-categories
      */
