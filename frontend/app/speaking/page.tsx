@@ -90,11 +90,7 @@ export default function SpeakingPage() {
     }, []);
 
     const handleEventClick = (eventId: string) => {
-        if (!isAuthenticated) {
-            router.push(`/login?redirect=/dashboard/speaking/${eventId}`);
-        } else {
-            router.push(`/dashboard/speaking/${eventId}`);
-        }
+        router.push(`/speaking/${eventId}`);
     };
 
     const formatDate = (dateString: string) => {

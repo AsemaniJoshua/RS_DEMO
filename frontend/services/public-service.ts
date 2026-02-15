@@ -164,6 +164,14 @@ export const publicService = {
     },
 
     /**
+     * Get single public media by ID
+     * GET /api/v1/public/media/:id
+     */
+    async getPublicMediaById(id: string): Promise<ApiResponse<PublicMedia>> {
+        return api.get<PublicMedia>(`/public/media/${id}`);
+    },
+
+    /**
      * Get public ebooks (limited to 6 for products page)
      * GET /api/v1/public/ebooks
      */

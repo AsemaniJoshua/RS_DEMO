@@ -20,8 +20,10 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
             try {
                 setLoading(true);
                 const response = await publicService.getPublicBlogById(id);
-                if (response.data) {
-                    setBlog(response.data);
+                // Backend returns { status: 'success', data: { blog } }
+                const blogData = (response.data as any)?.blog || response.data;
+                if (blogData) {
+                    setBlog(blogData);
                 } else {
                     setError("Blog post not found");
                 }
@@ -48,7 +50,8 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
     };
 
     const getAuthorName = (author: PublicBlog['author']) => {
-        return `${author.first_name} ${author.last_name}`;
+        if (!author) return 'Dr. George';
+        return `${author.first_name || ''} ${author.last_name || ''}`.trim() || 'Dr. George';
     };
 
     const handleShare = (platform: 'twitter' | 'linkedin' | 'whatsapp') => {
@@ -127,13 +130,15 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
             <section className="py-12 bg-white">
                 <div className="mx-auto max-w-4xl px-3 sm:px-6 lg:px-12">
                     {/* Categories */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        {blog.categories.map((cat) => (
-                            <span key={cat.id} className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
-                                {cat.name}
-                            </span>
-                        ))}
-                    </div>
+                    {blog.categories && blog.categories.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {blog.categories.map((cat) => (
+                                <span key={cat.id} className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
+                                    {cat.name}
+                                </span>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Title */}
                     <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -213,13 +218,13 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
             <section className="py-12 bg-white">
                 <div className="mx-auto max-w-4xl px-3 sm:px-6 lg:px-12">
                     <div 
-                        className="prose prose-lg max-w-none
+                        className="prose prose-lg max-w-none text-gray-900
                             prose-headings:font-bold prose-headings:text-gray-900
-                            prose-p:text-gray-700 prose-p:leading-relaxed
+                            prose-p:text-gray-900 prose-p:leading-relaxed
                             prose-a:text-[#0066ff] prose-a:no-underline hover:prose-a:underline
                             prose-strong:text-gray-900 prose-strong:font-semibold
                             prose-ul:list-disc prose-ol:list-decimal
-                            prose-li:text-gray-700 prose-li:marker:text-[#0066ff]
+                            prose-li:text-gray-900 prose-li:marker:text-[#0066ff]
                             prose-blockquote:border-l-4 prose-blockquote:border-[#0066ff] prose-blockquote:pl-4 prose-blockquote:italic
                             prose-code:text-[#0066ff] prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
                             prose-pre:bg-gray-900 prose-pre:text-gray-100"

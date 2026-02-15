@@ -55,22 +55,14 @@ export default function MediaPage() {
         fetchBlogs();
     }, []);
 
-    // Handle media click with authentication check
+    // Handle media click - redirect to public detail page
     const handleMediaClick = (mediaId: string) => {
-        if (!isAuthenticated) {
-            router.push(`/login?redirect=/dashboard/media/${mediaId}`);
-        } else {
-            router.push(`/dashboard/media/${mediaId}`);
-        }
+        router.push(`/media/${mediaId}`);
     };
 
-    // Handle blog navigation with authentication check
+    // Handle blog navigation - redirect to public blog detail page
     const handleBlogNavigation = (blogId: string) => {
-        if (!isAuthenticated) {
-            router.push(`/login?redirect=/dashboard/blog/${blogId}`);
-        } else {
-            router.push(`/dashboard/blog/${blogId}`);
-        }
+        router.push(`/blog/${blogId}`);
     };
 
     // Format date
