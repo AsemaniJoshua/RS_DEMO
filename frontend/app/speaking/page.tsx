@@ -150,23 +150,6 @@ export default function SpeakingPage() {
                                     </button>
                                 </Link>
                             </div>
-
-                            {/* Category Tags */}
-                            <div className="flex flex-wrap gap-3">
-                                {categories.map((category, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setActiveCategory(category)}
-                                        className={`px-3 py-1 text-sm rounded-full transition-all duration-200 cursor-pointer ${
-                                            activeCategory === category
-                                                ? "bg-[#0066ff] text-white"
-                                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                        }`}
-                                    >
-                                        {category}
-                                    </button>
-                                ))}
-                            </div>
                         </div>
 
                         {/* Right Image */}
@@ -202,15 +185,32 @@ export default function SpeakingPage() {
             {/* Upcoming Events Section */}
             <section className="py-12 sm:py-16 lg:py-20 bg-white">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-8">
                         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                             Upcoming <span className="text-[#0066ff]">Events</span>
                         </h2>
-                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-6">
                             {activeCategory === "All Categories" 
                                 ? "View all scheduled speaking engagements and events."
                                 : `Filtered by: ${activeCategory}`}
                         </p>
+                        
+                        {/* Category Filter Buttons */}
+                        <div className="flex flex-wrap justify-center gap-3">
+                            {categories.map((category, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setActiveCategory(category)}
+                                    className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer ${
+                                        activeCategory === category
+                                            ? "bg-[#0066ff] text-white shadow-lg"
+                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
+                                >
+                                    {category}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     {loading ? (
@@ -230,6 +230,95 @@ export default function SpeakingPage() {
                     ) : (
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {events.map((event) => (
+                                <div 
+                                    key={event.id} 
+                                    onClick={() => handleEventClick(event.id)}
+                                    className="bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-[#0066ff] transition-all duration-300 cursor-pointer"
+                                >
+                                    {event.image && (
+                                        <div className="relative w-full h-40 mb-4 rounded-xl overflow-hidden">
+                                            <Image
+                                                src={event.image}
+                                                alt={event.title}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                    <div className="flex items-start gap-3 mb-4">
+                                        <div className="w-10 h-10 bg-[#0066ff] rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-gray-900 mb-1">{event.title}</h3>
+                                            <p className="text-sm text-[#0066ff] font-medium">{event.venue}</p>
+                                        </div>
+                                    </div>
+                                    {event.description && (
+                                        <p className="text-sm text-gray-700 mb-3 line-clamp-2">{event.description}</p>
+                                    )}
+                                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                                        <span className="flex items-center gap-1">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                                                <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                            {formatDate(event.date)}
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/>
+                                                <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                            {event.location}
+                                        </span>
+                                    </div>
+                                    {event.category && (
+                                        <div className="mt-3 pt-3 border-t border-gray-200">
+                                            <span className="text-xs text-gray-600 font-medium">Category: {event.category}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* Past Engagements Section */}
+            <section className="py-12 sm:py-16 lg:py-20 bg-white">
+                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                            Past <span className="text-[#0066ff]">Engagements</span>
+                        </h2>
+                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+                            Trusted by leading organizations and institutions.
+                        </p>
+                    </div>
+
+                    {loadingCompleted ? (
+                        <div className="flex items-center justify-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff]"></div>
+                        </div>
+                    ) : completedEvents.length === 0 ? (
+                        <div className="text-center py-20">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="mx-auto mb-4 text-gray-400">
+                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                            <p className="text-gray-600 text-lg">No past engagements available.</p>
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {completedEvents.map((event) => (
                                 <div 
                                     key={event.id} 
                                     onClick={() => handleEventClick(event.id)}
@@ -389,95 +478,6 @@ export default function SpeakingPage() {
                             </div>
                         ))}
                     </div>
-                </div>
-            </section>
-
-            {/* Past Engagements Section */}
-            <section className="py-12 sm:py-16 lg:py-20 bg-white">
-                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                            Past <span className="text-[#0066ff]">Engagements</span>
-                        </h2>
-                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                            Trusted by leading organizations and institutions.
-                        </p>
-                    </div>
-
-                    {loadingCompleted ? (
-                        <div className="flex items-center justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0066ff]"></div>
-                        </div>
-                    ) : completedEvents.length === 0 ? (
-                        <div className="text-center py-20">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="mx-auto mb-4 text-gray-400">
-                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                            <p className="text-gray-600 text-lg">No past engagements available.</p>
-                        </div>
-                    ) : (
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {completedEvents.map((event) => (
-                                <div 
-                                    key={event.id} 
-                                    onClick={() => handleEventClick(event.id)}
-                                    className="bg-gray-50 rounded-2xl p-6 border border-gray-200 hover:border-[#0066ff] transition-all duration-300 cursor-pointer"
-                                >
-                                    {event.image && (
-                                        <div className="relative w-full h-40 mb-4 rounded-xl overflow-hidden">
-                                            <Image
-                                                src={event.image}
-                                                alt={event.title}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                    )}
-                                    <div className="flex items-start gap-3 mb-4">
-                                        <div className="w-10 h-10 bg-[#0066ff] rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-                                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2"/>
-                                            </svg>
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="font-bold text-gray-900 mb-1">{event.title}</h3>
-                                            <p className="text-sm text-[#0066ff] font-medium">{event.venue}</p>
-                                        </div>
-                                    </div>
-                                    {event.description && (
-                                        <p className="text-sm text-gray-700 mb-3 line-clamp-2">{event.description}</p>
-                                    )}
-                                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                                        <span className="flex items-center gap-1">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                                                <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2"/>
-                                            </svg>
-                                            {formatDate(event.date)}
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/>
-                                                <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
-                                            </svg>
-                                            {event.location}
-                                        </span>
-                                    </div>
-                                    {event.category && (
-                                        <div className="mt-3 pt-3 border-t border-gray-200">
-                                            <span className="text-xs text-gray-600 font-medium">Category: {event.category}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
             </section>
 

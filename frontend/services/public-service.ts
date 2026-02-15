@@ -172,11 +172,27 @@ export const publicService = {
     },
 
     /**
+     * Get single public ebook by ID
+     * GET /api/v1/public/ebooks/:id
+     */
+    async getPublicEbookById(id: string): Promise<ApiResponse<PublicEbook>> {
+        return api.get<PublicEbook>(`/public/ebooks/${id}`);
+    },
+
+    /**
      * Get public courses (limited to 6 for products page)
      * GET /api/v1/public/courses
      */
     async getPublicCourses(limit: number = 6): Promise<ApiResponse<PublicCourse[]>> {
         return api.get<PublicCourse[]>(`/public/courses?status=PUBLISHED&limit=${limit}`);
+    },
+
+    /**
+     * Get single public course by ID
+     * GET /api/v1/public/courses/:id
+     */
+    async getPublicCourseById(id: string): Promise<ApiResponse<PublicCourse>> {
+        return api.get<PublicCourse>(`/public/courses/${id}`);
     },
 
     /**

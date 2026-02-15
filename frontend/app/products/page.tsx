@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { publicService, PublicEbook, PublicCourse } from "@/services/public-service";
@@ -28,10 +29,17 @@ export default function ProductsPage() {
                     publicService.getPublicCourses(6)
                 ]);
                 
-                if (ebooksResponse.data && Array.isArray(ebooksResponse.data)) {
+                // Backend returns { data: { ebooks: [...] } } for ebooks
+                if (ebooksResponse.data && (ebooksResponse.data as any).ebooks && Array.isArray((ebooksResponse.data as any).ebooks)) {
+                    setEbooks((ebooksResponse.data as any).ebooks);
+                } else if (ebooksResponse.data && Array.isArray(ebooksResponse.data)) {
                     setEbooks(ebooksResponse.data);
                 }
-                if (coursesResponse.data && Array.isArray(coursesResponse.data)) {
+                
+                // Backend returns { data: { courses: [...] } } or direct array for courses
+                if (coursesResponse.data && (coursesResponse.data as any).courses && Array.isArray((coursesResponse.data as any).courses)) {
+                    setCourses((coursesResponse.data as any).courses);
+                } else if (coursesResponse.data && Array.isArray(coursesResponse.data)) {
                     setCourses(coursesResponse.data);
                 }
             } catch (error) {
@@ -44,6 +52,13 @@ export default function ProductsPage() {
     }, []);
 
     const filters = ["All", "eBook", "Course"];
+
+    // Format price helper
+    const formatPrice = (price: string | number): string => {
+        const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+        if (isNaN(numPrice)) return '0.00';
+        return numPrice.toFixed(2);
+    };
 
     // Interleave ebooks and courses (1 ebook, 1 course pattern)
     const combinedProducts: ProductItem[] = [];
@@ -63,18 +78,8 @@ export default function ProductsPage() {
         : combinedProducts.filter(product => product.type === activeFilter);
 
     const handleProductClick = (product: ProductItem) => {
-        if (!isAuthenticated) {
-            const redirectPath = product.type === 'eBook' 
-                ? `/dashboard/ebooks/${product.id}`
-                : `/dashboard/browse-courses/${product.id}`;
-            router.push(`/login?redirect=${redirectPath}`);
-        } else {
-            if (product.type === 'eBook') {
-                router.push(`/dashboard/ebooks/${product.id}`);
-            } else {
-                router.push(`/dashboard/browse-courses/${product.id}`);
-            }
-        }
+        // Navigate to product details page
+        router.push(`/products/${product.id}?type=${product.type}`);
     };
 
     return (
@@ -139,28 +144,46 @@ export default function ProductsPage() {
                                         onClick={() => handleProductClick(product)}
                                         className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 group cursor-pointer"
                                     >
-                                        {/* Product Image/Icon Area */}
-                                        <div className="relative h-48 bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff] flex items-center justify-center">
+                                        {/* Product Image Area */}
+                                        <div className="relative h-48 bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff] overflow-hidden">
                                             {index < 2 && (
-                                                <div className="absolute top-4 left-4 px-3 py-1 bg-[#00bfa6] rounded-full text-white text-xs font-bold">
+                                                <div className="absolute top-4 left-4 px-3 py-1 bg-[#00bfa6] rounded-full text-white text-xs font-bold z-10">
                                                     Featured
                                                 </div>
                                             )}
 
-                                            {/* Icon */}
-                                            <div className="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
-                                                {product.type === "eBook" ? (
-                                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                ) : (
-                                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                        <path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                )}
-                                            </div>
+                                            {/* Actual Image or Fallback Icon */}
+                                            {product.type === "eBook" && (product as PublicEbook).coverImage ? (
+                                                <Image 
+                                                    src={(product as PublicEbook).coverImage}
+                                                    alt={product.title}
+                                                    fill
+                                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                                />
+                                            ) : product.type === "Course" && (product as PublicCourse).thumbnailUrl ? (
+                                                <Image 
+                                                    src={(product as PublicCourse).thumbnailUrl || ''}
+                                                    alt={product.title}
+                                                    fill
+                                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <div className="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
+                                                        {product.type === "eBook" ? (
+                                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                                <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                        ) : (
+                                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                                <path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Product Content */}
@@ -228,7 +251,7 @@ export default function ProductsPage() {
                                             {/* Price & CTA */}
                                             <div className="flex items-center justify-between">
                                                 <div className="text-2xl font-bold text-gray-900">
-                                                    GHS {typeof product.price === 'number' ? product.price : product.price}
+                                                    GHS {formatPrice(product.price)}
                                                 </div>
                                                 <button className="h-10 px-6 rounded-full bg-[#0066ff] text-white text-sm font-medium hover:bg-[#0052cc] transition-all duration-200">
                                                     View Details
