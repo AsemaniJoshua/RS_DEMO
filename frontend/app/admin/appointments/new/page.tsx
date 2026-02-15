@@ -28,7 +28,7 @@ export default function NewAppointmentPage() {
     useEffect(() => {
         const fetchTypes = async () => {
             try {
-                const data = await appointmentService.getTypes();
+                const data = await appointmentService.getAdminTypes();
                 setTypes(data);
                 if (data.length > 0) {
                     setFormData(prev => ({ ...prev, typeId: data[0].id }));

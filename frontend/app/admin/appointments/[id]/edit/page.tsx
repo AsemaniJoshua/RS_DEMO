@@ -35,7 +35,7 @@ export default function EditAppointmentPage() {
             try {
                 const [appointmentData, typesData] = await Promise.all([
                     appointmentService.getById(appointmentId),
-                    appointmentService.getTypes()
+                    appointmentService.getAdminTypes()
                 ]);
                 setAppointment(appointmentData);
                 setTypes(typesData);

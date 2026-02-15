@@ -19,6 +19,16 @@ const menuItems = [
         href: "/admin"
     },
     {
+        label: "Finance",
+        icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+        ),
+        href: "/admin/finance"
+    },
+    {
         label: "Courses",
         icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -157,23 +167,23 @@ export default function AdminSidebar({ isMobileMenuOpen = false, onMobileMenuClo
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
             }`}>
             {/* Logo/Brand */}
-            <div className="p-2 border-b border-white/10">
-                <Link href="/admin" onClick={onMobileMenuClose} className="flex items-center gap-3 bg-white/5 p-2 rounded-lg justify-center">
-                    <div className="relative w-48 h-24">
+            <div className="p-3 border-b border-white/10 flex-shrink-0">
+                <Link href="/admin" onClick={onMobileMenuClose} className="flex items-center justify-center bg-white/5 p-2 rounded-lg">
+                    <div className="relative w-full h-20">
                         <Image 
                             src="/rx-logo.png" 
                             alt="RxWithDrGeorge" 
                             fill
-                            className="object-contain object-left md:object-center"
+                            className="object-contain"
+                            priority
                         />
                     </div>
                 </Link>
             </div>
 
-            {/* Navigation - with flex-1 to push logout down */}
-            <nav className="flex-1 overflow-y-auto py-1 px-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-                <ul className="space-y-0">
-                    {menuItems.map((item, index) => {
+            {/* Navigation - with flex-1 and scrollable */}
+            <nav className="flex-1 py-2 px-2 overflow-y-auto">
+                <ul className="space-y-1">{menuItems.map((item, index) => {
                         const isActive = pathname === item.href;
                         return (
                             <li key={index}>
@@ -196,7 +206,7 @@ export default function AdminSidebar({ isMobileMenuOpen = false, onMobileMenuClo
             </nav>
 
             {/* Logout - pinned to bottom */}
-            <div className="p-2 border-t border-white/10">
+            <div className="p-2 border-t border-white/10 flex-shrink-0">
                 <button
                     onClick={handleLogout}
                     className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 w-full"

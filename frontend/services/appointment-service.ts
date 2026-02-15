@@ -169,7 +169,8 @@ class AppointmentService {
     }
   }
 
-  // Get all appointments with optional filters
+  // ADMIN ENDPOINTS
+  // Get all appointments with optional filters (ADMIN)
   async getAllAppointments(filters?: AppointmentFilters): Promise<Appointment[]> {
     try {
       const params = new URLSearchParams();
@@ -189,7 +190,7 @@ class AppointmentService {
     }
   }
 
-  // Get single appointment by ID
+  // Get single appointment by ID (ADMIN)
   async getAppointmentById(id: string): Promise<Appointment> {
     try {
       const response = await axios.get(
@@ -204,7 +205,7 @@ class AppointmentService {
     }
   }
 
-  // Create new appointment
+  // Create new appointment (ADMIN)
   async createAppointment(data: CreateAppointmentData): Promise<Appointment> {
     try {
       const response = await axios.post(
@@ -220,7 +221,7 @@ class AppointmentService {
     }
   }
 
-  // Update appointment
+  // Update appointment (ADMIN)
   async updateAppointment(id: string, data: UpdateAppointmentData): Promise<Appointment> {
     try {
       const response = await axios.put(
@@ -236,7 +237,7 @@ class AppointmentService {
     }
   }
 
-  // Delete appointment
+  // Delete appointment (ADMIN)
   async deleteAppointment(id: string): Promise<void> {
     try {
       await axios.delete(
@@ -249,34 +250,21 @@ class AppointmentService {
     }
   }
 
-  // Get all appointment types (user dashboard fetches from user endpoint)
-  async getAllTypes(): Promise<AppointmentType[]> {
+  // Get all appointment types (ADMIN)
+  async getAdminTypes(): Promise<AppointmentType[]> {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/user/appointments/types`,
+        `${API_BASE_URL}/admin/appointments/types`,
         this.getAuthHeader()
       );
       return response.data.types;
     } catch (error: any) {
-      console.error('Error fetching appointment types:', error);
+      console.error('Error fetching admin appointment types:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch appointment types');
     }
   }
 
-  // Get all appointment types (public - for booking page without authentication)
-  async getPublicTypes(): Promise<AppointmentType[]> {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/public/appointment-types`
-      );
-      return response.data.types;
-    } catch (error: any) {
-      console.error('Error fetching public appointment types:', error);
-      throw new Error(error.response?.data?.message || 'Failed to fetch appointment types');
-    }
-  }
-
-  // Create new appointment type
+  // Create new appointment type (ADMIN)
   async createType(name: string): Promise<void> {
     try {
       await axios.post(
@@ -290,7 +278,7 @@ class AppointmentService {
     }
   }
 
-  // Delete appointment type
+  // Delete appointment type (ADMIN)
   async deleteType(id: string): Promise<void> {
     try {
       await axios.delete(
@@ -300,6 +288,35 @@ class AppointmentService {
     } catch (error: any) {
       console.error('Error deleting appointment type:', error);
       throw new Error(error.response?.data?.message || 'Failed to delete appointment type');
+    }
+  }
+
+  // USER DASHBOARD ENDPOINTS
+  // Get all appointment types (USER - for user dashboard)
+  async getAllTypes(): Promise<AppointmentType[]> {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/user/appointments/types`,
+        this.getAuthHeader()
+      );
+      return response.data.types;
+    } catch (error: any) {
+      console.error('Error fetching appointment types:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch appointment types');
+    }
+  }
+
+  // PUBLIC ENDPOINTS
+  // Get all appointment types (PUBLIC - for booking page without authentication)
+  async getPublicTypes(): Promise<AppointmentType[]> {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/public/appointment-types`
+      );
+      return response.data.types;
+    } catch (error: any) {
+      console.error('Error fetching public appointment types:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch appointment types');
     }
   }
 
