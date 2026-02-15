@@ -60,8 +60,14 @@ export const courseService = {
      * GET /api/v1/user/courses/:id
      */
     getUserCourseById: async (id: string) => {
-        const response = await api.get<Course>(`/user/courses/${id}`);
-        return response.data;
+        const response = await api.get<{ course: Course; isPurchased: boolean }>(`/user/courses/${id}`);
+        // Backend returns { course: {...}, isPurchased: true }
+        // We merge isPurchased into the course object for convenience
+        const courseData = response.data?.course;
+        if (courseData && response.data?.isPurchased !== undefined) {
+            courseData.isPurchased = response.data.isPurchased;
+        }
+        return courseData;
     },
 
     /**
