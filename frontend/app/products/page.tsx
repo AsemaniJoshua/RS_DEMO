@@ -197,9 +197,12 @@ export default function ProductsPage() {
                                             <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{product.title}</h3>
 
                                             {/* Description */}
-                                            <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3">
-                                                {product.description}
-                                            </p>
+                                            <div 
+                                                className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3"
+                                                dangerouslySetInnerHTML={{ 
+                                                    __html: product.description?.replace(/<[^>]*>/g, '') || '' 
+                                                }}
+                                            />
 
                                             {/* Features */}
                                             <ul className="space-y-2 mb-4">

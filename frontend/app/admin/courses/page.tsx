@@ -63,9 +63,12 @@ export default function CoursesPage() {
         try {
             await courseService.deleteCourse(deleteModal.courseId);
             setCourses(courses.filter(c => c.id !== deleteModal.courseId));
+            toast.success("Course deleted successfully");
             setDeleteModal({ isOpen: false, courseId: null, courseName: "" });
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error deleting course", error);
+            const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to delete course";
+            toast.error(errorMessage);
         } finally {
             setIsDeleting(false);
         }

@@ -244,9 +244,12 @@ interface ServiceItem {
                                 </div>
 
                                 {/* Description */}
-                                <p className="text-gray-600 mb-6 leading-relaxed line-clamp-3">
-                                    {item.description}
-                                </p>
+                                <div 
+                                    className="text-gray-600 mb-6 leading-relaxed line-clamp-3"
+                                    dangerouslySetInnerHTML={{ 
+                                        __html: item.description?.replace(/<[^>]*>/g, '') || '' 
+                                    }}
+                                />
 
                                 {/* Features */}
                                 <ul className="space-y-3 mb-8 flex-grow">

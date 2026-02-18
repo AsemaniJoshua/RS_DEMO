@@ -123,7 +123,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                                 </span>
                             </div>
                             <h2 className="text-xl font-bold text-gray-900 mb-3">Course Overview</h2>
-                            <p className="text-gray-700">{course.description || 'Enjoy your purchased course. Download it below to access all materials.'}</p>
+                            <div 
+                                className="prose prose-sm max-w-none text-gray-700"
+                                dangerouslySetInnerHTML={{ 
+                                    __html: course.description || 'Enjoy your purchased course. Download it below to access all materials.' 
+                                }}
+                            />
                         </div>
                     </div>
 

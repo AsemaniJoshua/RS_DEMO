@@ -15,6 +15,12 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
     const [newCategory, setNewCategory] = useState("");
     const [loading, setLoading] = useState(false);
     const [adding, setAdding] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string | null; name: string }>({ 
+        open: false, 
+        id: null, 
+        name: "" 
+    });
 
     useEffect(() => {
         if (isOpen) {
@@ -51,6 +57,24 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
             toast.error(error.response?.data?.error || "Failed to add category"); // Backend returns { error: message } or { message: ... }? Controller says { error: error.message }
         } finally {
             setAdding(false);
+        }
+    };
+
+    const handleDeleteCategory = async () => {
+        if (!deleteModal.id) return;
+        
+        setDeletingId(deleteModal.id);
+        try {
+            await courseService.deleteCategory(deleteModal.id);
+            toast.success("Category deleted");
+            setDeleteModal({ open: false, id: null, name: "" });
+            loadCategories();
+            onUpdate();
+        } catch (error: any) {
+            console.error("Failed to delete category", error);
+            toast.error(error.response?.data?.error || "Failed to delete category");
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -99,19 +123,7 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
                                 <div key={cat.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
                                     <span className="text-gray-700 font-medium">{cat.name}</span>
                                     <button 
-                                        onClick={async () => {
-                                            if (confirm('Are you sure you want to delete this category?')) {
-                                                try {
-                                                    await courseService.deleteCategory(cat.id);
-                                                    toast.success('Category deleted');
-                                                    loadCategories();
-                                                    onUpdate();
-                                                } catch (error) {
-                                                    console.error("Failed to delete category", error);
-                                                    toast.error('Failed to delete category');
-                                                }
-                                            }
-                                        }}
+                                        onClick={() => setDeleteModal({ open: true, id: cat.id, name: cat.name })}
                                         className="p-1 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded transition-colors"
                                         title="Delete Category"
                                     >
@@ -134,6 +146,34 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
                     </button>
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.open && (
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[60]">
+                    <div className="bg-white rounded-xl shadow-xl p-8 max-w-sm w-full mx-4">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Delete Category</h3>
+                        <p className="text-gray-700 mb-6">
+                            Are you sure you want to delete <span className="font-semibold">{deleteModal.name}</span>? This action cannot be undone.
+                        </p>
+                        <div className="flex gap-4 justify-end">
+                            <button
+                                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
+                                onClick={() => setDeleteModal({ open: false, id: null, name: "" })}
+                                disabled={deletingId === deleteModal.id}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50"
+                                onClick={handleDeleteCategory}
+                                disabled={deletingId === deleteModal.id}
+                            >
+                                {deletingId === deleteModal.id ? "Deleting..." : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

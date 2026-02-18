@@ -273,9 +273,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                             {/* Description */}
                             <div className="bg-white rounded-2xl p-8 border border-gray-200 mb-6">
                                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Description</h2>
-                                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                                    {product.description}
-                                </p>
+                                <div 
+                                    className="prose prose-lg max-w-none text-gray-700"
+                                    dangerouslySetInnerHTML={{ __html: product.description }}
+                                />
                             </div>
 
                             {/* Additional Info */}

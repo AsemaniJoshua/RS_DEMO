@@ -197,9 +197,10 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                         </div>
 
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Description</h3>
-                        <div className="prose prose-blue max-w-none text-gray-700 whitespace-pre-wrap">
-                            {course.description}
-                        </div>
+                        <div 
+                            className="prose prose-blue max-w-none text-gray-700"
+                            dangerouslySetInnerHTML={{ __html: course.description }}
+                        />
                     </div>
                 </div>
 

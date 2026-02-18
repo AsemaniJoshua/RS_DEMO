@@ -202,7 +202,12 @@ export default function CoursesPage() {
 
                                 {/* Course Info */}
                                 <div className="mb-4 text-sm text-gray-600">
-                                    <p className="line-clamp-2">{course.description || 'No description available'}</p>
+                                    <div 
+                                        className="line-clamp-2"
+                                        dangerouslySetInnerHTML={{ 
+                                            __html: course.description?.replace(/<[^>]*>/g, '') || 'No description available' 
+                                        }}
+                                    />
                                     {course.duration && (
                                         <p className="mt-2 text-xs text-gray-500">Duration: {course.duration}</p>
                                     )}

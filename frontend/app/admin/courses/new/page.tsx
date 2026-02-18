@@ -7,6 +7,7 @@ import { courseService } from "@/services/course-service";
 import toast from "react-hot-toast";
 import ImageUpload from "@/components/admin/ImageUpload";
 import FileUpload from "@/components/admin/FileUpload";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function AddCoursePage() {
     const router = useRouter();
@@ -192,14 +193,11 @@ export default function AddCoursePage() {
                         <label className="block text-sm font-semibold text-gray-900 mb-2">
                             Description <span className="text-red-500">*</span>
                         </label>
-                        <textarea
-                            name="description"
+                        <RichTextEditor
                             value={formData.description}
-                            onChange={handleChange}
-                            required
-                            rows={6}
+                            onChange={(value) => setFormData({ ...formData, description: value })}
                             placeholder="Describe what students will learn in this course..."
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900 resize-none"
+                            minHeight="300px"
                         />
                     </div>
 
