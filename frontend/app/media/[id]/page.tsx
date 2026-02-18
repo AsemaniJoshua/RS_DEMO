@@ -265,9 +265,10 @@ export default function MediaDetailPage({ params }: { params: Promise<{ id: stri
                     {media.description && (
                         <div className="mb-8">
                             <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Media</h2>
-                            <div className="prose prose-lg max-w-none text-gray-700">
-                                <p>{media.description}</p>
-                            </div>
+                            <div 
+                                className="prose prose-lg max-w-none text-gray-700"
+                                dangerouslySetInnerHTML={{ __html: media.description }}
+                            />
                         </div>
                     )}
 

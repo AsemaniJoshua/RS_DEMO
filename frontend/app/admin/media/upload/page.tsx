@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { mediaService } from "@/services/media-service";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import toast from "react-hot-toast";
 
 export default function UploadMediaPage() {
@@ -264,19 +265,18 @@ export default function UploadMediaPage() {
                                         <label className="block mb-1 text-gray-700 text-[15px] font-medium" htmlFor={`desc-${index}`}>
                                             Description
                                         </label>
-                                        <textarea
-                                            id={`desc-${index}`}
-                                            className="border border-gray-300 rounded-lg px-3 py-2 text-base w-72 min-h-[48px] bg-white text-gray-900 focus:outline-none focus:border-[#00d4aa] placeholder-gray-400 resize-y"
-                                            placeholder="Enter description"
-                                            value={descriptions[index] || ""}
-                                            onChange={e => {
-                                                const newDescs = [...descriptions];
-                                                newDescs[index] = e.target.value;
-                                                setDescriptions(newDescs);
-                                            }}
-                                            disabled={isUploading}
-                                            required
-                                        />
+                                        <div className="w-72">
+                                            <RichTextEditor
+                                                value={descriptions[index] || ""}
+                                                onChange={(value) => {
+                                                    const newDescs = [...descriptions];
+                                                    newDescs[index] = value;
+                                                    setDescriptions(newDescs);
+                                                }}
+                                                placeholder="Enter description"
+                                                minHeight="150px"
+                                            />
+                                        </div>
                                         <button
                                             onClick={() => removeFile(index)}
                                             className="p-2 hover:bg-red-50 rounded-lg transition-colors"

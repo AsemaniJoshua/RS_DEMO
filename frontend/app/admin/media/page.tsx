@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import DeleteMediaModal from "@/components/admin/DeleteMediaModal";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import { mediaService, MediaItem, MediaStats } from "@/services/media-service";
 import toast from "react-hot-toast";
 
@@ -437,7 +438,10 @@ export default function MediaLibraryPage() {
                                         <div className="text-xs text-gray-400 mt-1">{file.dimensions}</div>
                                     )}
                                     {file.description && (
-                                        <div className="text-xs text-gray-700 mt-2 line-clamp-2" title={file.description}>{file.description}</div>
+                                        <div 
+                                            className="text-xs text-gray-700 mt-2 line-clamp-2"
+                                            dangerouslySetInnerHTML={{ __html: file.description.replace(/<[^>]*>/g, '') }}
+                                        />
                                     )}
                                 </div>
                             </div>
@@ -485,7 +489,10 @@ export default function MediaLibraryPage() {
                                                 <div className="text-xs text-gray-400">{file.dimensions}</div>
                                             )}
                                             {file.description && (
-                                                <div className="text-xs text-gray-700 mt-1 line-clamp-2" title={file.description}>{file.description}</div>
+                                                <div 
+                                                    className="text-xs text-gray-700 mt-1 line-clamp-2"
+                                                    dangerouslySetInnerHTML={{ __html: file.description.replace(/<[^>]*>/g, '') }}
+                                                />
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
@@ -565,14 +572,14 @@ export default function MediaLibraryPage() {
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Media Details</h3>
                         
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Description
                             </label>
-                            <textarea
+                            <RichTextEditor
                                 value={editModal.description}
-                                onChange={(e) => setEditModal({ ...editModal, description: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#00d4aa] focus:border-[#00d4aa] min-h-[100px] text-gray-900 placeholder-gray-400"
+                                onChange={(value) => setEditModal({ ...editModal, description: value })}
                                 placeholder="Enter description..."
+                                minHeight="200px"
                             />
                         </div>
 
