@@ -20,6 +20,11 @@ export default function EbookCategoryManagementModal({
     const [newCategory, setNewCategory] = useState("");
     const [isCreating, setIsCreating] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string | null; name: string }>({ 
+        open: false, 
+        id: null, 
+        name: "" 
+    });
 
     if (!isOpen) return null;
 
@@ -52,15 +57,14 @@ export default function EbookCategoryManagementModal({
         }
     };
 
-    const handleDeleteCategory = async (categoryId: string, categoryName: string) => {
-        if (!confirm(`Are you sure you want to delete "${categoryName}"?`)) {
-            return;
-        }
+    const handleDeleteCategory = async () => {
+        if (!deleteModal.id) return;
 
-        setDeletingId(categoryId);
+        setDeletingId(deleteModal.id);
         try {
-            await ebookService.deleteCategory(categoryId);
+            await ebookService.deleteCategory(deleteModal.id);
             toast.success("Category deleted successfully");
+            setDeleteModal({ open: false, id: null, name: "" });
             onCategoryChange(); // Refresh categories
         } catch (error: any) {
             toast.error(error.message || "Failed to delete category");
@@ -156,7 +160,7 @@ export default function EbookCategoryManagementModal({
                                             </div>
                                         </div>
                                         <button
-                                            onClick={() => handleDeleteCategory(category.id, category.name)}
+                                            onClick={() => setDeleteModal({ open: true, id: category.id, name: category.name })}
                                             disabled={deletingId === category.id}
                                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                                             title="Delete category"
@@ -186,6 +190,34 @@ export default function EbookCategoryManagementModal({
                     </button>
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.open && (
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[60]">
+                    <div className="bg-white rounded-xl shadow-xl p-8 max-w-sm w-full mx-4">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Delete Category</h3>
+                        <p className="text-gray-700 mb-6">
+                            Are you sure you want to delete <span className="font-semibold">{deleteModal.name}</span>? This action cannot be undone.
+                        </p>
+                        <div className="flex gap-4 justify-end">
+                            <button
+                                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
+                                onClick={() => setDeleteModal({ open: false, id: null, name: "" })}
+                                disabled={deletingId === deleteModal.id}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50"
+                                onClick={handleDeleteCategory}
+                                disabled={deletingId === deleteModal.id}
+                            >
+                                {deletingId === deleteModal.id ? "Deleting..." : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

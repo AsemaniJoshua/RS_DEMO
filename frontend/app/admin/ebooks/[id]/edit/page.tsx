@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ebookService, EbookCategory } from "@/services/ebook-service";
 import ImageUpload from "@/components/admin/ImageUpload";
 import FileUpload from "@/components/admin/FileUpload";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import toast from "react-hot-toast";
 
 export default function EditEbookPage() {
@@ -259,12 +260,11 @@ export default function EditEbookPage() {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                        <textarea
+                        <RichTextEditor
                             value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            rows={4}
-                            className="w-full px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none resize-none placeholder:text-gray-400"
+                            onChange={(value) => setFormData({ ...formData, description: value })}
                             placeholder="Describe what the ebook is about..."
+                            minHeight="300px"
                         />
                     </div>
                 </div>

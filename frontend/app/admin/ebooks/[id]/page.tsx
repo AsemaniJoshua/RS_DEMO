@@ -147,13 +147,14 @@ export default function EbookDetailPage() {
                     {/* Description */}
                     <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Description</h3>
-                        <div className="prose max-w-none text-gray-600">
-                            {ebook.description ? (
-                                <p className="whitespace-pre-wrap">{ebook.description}</p>
-                            ) : (
-                                <p className="italic text-gray-400">No description provided.</p>
-                            )}
-                        </div>
+                        {ebook.description ? (
+                            <div 
+                                className="prose prose-blue max-w-none text-gray-600"
+                                dangerouslySetInnerHTML={{ __html: ebook.description }}
+                            />
+                        ) : (
+                            <p className="italic text-gray-400">No description provided.</p>
+                        )}
                     </div>
 
                     {/* Meta Data */}

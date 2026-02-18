@@ -249,9 +249,12 @@ export default function EbookDetailPage() {
                             <BookOpen className="w-5 h-5 text-[#00d4aa]" />
                             About This Book
                         </h3>
-                        <div className="prose prose-sm prose-blue max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
-                            {ebook.description || 'No description available.'}
-                        </div>
+                        <div 
+                            className="prose prose-sm prose-blue max-w-none text-gray-700 leading-relaxed"
+                            dangerouslySetInnerHTML={{ 
+                                __html: ebook.description || 'No description available.' 
+                            }}
+                        />
                     </div>
 
                     {/* Action Section */}
