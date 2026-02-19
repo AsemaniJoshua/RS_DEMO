@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { speakingService, SpeakingEvent, Category } from "@/services/speaking-service";
 import DeleteSpeakingEventModal from "@/components/admin/DeleteSpeakingEventModal";
 import ImageUpload from "@/components/admin/ImageUpload";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function EditSpeakingEventPage() {
     const router = useRouter();
@@ -298,14 +299,11 @@ export default function EditSpeakingEventPage() {
                         <label htmlFor="description" className="block text-sm font-semibold text-gray-900 mb-2">
                             Description / Details
                         </label>
-                        <textarea
-                            id="description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
+                        <RichTextEditor
+                            value={formData.description || ""}
+                            onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
                             placeholder="Provide details about the event, topics to be covered, live stream link, etc."
-                            rows={5}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900 resize-none"
+                            minHeight="300px"
                         />
                     </div>
                 </div>

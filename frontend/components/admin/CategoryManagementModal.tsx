@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { speakingService, Category } from "@/services/speaking-service";
 import toast from "react-hot-toast";
 
@@ -14,13 +14,36 @@ interface CategoryManagementModalProps {
 export default function CategoryManagementModal({
     isOpen,
     onClose,
-    categories,
+    categories: initialCategories,
     onCategoryChange
 }: CategoryManagementModalProps) {
+    const [categories, setCategories] = useState<Category[]>([]);
     const [newCategory, setNewCategory] = useState("");
     const [isCreating, setIsCreating] = useState(false);
+    const [isLoadingCategories, setIsLoadingCategories] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string | null; name: string }>({ open: false, id: null, name: "" });
+
+    const loadCategories = async () => {
+        try {
+            setIsLoadingCategories(true);
+            const categoriesData = await speakingService.getAllCategories();
+            console.log("Loaded categories:", categoriesData);
+            setCategories(categoriesData);
+        } catch (error) {
+            console.error("Failed to load categories", error);
+            toast.error("Failed to load categories");
+        } finally {
+            setIsLoadingCategories(false);
+        }
+    };
+
+    // Load categories when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            loadCategories();
+        }
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -45,7 +68,8 @@ export default function CategoryManagementModal({
             await speakingService.createCategory(trimmedCategory);
             toast.success("Category added successfully");
             setNewCategory("");
-            onCategoryChange(); // Refresh categories
+            loadCategories(); // Reload categories in modal
+            onCategoryChange(); // Notify parent to refresh
         } catch (error: any) {
             toast.error(error.message || "Failed to add category");
         } finally {
@@ -60,7 +84,8 @@ export default function CategoryManagementModal({
             await speakingService.deleteCategory(deleteModal.id);
             toast.success("Category deleted successfully");
             setDeleteModal({ open: false, id: null, name: "" });
-            onCategoryChange(); // Refresh categories
+            loadCategories(); // Reload categories in modal
+            onCategoryChange(); // Notify parent to refresh
         } catch (error: any) {
             toast.error(error.message || "Failed to delete category");
         } finally {
@@ -125,7 +150,12 @@ export default function CategoryManagementModal({
                             Existing Categories ({categories.length})
                         </h3>
                     
-                        {categories.length === 0 ? (
+                        {isLoadingCategories ? (
+                            <div className="text-center py-8">
+                                <div className="w-8 h-8 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin mx-auto"/>
+                                <p className="text-sm text-gray-500 mt-3">Loading categories...</p>
+                            </div>
+                        ) : categories.length === 0 ? (
                             <div className="text-center py-8 text-gray-500">
                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" className="mx-auto mb-3 text-gray-300">
                                     <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2z" stroke="currentColor" strokeWidth="2"/>

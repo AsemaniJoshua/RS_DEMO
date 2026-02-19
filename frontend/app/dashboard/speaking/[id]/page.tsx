@@ -84,7 +84,7 @@ export default function SpeakingEventDetailsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-6 min-w-0">
                     {/* Basic Info */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
@@ -147,7 +147,7 @@ export default function SpeakingEventDetailsPage() {
                     </div>
 
                     {/* Description */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 overflow-hidden">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
                                 <Info className="w-5 h-5" />
@@ -156,9 +156,10 @@ export default function SpeakingEventDetailsPage() {
                         </div>
                         
                         {event.description ? (
-                            <div className="prose prose-sm prose-blue max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
-                                {event.description}
-                            </div>
+                            <div 
+                                className="prose prose-sm prose-blue max-w-none text-gray-700 leading-relaxed overflow-x-auto break-words"
+                                dangerouslySetInnerHTML={{ __html: event.description }}
+                            />
                         ) : (
                             <p className="text-gray-400 italic">No description provided.</p>
                         )}

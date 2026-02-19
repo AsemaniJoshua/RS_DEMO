@@ -38,42 +38,44 @@ export const speakingService = {
         if (filters?.status) params.append('status', filters.status);
         if (filters?.search) params.append('search', filters.search);
 
-        const response = await api.get<{ events: SpeakingEvent[] }>(`/user/speaking?${params.toString()}`);
-        return response.data?.events || [];
+        const response: any = await api.get(`/user/speaking?${params.toString()}`);
+        return response.events || response.data?.events || [];
     },
 
     async getSpeakingEventById(id: string): Promise<SpeakingEvent | undefined> {
-        const response = await api.get<{ event: SpeakingEvent }>(`/user/speaking/${id}`);
-        return response.data?.event;
+        const response: any = await api.get(`/user/speaking/${id}`);
+        return response.event || response.data?.event;
     },
     // ==========================================
     // Admin Methods
     // ==========================================
 
     async getAllEvents() {
-        const response = await api.get<{ events: SpeakingEvent[] }>('/admin/speaking');
-        return response.data?.events || [];
+        const response: any = await api.get('/admin/speaking');
+        // Backend returns { success: true, events: [...] } directly
+        return response.events || response.data?.events || [];
     },
 
     async getEventById(id: string) {
-        const response = await api.get<{ event: SpeakingEvent }>(`/admin/speaking/${id}`);
-        return response.data?.event;
+        const response: any = await api.get(`/admin/speaking/${id}`);
+        // Backend returns { success: true, event: {...} } directly
+        return response.event || response.data?.event;
     },
 
 
     async createEvent(data: FormData | Partial<SpeakingEvent>) {
-        const response = await api.post<SpeakingEvent>('/admin/speaking', data);
-        return response.data;
+        const response: any = await api.post('/admin/speaking', data);
+        return response.event || response.data?.event || response.data || response;
     },
 
     async updateEvent(id: string, data: FormData | Partial<SpeakingEvent>) {
-        const response = await api.put<SpeakingEvent>(`/admin/speaking/${id}`, data);
-        return response.data;
+        const response: any = await api.put(`/admin/speaking/${id}`, data);
+        return response.event || response.data?.event || response.data || response;
     },
 
     async deleteEvent(id: string) {
-        const response = await api.delete<{ message: string }>(`/admin/speaking/${id}`);
-        return response.data;
+        const response: any = await api.delete(`/admin/speaking/${id}`);
+        return response.data || response;
     },
 
     // ==========================================
@@ -81,17 +83,19 @@ export const speakingService = {
     // ==========================================
 
     async getAllCategories() {
-        const response = await api.get<{ categories: Category[] }>('/admin/speaking/categories');
-        return response.data?.categories || [];
+        const response: any = await api.get('/admin/speaking/categories');
+        // Backend returns { success: true, categories: [...] } directly
+        return response.categories || response.data?.categories || [];
     },
 
     async createCategory(name: string) {
-        const response = await api.post<Category>('/admin/speaking/categories', { name });
-        return response.data;
+        const response: any = await api.post('/admin/speaking/categories', { name });
+        // Backend returns { success: true, categories: [...] } directly
+        return response.categories || response.data?.categories || [];
     },
 
     async deleteCategory(id: string) {
-        const response = await api.delete<{ message: string }>(`/admin/speaking/categories/${id}`);
-        return response.data;
+        const response: any = await api.delete(`/admin/speaking/categories/${id}`);
+        return response.data || response;
     }
 };
