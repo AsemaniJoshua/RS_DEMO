@@ -229,7 +229,8 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
                             prose-li:text-gray-900 prose-li:marker:text-[#0066ff]
                             prose-blockquote:border-l-4 prose-blockquote:border-[#0066ff] prose-blockquote:pl-4 prose-blockquote:italic
                             prose-code:text-[#0066ff] prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                            prose-pre:bg-gray-900 prose-pre:text-gray-100"
+                            prose-pre:bg-gray-900 prose-pre:text-gray-100
+                            overflow-x-auto break-words"
                         dangerouslySetInnerHTML={{ __html: blog.content }}
                     />
 

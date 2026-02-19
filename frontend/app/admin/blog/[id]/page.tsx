@@ -139,7 +139,7 @@ export default function BlogDetailsPage({ params }: { params: Promise<{ id: stri
                             </div>
                         </div>
 
-                        <div className="prose prose-blue max-w-none text-gray-700 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+                        <div className="prose prose-blue max-w-none text-gray-700 bg-gray-50/50 p-6 rounded-xl border border-gray-100 overflow-x-auto break-words">
                             <div dangerouslySetInnerHTML={{ __html: blog.content }} />
                         </div>
                     </div>

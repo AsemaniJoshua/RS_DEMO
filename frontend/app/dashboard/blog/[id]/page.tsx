@@ -142,7 +142,7 @@ export default function BlogDetailsPage() {
 
                         {/* Content */}
                         <div 
-                            className="prose prose-lg max-w-none text-gray-700 prose-headings:text-gray-900 prose-a:text-[#0066ff] prose-img:rounded-xl"
+                            className="prose prose-lg max-w-none text-gray-700 prose-headings:text-gray-900 prose-a:text-[#0066ff] prose-img:rounded-xl overflow-x-auto break-words"
                             dangerouslySetInnerHTML={{ __html: blog.content }}
                         />
 
