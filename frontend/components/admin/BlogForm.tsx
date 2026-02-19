@@ -235,7 +235,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                             Excerpt
                         </label>
                         <RichTextEditor
-                            value={formData.excerpt}
+                            value={formData.excerpt || ""}
                             onChange={(value) => {
                                 setFormData(prev => ({
                                     ...prev,
