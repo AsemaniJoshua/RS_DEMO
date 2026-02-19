@@ -97,9 +97,9 @@ export default function BlogDetailsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-6 min-w-0">
                     {/* Content Card */}
-                    <article className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                    <article className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 overflow-hidden">
                         {/* Meta */}
                         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-6">
                             {blog.categories && blog.categories.length > 0 && (
