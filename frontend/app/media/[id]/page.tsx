@@ -51,7 +51,8 @@ export default function MediaDetailPage({ params }: { params: Promise<{ id: stri
         if (!media) return;
         
         const url = window.location.href;
-        const text = `${media.original_name} - ${media.description || 'Check out this media'}`;
+        const cleanDescription = media.description?.replace(/<[^>]*>/g, '') || 'Check out this media';
+        const text = `${media.original_name} - ${cleanDescription}`;
         
         let shareUrl = '';
         

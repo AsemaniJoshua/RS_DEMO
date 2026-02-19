@@ -50,7 +50,7 @@ export default function MediaDetailPage() {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = item.description || item.name || 'media-file';
+            a.download = item.original_name || item.name || 'media-file';
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -110,7 +110,7 @@ export default function MediaDetailPage() {
                     <div className="relative h-64 md:h-[400px] w-full bg-gray-50">
                         <img 
                             src={item.url} 
-                            alt={item.description || item.name} 
+                            alt={item.original_name || item.name} 
                             className="w-full h-full object-contain"
                         />
                     </div>
@@ -141,11 +141,14 @@ export default function MediaDetailPage() {
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
                             <div className="flex-1">
                                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                                    {item.description || item.name}
-                                </h1>
-                                <p className="text-gray-500 text-sm">
                                     {item.original_name || item.name}
-                                </p>
+                                </h1>
+                                {item.description && (
+                                    <div 
+                                        className="text-gray-600 mt-2 prose prose-sm max-w-none"
+                                        dangerouslySetInnerHTML={{ __html: item.description }}
+                                    />
+                                )}
                             </div>
                             <span className={`px-4 py-1.5 rounded-full text-sm font-semibold border flex items-center gap-2 ${getFileTypeColor(item.file_type)}`}>
                                 {getFileTypeIcon(item.file_type)}

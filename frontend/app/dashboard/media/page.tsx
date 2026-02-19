@@ -165,8 +165,14 @@ export default function MediaLibraryPage() {
                                 </div>
                                 <div className="p-4 flex flex-col flex-1">
                                     <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 leading-snug group-hover:text-[#0066ff] transition-colors">
-                                        {item.description || item.name}
+                                        {item.original_name || item.name}
                                     </h3>
+                                    {item.description && (
+                                        <div 
+                                            className="text-sm text-gray-600 line-clamp-2 mt-1"
+                                            dangerouslySetInnerHTML={{ __html: item.description.replace(/<[^>]*>/g, '') }}
+                                        />
+                                    )}
                                     
                                     <div className="mt-auto flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-50">
                                         <span>{new Date(item.created_at).toLocaleDateString()}</span>

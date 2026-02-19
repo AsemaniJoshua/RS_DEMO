@@ -249,43 +249,47 @@ export default function UploadMediaPage() {
                         <h3 className="text-lg font-bold text-gray-900 mb-4">
                             Files to Upload ({uploadedFiles.length}/{MAX_FILES})
                         </h3>
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {uploadedFiles.map((file, index) => (
-                                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                    <div className="flex items-center gap-3 flex-1">
-                                        <div className="w-10 h-10 bg-[#00d4aa]/10 rounded-lg flex items-center justify-center">
+                                <div key={index} className="relative p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                    {/* Remove Button - Top Right */}
+                                    <button
+                                        onClick={() => removeFile(index)}
+                                        className="absolute top-3 right-3 p-2 hover:bg-red-50 rounded-lg transition-colors z-10 bg-white shadow-sm border border-gray-200"
+                                        disabled={isUploading}
+                                        title="Remove file"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-600">
+                                            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2"/>
+                                        </svg>
+                                    </button>
+
+                                    {/* File Info */}
+                                    <div className="flex items-center gap-3 mb-4 pr-12">
+                                        <div className="w-12 h-12 bg-[#00d4aa]/10 rounded-lg flex items-center justify-center flex-shrink-0">
                                             {getFileTypeIcon(file)}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="font-medium text-gray-900 truncate">{file.name}</div>
+                                            <div className="font-medium text-gray-900 truncate text-base">{file.name}</div>
                                             <div className="text-sm text-gray-500">{formatFileSize(file.size)}</div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2 ml-4">
-                                        <label className="block mb-1 text-gray-700 text-[15px] font-medium" htmlFor={`desc-${index}`}>
-                                            Description
+
+                                    {/* Description Editor */}
+                                    <div>
+                                        <label className="block mb-2 text-gray-700 text-sm font-medium" htmlFor={`desc-${index}`}>
+                                            Description *
                                         </label>
-                                        <div className="w-72">
-                                            <RichTextEditor
-                                                value={descriptions[index] || ""}
-                                                onChange={(value) => {
-                                                    const newDescs = [...descriptions];
-                                                    newDescs[index] = value;
-                                                    setDescriptions(newDescs);
-                                                }}
-                                                placeholder="Enter description"
-                                                minHeight="150px"
-                                            />
-                                        </div>
-                                        <button
-                                            onClick={() => removeFile(index)}
-                                            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                                            disabled={isUploading}
-                                        >
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-600">
-                                                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2"/>
-                                            </svg>
-                                        </button>
+                                        <RichTextEditor
+                                            value={descriptions[index] || ""}
+                                            onChange={(value) => {
+                                                const newDescs = [...descriptions];
+                                                newDescs[index] = value;
+                                                setDescriptions(newDescs);
+                                            }}
+                                            placeholder="Enter description for this media file..."
+                                            minHeight="150px"
+                                        />
                                     </div>
                                 </div>
                             ))}
