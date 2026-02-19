@@ -222,9 +222,10 @@ export default function BlogDetailsPage({ params }: { params: Promise<{ id: stri
                                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">
                                     Excerpt
                                 </label>
-                                <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 italic">
-                                    {blog.excerpt || "No excerpt provided."}
-                                </div>
+                                <div 
+                                    className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 italic prose prose-sm max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: blog.excerpt || "No excerpt provided." }}
+                                />
                             </div>
                         </div>
                     </div>

@@ -273,7 +273,10 @@ export default function MediaPage() {
                                 </div>
                                 <h3 className="text-sm font-semibold text-[#0066ff] mb-2">{getFirstCategory(blog)}</h3>
                                 <h4 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{blog.title}</h4>
-                                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{blog.excerpt}</p>
+                                <div 
+                                    className="text-sm text-gray-600 mb-3 line-clamp-2"
+                                    dangerouslySetInnerHTML={{ __html: blog.excerpt?.replace(/<[^>]*>/g, '') || '' }}
+                                />
                                 <p className="text-sm text-gray-500">{formatDate(blog.published_at)}</p>
                             </div>
                         ))}

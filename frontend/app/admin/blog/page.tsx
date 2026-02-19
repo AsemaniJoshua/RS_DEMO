@@ -211,10 +211,8 @@ export default function BlogManagerPage() {
                                                 <div
                                                     className="text-sm text-gray-500 mt-1 overflow-hidden whitespace-nowrap text-ellipsis max-w-[180px]"
                                                     style={{ textOverflow: 'ellipsis', display: 'block' }}
-                                                    title={blog.excerpt}
-                                                >
-                                                    {blog.excerpt}
-                                                </div>
+                                                    dangerouslySetInnerHTML={{ __html: blog.excerpt.replace(/<[^>]*>/g, '') }}
+                                                />
                                             )}
                                         </Link>
                                     </td>

@@ -93,9 +93,10 @@ export default function BlogEventsPage() {
                             <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#0066ff] transition-colors">
                                 {blog.title}
                             </h3>
-                            <p className="text-gray-600 text-sm mb-4 line-clamp-3 grow">
-                                {blog.excerpt || "No excerpt available."}
-                            </p>
+                            <div 
+                                className="text-gray-600 text-sm mb-4 line-clamp-3 grow"
+                                dangerouslySetInnerHTML={{ __html: blog.excerpt?.replace(/<[^>]*>/g, '') || "No excerpt available." }}
+                            />
                             <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
                                 <div className="flex items-center gap-2">
                                     <User className="w-3 h-3" />

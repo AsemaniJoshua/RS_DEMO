@@ -58,7 +58,8 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
         if (!blog) return;
         
         const url = window.location.href;
-        const text = `${blog.title} - ${blog.excerpt}`;
+        const cleanExcerpt = blog.excerpt?.replace(/<[^>]*>/g, '') || '';
+        const text = `${blog.title} - ${cleanExcerpt}`;
         
         let shareUrl = '';
         
@@ -146,9 +147,10 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
                     </h1>
 
                     {/* Excerpt */}
-                    <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                        {blog.excerpt}
-                    </p>
+                    <div 
+                        className="text-xl text-gray-600 mb-8 leading-relaxed prose prose-lg max-w-none"
+                        dangerouslySetInnerHTML={{ __html: blog.excerpt }}
+                    />
 
                     {/* Meta info */}
                     <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-200">

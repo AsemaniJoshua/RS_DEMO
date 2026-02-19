@@ -109,7 +109,8 @@ export default function BlogPage() {
     // Handle share functionality
     const handleShare = (platform: 'twitter' | 'linkedin' | 'whatsapp', post: PublicBlog) => {
         const url = `${window.location.origin}/blog/${post.id}`;
-        const text = `${post.title} - ${post.excerpt}`;
+        const cleanExcerpt = post.excerpt?.replace(/<[^>]*>/g, '') || '';
+        const text = `${post.title} - ${cleanExcerpt}`;
         
         let shareUrl = '';
         
@@ -272,9 +273,10 @@ export default function BlogPage() {
                                         <h2 className="text-3xl font-bold text-gray-900 mb-4 hover:text-[#0066ff] transition-colors duration-200">
                                             {featuredPost.title}
                                         </h2>
-                                        <p className="text-gray-600 mb-6 leading-relaxed">
-                                            {featuredPost.excerpt}
-                                        </p>
+                                        <div 
+                                            className="text-gray-600 mb-6 leading-relaxed prose prose-sm max-w-none"
+                                            dangerouslySetInnerHTML={{ __html: featuredPost.excerpt }}
+                                        />
 
                                         {/* Meta and Social Share */}
                                         <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
@@ -382,9 +384,10 @@ export default function BlogPage() {
                                                 <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-[#0066ff] transition-colors duration-200">
                                                     {post.title}
                                                 </h3>
-                                                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                                                    {post.excerpt}
-                                                </p>
+                                                <div 
+                                                    className="text-gray-600 text-sm mb-3 line-clamp-2"
+                                                    dangerouslySetInnerHTML={{ __html: post.excerpt?.replace(/<[^>]*>/g, '') || '' }}
+                                                />
                                                 <div className="flex items-center gap-3 text-xs text-gray-500">
                                                     <span>{getAuthorName(post.author)}</span>
                                                     <span>•</span>

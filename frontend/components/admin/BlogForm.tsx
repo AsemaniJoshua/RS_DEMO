@@ -44,7 +44,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                 featured_image: initialData.featured_image || "",
                 status: initialData.status,
                 meta_title: initialData.meta_title || "",
-                meta_description: initialData.meta_description || "",
+                meta_description: (initialData.meta_description || "").replace(/<[^>]*>/g, ''),
                 categories: initialData.categories?.map(c => ({ name: c.name, slug: c.slug })) || [],
                 tags: initialData.tags?.map(t => ({ name: t.name })) || []
             });
@@ -62,9 +62,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
             if (name === 'title') {
                 updates.meta_title = value;
             }
-            if (name === 'excerpt') {
-                updates.meta_description = value;
-            }
+
             
             return {
                 ...prev,
@@ -236,13 +234,17 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                         <label className="block text-sm font-semibold text-gray-900 mb-2">
                             Excerpt
                         </label>
-                        <textarea
-                            name="excerpt"
+                        <RichTextEditor
                             value={formData.excerpt}
-                            onChange={handleChange}
-                            rows={3}
+                            onChange={(value) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    excerpt: value,
+                                    meta_description: value.replace(/<[^>]*>/g, '')
+                                }));
+                            }}
                             placeholder="Brief summary of the post..."
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066ff] focus:border-transparent resize-none text-gray-900"
+                            minHeight="150px"
                         />
                         <p className="text-sm text-gray-500 mt-1">Appears in blog listings and search results.</p>
                     </div>
