@@ -274,7 +274,7 @@ export default function BlogPage() {
                                             {featuredPost.title}
                                         </h2>
                                         <div 
-                                            className="text-gray-600 mb-6 leading-relaxed prose prose-sm max-w-none"
+                                            className="text-gray-600 mb-6 leading-relaxed prose prose-sm max-w-none overflow-x-auto break-words"
                                             dangerouslySetInnerHTML={{ __html: featuredPost.excerpt }}
                                         />
 

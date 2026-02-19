@@ -148,7 +148,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
 
                     {/* Excerpt */}
                     <div 
-                        className="text-xl text-gray-600 mb-8 leading-relaxed prose prose-lg max-w-none"
+                        className="text-xl text-gray-600 mb-8 leading-relaxed prose prose-lg max-w-none overflow-x-auto break-words"
                         dangerouslySetInnerHTML={{ __html: blog.excerpt }}
                     />
 

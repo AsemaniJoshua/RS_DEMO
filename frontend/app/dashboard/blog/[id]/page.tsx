@@ -135,7 +135,7 @@ export default function BlogDetailsPage() {
                         {/* Excerpt */}
                         {blog.excerpt && (
                             <div 
-                                className="text-lg text-gray-600 italic mb-8 pb-6 border-b border-gray-100 prose prose-sm max-w-none"
+                                className="text-lg text-gray-600 italic mb-8 pb-6 border-b border-gray-100 prose prose-sm max-w-none overflow-x-auto break-words"
                                 dangerouslySetInnerHTML={{ __html: blog.excerpt }}
                             />
                         )}

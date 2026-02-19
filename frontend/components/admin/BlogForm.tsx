@@ -44,7 +44,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                 featured_image: initialData.featured_image || "",
                 status: initialData.status,
                 meta_title: initialData.meta_title || "",
-                meta_description: (initialData.meta_description || "").replace(/<[^>]*>/g, ''),
+                meta_description: (initialData.meta_description || "").replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(),
                 categories: initialData.categories?.map(c => ({ name: c.name, slug: c.slug })) || [],
                 tags: initialData.tags?.map(t => ({ name: t.name })) || []
             });
@@ -240,7 +240,7 @@ export default function BlogForm({ initialData, isEditing = false }: BlogFormPro
                                 setFormData(prev => ({
                                     ...prev,
                                     excerpt: value,
-                                    meta_description: value.replace(/<[^>]*>/g, '')
+                                    meta_description: value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
                                 }));
                             }}
                             placeholder="Brief summary of the post..."
