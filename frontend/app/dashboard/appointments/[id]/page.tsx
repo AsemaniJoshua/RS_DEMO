@@ -113,7 +113,7 @@ export default function AppointmentDetailPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-6 min-w-0">
                     {/* Status & Time Card */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                         <div className="flex items-start justify-between mb-6">
@@ -182,7 +182,7 @@ export default function AppointmentDetailPage() {
                             <div>
                                 <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Additional Notes</h4>
                                 {appointment.notes ? (
-                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-gray-700">
+                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-gray-700 overflow-x-auto break-words">
                                         {appointment.notes}
                                     </div>
                                 ) : (

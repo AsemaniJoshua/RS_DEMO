@@ -147,7 +147,7 @@ export default function ViewAppointmentPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-6 min-w-0">
                     {/* Status & Time Card */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                         <div className="flex items-start justify-between mb-6">
@@ -217,7 +217,7 @@ export default function ViewAppointmentPage() {
                                 <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Additional Notes</h4>
                                 {appointment.notes ? (
                                     <div 
-                                        className="prose prose-sm prose-blue max-w-none p-4 bg-gray-50 rounded-xl border border-gray-100 text-gray-700"
+                                        className="prose prose-sm prose-blue max-w-none p-4 bg-gray-50 rounded-xl border border-gray-100 text-gray-700 overflow-x-auto break-words"
                                         dangerouslySetInnerHTML={{ __html: appointment.notes }}
                                     />
                                 ) : (

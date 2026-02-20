@@ -25,7 +25,7 @@ export default function AppointmentTypeModal({ isOpen, onClose, onUpdate }: Appo
 
     const fetchTypes = async () => {
         try {
-            const data = await appointmentService.getAllTypes();
+            const data = await appointmentService.getAdminTypes();
             setTypes(data);
         } catch (error: any) {
             toast.error(error.message || "Failed to load types");

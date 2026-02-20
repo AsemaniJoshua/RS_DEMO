@@ -1,7 +1,5 @@
 
-  import axios from 'axios';
-
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+  import { api } from "@/lib/api";
 
 export interface Appointment {
   id: string;
@@ -64,15 +62,6 @@ export interface AppointmentType {
 }
 
 class AppointmentService {
-  private getAuthHeader() {
-    const token = localStorage.getItem('auth_token');
-    return {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    };
-  }
-
   // USER DASHBOARD ENDPOINTS
   // Get all appointments for the logged-in user
   async getMyAppointments(): Promise<Appointment[]> {
@@ -91,14 +80,8 @@ class AppointmentService {
         }
       }
       if (!userId) throw new Error('User ID not found. Please log in again.');
-      const response = await axios.get(
-        `${API_BASE_URL}/user/appointments`,
-        {
-          params: { userId },
-          ...this.getAuthHeader()
-        }
-      );
-      return response.data.data.appointments;
+      const response: any = await api.get(`/user/appointments?userId=${userId}`);
+      return response.data?.appointments || response.appointments || [];
     } catch (error: any) {
       console.error('Error fetching user appointments:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch your appointments');
@@ -122,14 +105,8 @@ class AppointmentService {
         }
       }
       if (!userId) throw new Error('User ID not found. Please log in again.');
-      const response = await axios.get(
-        `${API_BASE_URL}/user/appointments/${id}`,
-        {
-          params: { userId },
-          ...this.getAuthHeader()
-        }
-      );
-      return response.data.data.appointment;
+      const response: any = await api.get(`/user/appointments/${id}?userId=${userId}`);
+      return response.data?.appointment || response.appointment;
     } catch (error: any) {
       console.error('Error fetching user appointment:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch appointment');
@@ -157,12 +134,8 @@ class AppointmentService {
         }
       }
       const payload = { ...data, userId };
-      const response = await axios.post(
-        `${API_BASE_URL}/user/appointments`,
-        payload,
-        this.getAuthHeader()
-      );
-      return response.data.data.appointment;
+      const response: any = await api.post('/user/appointments', payload);
+      return response.data?.appointment || response.appointment;
     } catch (error: any) {
       console.error('Error creating user appointment:', error);
       throw new Error(error.response?.data?.message || 'Failed to create appointment');
@@ -178,12 +151,9 @@ class AppointmentService {
       if (filters?.status) params.append('status', filters.status);
       if (filters?.search) params.append('search', filters.search);
 
-      const response = await axios.get(
-        `${API_BASE_URL}/admin/appointments?${params.toString()}`,
-        this.getAuthHeader()
-      );
+      const response: any = await api.get(`/admin/appointments?${params.toString()}`);
 
-      return response.data.appointments;
+      return response.appointments || response.data?.appointments || [];
     } catch (error: any) {
       console.error('Error fetching appointments:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch appointments');
@@ -193,12 +163,9 @@ class AppointmentService {
   // Get single appointment by ID (ADMIN)
   async getAppointmentById(id: string): Promise<Appointment> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/admin/appointments/${id}`,
-        this.getAuthHeader()
-      );
+      const response: any = await api.get(`/admin/appointments/${id}`);
 
-      return response.data.appointment;
+      return response.appointment || response.data?.appointment;
     } catch (error: any) {
       console.error('Error fetching appointment:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch appointment');
@@ -208,13 +175,9 @@ class AppointmentService {
   // Create new appointment (ADMIN)
   async createAppointment(data: CreateAppointmentData): Promise<Appointment> {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/admin/appointments`,
-        data,
-        this.getAuthHeader()
-      );
+      const response: any = await api.post('/admin/appointments', data);
 
-      return response.data.appointment;
+      return response.appointment || response.data?.appointment;
     } catch (error: any) {
       console.error('Error creating appointment:', error);
       throw new Error(error.response?.data?.message || 'Failed to create appointment');
@@ -224,13 +187,9 @@ class AppointmentService {
   // Update appointment (ADMIN)
   async updateAppointment(id: string, data: UpdateAppointmentData): Promise<Appointment> {
     try {
-      const response = await axios.put(
-        `${API_BASE_URL}/admin/appointments/${id}`,
-        data,
-        this.getAuthHeader()
-      );
+      const response: any = await api.put(`/admin/appointments/${id}`, data);
 
-      return response.data.appointment;
+      return response.appointment || response.data?.appointment;
     } catch (error: any) {
       console.error('Error updating appointment:', error);
       throw new Error(error.response?.data?.message || 'Failed to update appointment');
@@ -240,10 +199,7 @@ class AppointmentService {
   // Delete appointment (ADMIN)
   async deleteAppointment(id: string): Promise<void> {
     try {
-      await axios.delete(
-        `${API_BASE_URL}/admin/appointments/${id}`,
-        this.getAuthHeader()
-      );
+      await api.delete(`/admin/appointments/${id}`);
     } catch (error: any) {
       console.error('Error deleting appointment:', error);
       throw new Error(error.response?.data?.message || 'Failed to delete appointment');
@@ -253,11 +209,8 @@ class AppointmentService {
   // Get all appointment types (ADMIN)
   async getAdminTypes(): Promise<AppointmentType[]> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/admin/appointments/types`,
-        this.getAuthHeader()
-      );
-      return response.data.types;
+      const response: any = await api.get('/admin/appointments/types');
+      return response.types || response.data?.types || [];
     } catch (error: any) {
       console.error('Error fetching admin appointment types:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch appointment types');
@@ -267,11 +220,7 @@ class AppointmentService {
   // Create new appointment type (ADMIN)
   async createType(name: string): Promise<void> {
     try {
-      await axios.post(
-        `${API_BASE_URL}/admin/appointments/types`,
-        { name },
-        this.getAuthHeader()
-      );
+      await api.post('/admin/appointments/types', { name });
     } catch (error: any) {
       console.error('Error creating appointment type:', error);
       throw new Error(error.response?.data?.message || 'Failed to create appointment type');
@@ -281,10 +230,7 @@ class AppointmentService {
   // Delete appointment type (ADMIN)
   async deleteType(id: string): Promise<void> {
     try {
-      await axios.delete(
-        `${API_BASE_URL}/admin/appointments/types/${id}`,
-        this.getAuthHeader()
-      );
+      await api.delete(`/admin/appointments/types/${id}`);
     } catch (error: any) {
       console.error('Error deleting appointment type:', error);
       throw new Error(error.response?.data?.message || 'Failed to delete appointment type');
@@ -295,11 +241,8 @@ class AppointmentService {
   // Get all appointment types (USER - for user dashboard)
   async getAllTypes(): Promise<AppointmentType[]> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/user/appointments/types`,
-        this.getAuthHeader()
-      );
-      return response.data.types;
+      const response: any = await api.get('/user/appointments/types');
+      return response.types || response.data?.types || [];
     } catch (error: any) {
       console.error('Error fetching appointment types:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch appointment types');
@@ -310,10 +253,8 @@ class AppointmentService {
   // Get all appointment types (PUBLIC - for booking page without authentication)
   async getPublicTypes(): Promise<AppointmentType[]> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/public/appointment-types`
-      );
-      return response.data.types;
+      const response: any = await api.get('/public/appointment-types');
+      return response.types || response.data?.types || [];
     } catch (error: any) {
       console.error('Error fetching public appointment types:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch appointment types');
