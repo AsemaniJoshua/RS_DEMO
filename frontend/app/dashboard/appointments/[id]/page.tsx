@@ -182,9 +182,10 @@ export default function AppointmentDetailPage() {
                             <div>
                                 <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Additional Notes</h4>
                                 {appointment.notes ? (
-                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-gray-700 overflow-x-auto break-words">
-                                        {appointment.notes}
-                                    </div>
+                                    <div 
+                                        className="prose prose-sm prose-blue max-w-none p-4 bg-gray-50 rounded-xl border border-gray-100 text-gray-700 overflow-x-auto break-words"
+                                        dangerouslySetInnerHTML={{ __html: appointment.notes }}
+                                    />
                                 ) : (
                                     <div className="text-gray-400 italic flex items-center gap-2 p-4 bg-gray-50/30 rounded-xl border border-dashed border-gray-200">
                                         <AlertCircle className="w-4 h-4" />
