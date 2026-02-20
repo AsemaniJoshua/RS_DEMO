@@ -225,10 +225,12 @@ export default function SpeakingDetailPage({ params }: { params: Promise<{ id: s
                     {event.description && (
                         <div className="mb-12">
                             <h2 className="text-2xl font-bold text-gray-900 mb-6">About This Event</h2>
-                            <div 
-                                className="prose prose-lg max-w-none text-gray-900 overflow-x-auto break-words"
-                                dangerouslySetInnerHTML={{ __html: event.description }}
-                            />
+                            <div className="overflow-hidden">
+                                <div 
+                                    className="prose prose-lg max-w-none text-gray-900 overflow-x-auto [word-break:break-word]"
+                                    dangerouslySetInnerHTML={{ __html: event.description }}
+                                />
+                            </div>
                         </div>
                     )}
 

@@ -209,12 +209,9 @@ export default function LiveSessionDetailsPage() {
                             About This Session
                         </h2>
                         {session.description ? (
-                            <div className="overflow-hidden">
-                                <div 
-                                    className="prose prose-sm prose-blue max-w-none text-gray-700 overflow-x-auto [word-break:break-word]"
-                                    dangerouslySetInnerHTML={{ __html: session.description }}
-                                />
-                            </div>
+                            <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                                {session.description.replace(/<[^>]*>/g, '')}
+                            </p>
                         ) : (
                             <p className="text-gray-500 italic">No description provided for this session.</p>
                         )}

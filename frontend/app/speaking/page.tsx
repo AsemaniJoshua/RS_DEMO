@@ -256,7 +256,7 @@ export default function SpeakingPage() {
                                         </div>
                                     </div>
                                     {event.description && (
-                                        <p className="text-sm text-gray-700 mb-3 line-clamp-2">{event.description}</p>
+                                        <p className="text-sm text-gray-700 mb-3 line-clamp-2">{event.description.replace(/<[^>]*>/g, '')}</p>
                                     )}
                                     <div className="flex items-center gap-4 text-xs text-gray-500">
                                         <span className="flex items-center gap-1">
@@ -345,7 +345,7 @@ export default function SpeakingPage() {
                                         </div>
                                     </div>
                                     {event.description && (
-                                        <p className="text-sm text-gray-700 mb-3 line-clamp-2">{event.description}</p>
+                                        <p className="text-sm text-gray-700 mb-3 line-clamp-2">{event.description.replace(/<[^>]*>/g, '')}</p>
                                     )}
                                     <div className="flex items-center gap-4 text-xs text-gray-500">
                                         <span className="flex items-center gap-1">

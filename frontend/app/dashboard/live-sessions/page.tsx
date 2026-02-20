@@ -61,6 +61,7 @@ export default function UserLiveSessionsPage() {
     const liveCount = sessions.filter(s => s.status === 'LIVE').length;
     const pastCount = sessions.filter(s => s.is_past || s.status === 'COMPLETED').length;
     const allCount = sessions.filter(s => s.status !== 'CANCELLED').length;
+    const myRegisteredSessions = sessions.filter(s => s.is_registered && s.status !== 'CANCELLED');
 
     const filteredSessions = sessions.filter(session => {
         if (filter === 'all') return session.status !== 'CANCELLED';
@@ -92,8 +93,87 @@ export default function UserLiveSessionsPage() {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Filter Tabs */}
-                <div className="inline-flex gap-2 mb-6 bg-white p-1 rounded-lg border border-gray-200">
+                {/* My Registered Sessions Section */}
+                {myRegisteredSessions.length > 0 && (
+                    <div className="mb-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900">My Registered Sessions</h2>
+                                <p className="text-gray-600 text-sm mt-1">Sessions you've registered for</p>
+                            </div>
+                            <Link
+                                href="/dashboard/live-sessions/my-sessions"
+                                className="text-[#0066ff] hover:text-[#0052cc] font-medium text-sm flex items-center gap-1"
+                            >
+                                View All
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M5 12h14m-7-7l7 7-7 7"/>
+                                </svg>
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {myRegisteredSessions.slice(0, 3).map((session) => (
+                                <Link
+                                    key={session.id}
+                                    href={`/dashboard/live-sessions/${session.id}`}
+                                    className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 hover:shadow-lg transition-shadow overflow-hidden group"
+                                >
+                                    <div className="p-6">
+                                        {/* Status Badge */}
+                                        <div className="flex items-center justify-between mb-3">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(session.status)}`}>
+                                                {session.status}
+                                            </span>
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="mr-1">
+                                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                                </svg>
+                                                Registered
+                                            </span>
+                                        </div>
+
+                                        {/* Title */}
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#0066ff] transition-colors">
+                                            {session.title}
+                                        </h3>
+
+                                        {/* Description */}
+                                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                                            {session.description ? session.description.replace(/<[^>]*>/g, '') : 'No description provided'}
+                                        </p>
+
+                                        {/* Date & Time */}
+                                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                                <line x1="3" y1="10" x2="21" y2="10"/>
+                                            </svg>
+                                            {formatDate(session.scheduled_date)} at {formatTime(session.scheduled_date)}
+                                        </div>
+
+                                        {/* Duration */}
+                                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <polyline points="12 6 12 12 16 14"/>
+                                            </svg>
+                                            {session.duration_minutes} minutes
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* All Sessions Section */}
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">All Sessions</h2>
+                    
+                    {/* Filter Tabs */}
+                    <div className="inline-flex gap-2 mb-6 bg-white p-1 rounded-lg border border-gray-200">
                     <button
                         onClick={() => setFilter('upcoming')}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
@@ -252,18 +332,6 @@ export default function UserLiveSessionsPage() {
                     </div>
                 )}
 
-                {/* My Sessions Link */}
-                <div className="mt-8 text-center">
-                    <Link
-                        href="/dashboard/live-sessions/my-sessions"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-[#0066ff] text-[#0066ff] rounded-lg hover:bg-[#0066ff] hover:text-white transition-colors font-medium"
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                        View My Registered Sessions
-                    </Link>
                 </div>
             </div>
         </div>

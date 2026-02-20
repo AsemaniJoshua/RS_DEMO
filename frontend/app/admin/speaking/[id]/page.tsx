@@ -186,10 +186,12 @@ export default function ViewSpeakingEventPage() {
                         </div>
                         
                         {event.description ? (
-                            <div 
-                                className="prose prose-sm prose-blue max-w-none text-gray-700 leading-relaxed overflow-x-auto break-words"
-                                dangerouslySetInnerHTML={{ __html: event.description }}
-                            />
+                            <div className="overflow-hidden">
+                                <div 
+                                    className="prose prose-sm prose-blue max-w-none text-gray-700 leading-relaxed overflow-x-auto [word-break:break-word]"
+                                    dangerouslySetInnerHTML={{ __html: event.description }}
+                                />
+                            </div>
                         ) : (
                             <p className="text-gray-400 italic">No description provided.</p>
                         )}
