@@ -86,13 +86,6 @@ export default function EditSpeakingEventPage() {
             toast.error("Event date is required");
             return;
         }
-        const selectedDate = new Date(formData.date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (selectedDate <= today) {
-            toast.error("Event date must be in the future");
-            return;
-        }
         if (!formData.location.trim()) {
             toast.error("Location is required");
             return;
