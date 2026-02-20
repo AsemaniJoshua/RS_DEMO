@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import BackButton from "@/components/ui/BackButton";
 import { appointmentService } from "@/services/appointment-service";
 import toast from "react-hot-toast";
-import dynamic from "next/dynamic";
-import "react-quill-new/dist/quill.snow.css";
-
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function NewAppointmentPage() {
   const router = useRouter();
@@ -75,13 +72,6 @@ export default function NewAppointmentPage() {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleNotesChange = (value: string) => {
-    setFormData({
-      ...formData,
-      notes: value,
     });
   };
 
@@ -303,12 +293,11 @@ export default function NewAppointmentPage() {
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Additional Notes
               </label>
-              <ReactQuill
-                theme="snow"
+              <RichTextEditor
                 value={formData.notes}
-                onChange={handleNotesChange}
+                onChange={(value) => setFormData({ ...formData, notes: value })}
                 placeholder="Add any additional notes about the appointment..."
-                style={{ height: "200px", marginBottom: "50px" }}
+                minHeight="150px"
               />
             </div>
           </div>
