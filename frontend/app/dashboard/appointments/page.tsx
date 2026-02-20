@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 export default function AppointmentsPage() {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
-    const [activeTab, setActiveTab] = useState("upcoming");
+    const [activeTab, setActiveTab] = useState<"upcoming" | "past" | "cancelled">("upcoming");
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
@@ -51,11 +51,16 @@ export default function AppointmentsPage() {
         });
     };
 
-    // Split appointments into upcoming and past
+    // Split appointments into upcoming, past, and cancelled
     const now = new Date();
-    const upcomingAppointments = appointments.filter(a => new Date(a.date) >= now);
-    const pastAppointments = appointments.filter(a => new Date(a.date) < now);
-    const displayedAppointments = activeTab === "upcoming" ? upcomingAppointments : pastAppointments;
+    const cancelledAppointments = appointments.filter(a => a.status === 'CANCELLED');
+    const upcomingAppointments = appointments.filter(a => new Date(a.date) >= now && a.status !== 'CANCELLED');
+    const pastAppointments = appointments.filter(a => new Date(a.date) < now && a.status !== 'CANCELLED');
+    
+    const displayedAppointments = 
+        activeTab === "upcoming" ? upcomingAppointments : 
+        activeTab === "past" ? pastAppointments : 
+        cancelledAppointments;
 
     return (
         <div className="p-4 md:p-8">
@@ -76,7 +81,7 @@ export default function AppointmentsPage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="text-2xl font-bold text-gray-900">{upcomingAppointments.length}</div>
                     <div className="text-sm text-gray-600">Upcoming Appointments</div>
@@ -84,6 +89,10 @@ export default function AppointmentsPage() {
                 <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <div className="text-2xl font-bold text-blue-600">{pastAppointments.length}</div>
                     <div className="text-sm text-gray-600">Past or Completed</div>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <div className="text-2xl font-bold text-red-600">{cancelledAppointments.length}</div>
+                    <div className="text-sm text-gray-600">Cancelled</div>
                 </div>
             </div>
 
@@ -110,6 +119,16 @@ export default function AppointmentsPage() {
                     >
                         Past ({pastAppointments.length})
                     </button>
+                    <button
+                        onClick={() => setActiveTab("cancelled")}
+                        className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+                            activeTab === "cancelled"
+                                ? "text-[#0066ff] border-b-2 border-[#0066ff]"
+                                : "text-gray-600 hover:text-gray-900"
+                        }`}
+                    >
+                        Cancelled ({cancelledAppointments.length})
+                    </button>
                 </div>
 
                 {/* Appointments List */}
@@ -134,7 +153,9 @@ export default function AppointmentsPage() {
                             <p className="text-gray-600">
                                 {activeTab === "upcoming" 
                                     ? "Book your first appointment to get started" 
-                                    : "Your completed appointments will appear here"}
+                                    : activeTab === "past"
+                                    ? "Your completed appointments will appear here"
+                                    : "Your cancelled appointments will appear here"}
                             </p>
                         </div>
                     ) : (

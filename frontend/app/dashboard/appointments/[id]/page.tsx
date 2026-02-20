@@ -48,7 +48,7 @@ export default function AppointmentDetailPage() {
         if (!appointment) return;
         setIsDeleting(true);
         try {
-            await appointmentService.deleteMyAppointment(appointment.id);
+            await appointmentService.cancelMyAppointment(appointment.id);
             toast.success("Appointment cancelled successfully");
             router.push("/dashboard/appointments");
         } catch (error: any) {

@@ -142,8 +142,8 @@ class AppointmentService {
     }
   }
 
-  // Delete/Cancel an appointment for the logged-in user
-  async deleteMyAppointment(id: string): Promise<void> {
+  // Cancel an appointment for the logged-in user (updates status to CANCELLED)
+  async cancelMyAppointment(id: string): Promise<void> {
     try {
       // Extract userId from localStorage (user object or user_id)
       let userId = '';
@@ -159,9 +159,9 @@ class AppointmentService {
         }
       }
       if (!userId) throw new Error('User ID not found. Please log in again.');
-      await api.delete(`/user/appointments/${id}?userId=${userId}`);
+      await api.patch(`/user/appointments/${id}/cancel?userId=${userId}`, {});
     } catch (error: any) {
-      console.error('Error deleting user appointment:', error);
+      console.error('Error cancelling user appointment:', error);
       throw new Error(error.response?.data?.message || 'Failed to cancel appointment');
     }
   }
