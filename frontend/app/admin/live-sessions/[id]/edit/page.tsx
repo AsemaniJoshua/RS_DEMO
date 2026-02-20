@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { liveSessionsService, type LiveSession } from "@/services/live-sessions-service";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function EditLiveSessionPage() {
     const params = useParams();
@@ -137,12 +138,11 @@ export default function EditLiveSessionPage() {
                 
                 <div>
                     <label className="block text-sm font-medium text-gray-900 mb-2">Description</label>
-                    <textarea 
-                        rows={4}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-[#0066ff] focus:outline-none resize-none text-gray-900 placeholder-gray-500"
-                        placeholder="Provide details about the session..."
+                    <RichTextEditor
                         value={session.description}
-                        onChange={e => setSession({...session, description: e.target.value})}
+                        onChange={(value) => setSession({...session, description: value})}
+                        placeholder="Provide details about the session..."
+                        minHeight="200px"
                     />
                 </div>
 

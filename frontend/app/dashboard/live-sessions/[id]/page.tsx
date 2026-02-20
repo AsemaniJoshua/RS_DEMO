@@ -208,9 +208,16 @@ export default function LiveSessionDetailsPage() {
                             <Video className="w-5 h-5 text-[#00d4aa]" />
                             About This Session
                         </h2>
-                        <div className="prose prose-sm prose-blue max-w-none text-gray-700 whitespace-pre-line leading-relaxed">
-                            {session.description || 'No description provided for this session.'}
-                        </div>
+                        {session.description ? (
+                            <div className="overflow-hidden">
+                                <div 
+                                    className="prose prose-sm prose-blue max-w-none text-gray-700 overflow-x-auto [word-break:break-word]"
+                                    dangerouslySetInnerHTML={{ __html: session.description }}
+                                />
+                            </div>
+                        ) : (
+                            <p className="text-gray-500 italic">No description provided for this session.</p>
+                        )}
                     </div>
 
                     {/* Meeting Details (if registered) */}

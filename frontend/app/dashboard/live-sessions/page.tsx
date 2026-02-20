@@ -206,7 +206,7 @@ export default function UserLiveSessionsPage() {
 
                                     {/* Description */}
                                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                                        {session.description || 'No description provided'}
+                                        {session.description ? session.description.replace(/<[^>]*>/g, '') : 'No description provided'}
                                     </p>
 
                                     {/* Date & Time */}

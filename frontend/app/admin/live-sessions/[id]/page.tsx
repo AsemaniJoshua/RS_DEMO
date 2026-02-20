@@ -135,7 +135,16 @@ export default function LiveSessionDetailsPage() {
                     <div className="space-y-3">
                         <div>
                             <label className="text-sm font-medium text-gray-500">Description</label>
-                            <p className="text-gray-900 mt-1">{session.description || 'No description provided'}</p>
+                            {session.description ? (
+                                <div className="overflow-hidden">
+                                    <div 
+                                        className="prose prose-sm max-w-none mt-1 text-gray-900 overflow-x-auto [word-break:break-word]"
+                                        dangerouslySetInnerHTML={{ __html: session.description }}
+                                    />
+                                </div>
+                            ) : (
+                                <p className="text-gray-500 mt-1 italic">No description provided</p>
+                            )}
                         </div>
                         
                         <div className="grid grid-cols-2 gap-4">

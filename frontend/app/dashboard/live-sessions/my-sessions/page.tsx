@@ -132,7 +132,7 @@ export default function MySessionsPage() {
                                             </h3>
                                             
                                             <p className="text-gray-600 mb-6 line-clamp-2">
-                                                {session.description || 'No description provided'}
+                                                {session.description ? session.description.replace(/<[^>]*>/g, '') : 'No description provided'}
                                             </p>
 
                                             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
