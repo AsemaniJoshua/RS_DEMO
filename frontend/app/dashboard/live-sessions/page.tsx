@@ -5,6 +5,16 @@ import { liveSessionsService, type LiveSession } from "@/services/live-sessions-
 import toast from "react-hot-toast";
 import Link from "next/link";
 
+// Helper function to strip HTML tags and decode HTML entities
+const stripHtmlAndDecode = (html: string): string => {
+    // First strip HTML tags
+    const withoutTags = html.replace(/<[^>]*>/g, '');
+    // Then decode HTML entities
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = withoutTags;
+    return textarea.value;
+};
+
 export default function UserLiveSessionsPage() {
     const [sessions, setSessions] = useState<LiveSession[]>([]);
     const [filter, setFilter] = useState<'all' | 'upcoming' | 'live' | 'past'>('upcoming');
@@ -139,7 +149,7 @@ export default function UserLiveSessionsPage() {
 
                                         {/* Description */}
                                         <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                                            {session.description ? session.description.replace(/<[^>]*>/g, '') : 'No description provided'}
+                                            {session.description ? stripHtmlAndDecode(session.description) : 'No description provided'}
                                         </p>
 
                                         {/* Date & Time */}
@@ -286,7 +296,7 @@ export default function UserLiveSessionsPage() {
 
                                     {/* Description */}
                                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                                        {session.description ? session.description.replace(/<[^>]*>/g, '') : 'No description provided'}
+                                        {session.description ? stripHtmlAndDecode(session.description) : 'No description provided'}
                                     </p>
 
                                     {/* Date & Time */}

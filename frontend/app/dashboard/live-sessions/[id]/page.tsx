@@ -19,6 +19,16 @@ import {
     ExternalLink
 } from "lucide-react";
 
+// Helper function to strip HTML tags and decode HTML entities
+const stripHtmlAndDecode = (html: string): string => {
+    // First strip HTML tags
+    const withoutTags = html.replace(/<[^>]*>/g, '');
+    // Then decode HTML entities
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = withoutTags;
+    return textarea.value;
+};
+
 export default function LiveSessionDetailsPage() {
     const params = useParams();
     const router = useRouter();
@@ -210,7 +220,7 @@ export default function LiveSessionDetailsPage() {
                         </h2>
                         {session.description ? (
                             <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-                                {session.description.replace(/<[^>]*>/g, '')}
+                                {stripHtmlAndDecode(session.description)}
                             </p>
                         ) : (
                             <p className="text-gray-500 italic">No description provided for this session.</p>

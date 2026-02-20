@@ -15,6 +15,16 @@ import {
     AlertCircle
 } from "lucide-react";
 
+// Helper function to strip HTML tags and decode HTML entities
+const stripHtmlAndDecode = (html: string): string => {
+    // First strip HTML tags
+    const withoutTags = html.replace(/<[^>]*>/g, '');
+    // Then decode HTML entities
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = withoutTags;
+    return textarea.value;
+};
+
     const getStatusColor = (status: SessionStatus) => {
         switch (status) {
             case 'LIVE':
@@ -132,7 +142,7 @@ export default function MySessionsPage() {
                                             </h3>
                                             
                                             <p className="text-gray-600 mb-6 line-clamp-2">
-                                                {session.description ? session.description.replace(/<[^>]*>/g, '') : 'No description provided'}
+                                                {session.description ? stripHtmlAndDecode(session.description) : 'No description provided'}
                                             </p>
 
                                             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
