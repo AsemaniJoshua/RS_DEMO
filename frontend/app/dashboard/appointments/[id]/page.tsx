@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { appointmentService, Appointment } from "@/services/appointment-service";
 import toast from "react-hot-toast";
+import DeleteModal from "@/components/dashboard/DeleteModal";
 import { 
     Calendar, 
     Clock, 
@@ -15,7 +16,8 @@ import {
     CheckCircle, 
     XCircle, 
     AlertCircle, 
-    ArrowLeft
+    ArrowLeft,
+    Trash2
 } from "lucide-react";
 
 export default function AppointmentDetailPage() {
@@ -24,6 +26,8 @@ export default function AppointmentDetailPage() {
     const appointmentId = params.id as string;
     const [appointment, setAppointment] = useState<Appointment | null>(null);
     const [loading, setLoading] = useState(true);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const fetchAppointment = async () => {
@@ -39,6 +43,20 @@ export default function AppointmentDetailPage() {
         };
         fetchAppointment();
     }, [appointmentId]);
+
+    const handleCancelAppointment = async () => {
+        if (!appointment) return;
+        setIsDeleting(true);
+        try {
+            await appointmentService.deleteMyAppointment(appointment.id);
+            toast.success("Appointment cancelled successfully");
+            router.push("/dashboard/appointments");
+        } catch (error: any) {
+            toast.error(error.message || "Failed to cancel appointment");
+            setIsDeleting(false);
+            setDeleteModalOpen(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -109,6 +127,15 @@ export default function AppointmentDetailPage() {
                         </div>
                     </div>
                 </div>
+                {appointment.status !== 'CANCELLED' && appointment.status !== 'COMPLETED' && (
+                    <button 
+                        onClick={() => setDeleteModalOpen(true)}
+                        className="px-5 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl hover:bg-red-100 transition-colors font-medium flex items-center gap-2"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        Cancel Appointment
+                    </button>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -245,6 +272,14 @@ export default function AppointmentDetailPage() {
                     </div>
                 </div>
             </div>
+
+            <DeleteModal
+                isOpen={deleteModalOpen}
+                title="Cancel Appointment"
+                message="Are you sure you want to cancel this appointment? This action cannot be undone and you will need to book a new appointment."
+                onConfirm={handleCancelAppointment}
+                onCancel={() => setDeleteModalOpen(false)}
+            />
         </div>
     );
 }

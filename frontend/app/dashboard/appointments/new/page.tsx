@@ -12,6 +12,7 @@ export default function NewAppointmentPage() {
   const [types, setTypes] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   // Assume user email is available from localStorage or context
   const [formData, setFormData] = useState({
     patientName: "",
@@ -77,12 +78,18 @@ export default function NewAppointmentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Show confirmation modal first
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmSubmit = async () => {
     // Validate date is in the future
     const selectedDate = new Date(formData.date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (selectedDate <= today) {
       toast.error("Appointment date must be in the future");
+      setShowConfirmModal(false);
       return;
     }
     setIsSubmitting(true);
@@ -132,6 +139,7 @@ export default function NewAppointmentPage() {
       console.error("Appointment creation error:", error);
     } finally {
       setIsSubmitting(false);
+      setShowConfirmModal(false);
     }
   };
 
@@ -154,6 +162,22 @@ export default function NewAppointmentPage() {
         </div>
       </div>
       <form onSubmit={handleSubmit} className="max-w-4xl">
+        {/* Warning Banner */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+          <div className="p-2 bg-amber-100 rounded-lg shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-amber-600">
+              <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-amber-900 mb-1">Important Notice</h3>
+            <p className="text-sm text-amber-800">
+              Once you create this appointment, you <strong>cannot edit</strong> the details. 
+              You can only cancel it and create a new one if needed. Please ensure all information is correct before submitting.
+            </p>
+          </div>
+        </div>
+
         <div className="bg-white rounded-xl p-6 border border-gray-100 space-y-6">
           {/* Patient Information Section */}
           <div>
@@ -317,6 +341,60 @@ export default function NewAppointmentPage() {
           </div>
         </div>
       </form>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-50"
+            onClick={() => !isSubmitting && setShowConfirmModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
+              {/* Icon */}
+              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-amber-600">
+                  <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+
+              {/* Content */}
+              <h3 className="text-lg font-bold text-gray-900 text-center mb-2">Confirm Appointment</h3>
+              <p className="text-sm text-gray-600 text-center mb-6">
+                Please confirm that all details are correct. <strong>You will not be able to edit this appointment</strong> after creation. You can only cancel and create a new one.
+              </p>
+
+              {/* Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Review Details
+                </button>
+                <button
+                  onClick={handleConfirmSubmit}
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Booking...
+                    </>
+                  ) : (
+                    "Confirm & Book"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
