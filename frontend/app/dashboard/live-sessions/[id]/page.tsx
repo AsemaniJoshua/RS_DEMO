@@ -93,13 +93,18 @@ export default function LiveSessionDetailsPage() {
     const handlePurchaseRecording = async () => {
         try {
             setPurchasing(true);
-            const response = await liveSessionsService.purchaseRecording(sessionId);
+            
+            // Create callback URL for payment verification
+            const callbackUrl = `${window.location.origin}/dashboard/recordings/verify`;
+            
+            const response = await liveSessionsService.purchaseRecording(sessionId, callbackUrl);
             
             // Redirect to Paystack payment page
             if (response.data?.authorization_url) {
                 window.location.href = response.data.authorization_url;
             } else {
                 toast.error('Failed to initialize payment');
+                setPurchasing(false);
             }
         } catch (err: unknown) {
             const error = err as { message?: string };
