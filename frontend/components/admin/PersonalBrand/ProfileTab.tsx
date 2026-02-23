@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { PersonalBrand, personalBrandService, UpdateProfileData } from '@/services/personal-brand-service';
+
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
 
 interface ProfileTabProps {
     personalBrand: PersonalBrand;
@@ -106,12 +109,30 @@ export default function ProfileTab({ personalBrand, onUpdate, isEditMode }: Prof
                 {/* Bio */}
                 <div className="bg-gray-50 rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Short Bio</h3>
-                    <p className="text-gray-700 whitespace-pre-wrap">{profile?.short_bio || 'Not set'}</p>
+                    {profile?.short_bio ? (
+                        <div className="overflow-hidden">
+                            <div 
+                                className="prose prose-sm max-w-none overflow-x-auto [word-break:break-word] text-gray-700"
+                                dangerouslySetInnerHTML={{ __html: profile.short_bio }}
+                            />
+                        </div>
+                    ) : (
+                        <p className="text-gray-500 italic">Not set</p>
+                    )}
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Full Bio</h3>
-                    <p className="text-gray-700 whitespace-pre-wrap">{profile?.full_bio || 'Not set'}</p>
+                    {profile?.full_bio ? (
+                        <div className="overflow-hidden">
+                            <div 
+                                className="prose prose-sm max-w-none overflow-x-auto [word-break:break-word] text-gray-700"
+                                dangerouslySetInnerHTML={{ __html: profile.full_bio }}
+                            />
+                        </div>
+                    ) : (
+                        <p className="text-gray-500 italic">Not set</p>
+                    )}
                 </div>
             </div>
         );
@@ -215,22 +236,20 @@ export default function ProfileTab({ personalBrand, onUpdate, isEditMode }: Prof
                 </div>
                 <div className="col-span-2">
                     <label className="block text-sm font-semibold text-gray-900 mb-2">Short Bio *</label>
-                    <textarea
+                    <RichTextEditor
                         value={formData.short_bio}
-                        onChange={(e) => setFormData({ ...formData, short_bio: e.target.value })}
-                        required
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        onChange={(value) => setFormData({ ...formData, short_bio: value })}
+                        placeholder="Enter a brief professional summary..."
+                        minHeight="150px"
                     />
                 </div>
                 <div className="col-span-2">
                     <label className="block text-sm font-semibold text-gray-900 mb-2">Full Bio *</label>
-                    <textarea
+                    <RichTextEditor
                         value={formData.full_bio}
-                        onChange={(e) => setFormData({ ...formData, full_bio: e.target.value })}
-                        required
-                        rows={6}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#00d4aa] focus:outline-none text-gray-900"
+                        onChange={(value) => setFormData({ ...formData, full_bio: value })}
+                        placeholder="Enter your complete professional biography..."
+                        minHeight="300px"
                     />
                 </div>
             </div>

@@ -98,9 +98,18 @@ export default function AboutPage() {
                             </h1>
 
                             {/* Description */}
-                            <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">
-                                {personalBrand?.profile?.full_bio || "A passionate pharmacist and health educator dedicated to empowering individuals with the knowledge they need to make informed health decisions."}
-                            </p>
+                            {personalBrand?.profile?.full_bio ? (
+                                <div className="overflow-hidden mb-8">
+                                    <div 
+                                        className="prose prose-lg max-w-none overflow-x-auto [word-break:break-word] text-gray-600"
+                                        dangerouslySetInnerHTML={{ __html: personalBrand.profile.full_bio }}
+                                    />
+                                </div>
+                            ) : (
+                                <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">
+                                    A passionate pharmacist and health educator dedicated to empowering individuals with the knowledge they need to make informed health decisions.
+                                </p>
+                            )}
 
                             {/* CTA Buttons */}
                             <div className="flex flex-wrap gap-4">
