@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import contactFAQsData from "@/data/contactFAQs.json";
 import { publicService, PublicPersonalBrand } from "@/services/public-service";
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor (client-side only)
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), { ssr: false });
 
 export default function ContactPage() {
     const [personalBrand, setPersonalBrand] = useState<PublicPersonalBrand | null>(null);
@@ -37,6 +41,13 @@ export default function ContactPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Validate message is not empty after stripping HTML
+        const strippedMessage = formData.message.replace(/<[^>]*>/g, '').trim();
+        if (!strippedMessage) {
+            toast.error('Please enter a message');
+            return;
+        }
         
         setSubmitting(true);
         try {
@@ -206,15 +217,11 @@ export default function ContactPage() {
                                         <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
                                             Message *
                                         </label>
-                                        <textarea
-                                            id="message"
-                                            name="message"
+                                        <RichTextEditor
                                             value={formData.message}
-                                            onChange={handleChange}
-                                            required
-                                            rows={6}
-                                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none transition-colors resize-none text-gray-900"
+                                            onChange={(value) => setFormData({ ...formData, message: value })}
                                             placeholder="Tell me how I can help you..."
+                                            minHeight="200px"
                                         />
                                     </div>
 
