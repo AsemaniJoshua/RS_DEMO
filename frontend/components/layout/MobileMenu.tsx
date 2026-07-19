@@ -25,6 +25,7 @@ export default function MobileMenu() {
             {/* Mobile Menu Button */}
             <button
                 onClick={toggleMenu}
+                style={{ marginRight: '16px' }}
                 className="flex xl:hidden p-2 text-gray-600 hover:text-[#0066ff] transition-colors cursor-pointer"
                 aria-label="Toggle mobile menu"
                 aria-expanded={isOpen}

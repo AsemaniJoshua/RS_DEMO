@@ -213,8 +213,102 @@ export default function SpeakingEventsPage() {
                 </div>
             </div>
 
-            {/* Speaking Table */}
-            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            {/* Speaking Mobile Cards View */}
+            <div className="block md:hidden space-y-4">
+                {isLoading ? (
+                    <div className="flex flex-col items-center gap-3 p-12 bg-white rounded-xl border border-gray-100">
+                        <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-gray-600">Loading events...</p>
+                    </div>
+                ) : filteredSpeaking.length === 0 ? (
+                    <div className="bg-white rounded-xl p-8 text-center text-gray-500 border border-gray-100">
+                        No events found
+                    </div>
+                ) : (
+                    filteredSpeaking.map((engagement) => (
+                        <div key={engagement.id} className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm space-y-3">
+                            <div className="flex items-start gap-3">
+                                <div className="w-16 h-16 relative rounded-lg overflow-hidden shrink-0 bg-gray-100 shadow-sm">
+                                    {engagement.image ? (
+                                        <img 
+                                            src={engagement.image} 
+                                            alt={engagement.title}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                <path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM11 13.5l2.5 3.01L17 12l4 5H3l4-6 4 7.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="font-semibold text-gray-900 line-clamp-2">{engagement.title}</div>
+                                    <div className="text-xs text-gray-500 mt-1">{engagement.venue}</div>
+                                </div>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2 pt-1">
+                                <span className="px-2.5 py-0.5 bg-purple-50 text-purple-700 rounded-full text-xs font-medium">
+                                    {engagement.category}
+                                </span>
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    engagement.status === "UPCOMING" ? "bg-green-50 text-green-700" :
+                                    engagement.status === "COMPLETED" ? "bg-blue-50 text-blue-700" :
+                                    "bg-gray-100 text-gray-700"
+                                }`}>
+                                    {engagement.status === "UPCOMING" ? "Upcoming" :
+                                     engagement.status === "COMPLETED" ? "Completed" :
+                                     "Cancelled"}
+                                </span>
+                            </div>
+
+                            <div className="text-xs sm:text-sm text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-gray-400 font-medium w-16">Date:</span>
+                                    <span className="text-gray-900">{new Date(engagement.date).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-gray-400 font-medium w-16">Location:</span>
+                                    <span className="text-gray-900">{engagement.location}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
+                                <Link href={`/admin/speaking/${engagement.id}`}>
+                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="View event">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                                        </svg>
+                                    </button>
+                                </Link>
+                                <Link href={`/admin/speaking/${engagement.id}/edit`}>
+                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="Edit event">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </button>
+                                </Link>
+                                <button 
+                                    onClick={() => handleDeleteClick(engagement.id, engagement.title)}
+                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600" 
+                                    title="Delete event"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Speaking Desktop Table */}
+            <div className="hidden md:block bg-white rounded-xl border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>

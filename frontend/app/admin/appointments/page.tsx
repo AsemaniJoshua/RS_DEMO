@@ -262,80 +262,144 @@ export default function AppointmentsPage() {
             )}
 
             {filteredAppointments.length > 0 && (
-                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-[768px]">
-                            <thead>
-                                <tr className="bg-gray-50 border-b border-gray-100">
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Patient</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Date & Time</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Duration</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contact</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredAppointments.map((appointment, idx) => (
-                                    <tr key={appointment.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                                        <td className="px-6 py-4">
-                                            <div className="font-semibold text-gray-900">{appointment.patientName}</div>
+                <>
+                    {/* Appointments Mobile Cards View */}
+                    <div className="block md:hidden space-y-4">
+                        {filteredAppointments.map((appointment) => (
+                            <div key={appointment.id} className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm space-y-3">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <div className="font-semibold text-gray-900">{appointment.patientName}</div>
+                                        <span className="inline-block mt-1 px-2.5 py-0.5 bg-purple-50 text-purple-700 rounded-full text-xs font-medium">
+                                            {appointment.type.name}
+                                        </span>
+                                    </div>
+                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
+                                        {appointment.status}
+                                    </span>
+                                </div>
+                                
+                                <div className="text-xs sm:text-sm text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-gray-400 font-medium w-20 shrink-0">Date & Time:</span>
+                                        <span className="text-gray-900">{new Date(appointment.date).toLocaleDateString()} at {appointment.time} ({appointment.duration})</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-gray-400 font-medium w-20 shrink-0">Phone:</span>
+                                        <span className="text-gray-900">{appointment.patientPhone}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-gray-400 font-medium w-20 shrink-0">Email:</span>
+                                        <span className="text-gray-900 truncate">{appointment.patientEmail}</span>
+                                    </div>
+                                </div>
 
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
-                                                {appointment.type.name}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="text-gray-900">{new Date(appointment.date).toLocaleDateString()}</div>
-                                            <div className="text-sm text-gray-600">{appointment.time}</div>
-                                        </td>
-                                        <td className="px-6 py-4 text-gray-900">{appointment.duration}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="text-sm text-gray-900">{appointment.patientPhone}</div>
-                                            <div className="text-sm text-gray-600">{appointment.patientEmail}</div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
-                                                {appointment.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <Link href={`/admin/appointments/${appointment.id}`}>
-                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="View Details">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                            <circle cx="12" cy="12" r="3"></circle>
-                                                        </svg>
-                                                    </button>
-                                                </Link>
-                                                <Link href={`/admin/appointments/${appointment.id}/edit`}>
-                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        </svg>
-                                                    </button>
-                                                </Link>
-                                                <button 
-                                                    onClick={() => handleDeleteClick(appointment.id, appointment.patientName)}
-                                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
-                                                >
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
+                                    <Link href={`/admin/appointments/${appointment.id}`}>
+                                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="View Details">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    </Link>
+                                    <Link href={`/admin/appointments/${appointment.id}/edit`}>
+                                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="Edit">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </button>
+                                    </Link>
+                                    <button 
+                                        onClick={() => handleDeleteClick(appointment.id, appointment.patientName)}
+                                        className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                                        title="Delete"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                </div>
+
+                    {/* Appointments Desktop Table */}
+                    <div className="hidden md:block bg-white rounded-xl border border-gray-100 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full min-w-[768px]">
+                                <thead>
+                                    <tr className="bg-gray-50 border-b border-gray-100">
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Patient</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Date & Time</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Duration</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contact</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredAppointments.map((appointment, idx) => (
+                                        <tr key={appointment.id} className={`border-b border-gray-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                            <td className="px-6 py-4">
+                                                <div className="font-semibold text-gray-900">{appointment.patientName}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
+                                                    {appointment.type.name}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-gray-900">{new Date(appointment.date).toLocaleDateString()}</div>
+                                                <div className="text-sm text-gray-600">{appointment.time}</div>
+                                            </td>
+                                            <td className="px-6 py-4 text-gray-900">{appointment.duration}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-900">{appointment.patientPhone}</div>
+                                                <div className="text-sm text-gray-600">{appointment.patientEmail}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
+                                                    {appointment.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Link href={`/admin/appointments/${appointment.id}`}>
+                                                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="View Details">
+                                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                                <circle cx="12" cy="12" r="3"></circle>
+                                                            </svg>
+                                                        </button>
+                                                    </Link>
+                                                    <Link href={`/admin/appointments/${appointment.id}/edit`}>
+                                                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700">
+                                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                            </svg>
+                                                        </button>
+                                                    </Link>
+                                                    <button 
+                                                        onClick={() => handleDeleteClick(appointment.id, appointment.patientName)}
+                                                        className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                                                    >
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </>
             )}
 
             {/* Delete Modal */}

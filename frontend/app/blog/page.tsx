@@ -169,7 +169,7 @@ export default function BlogPage() {
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-4xl mx-auto text-center">
                         {/* Heading */}
-                        <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6">
                             Health Insights{" "}
                             <span className="text-[#0066ff]">& Articles</span>
                         </h1>
@@ -191,25 +191,27 @@ export default function BlogPage() {
                                     placeholder="Search articles..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full h-14 pl-12 pr-4 rounded-full border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none text-gray-900 placeholder-gray-400"
+                                    className="w-full h-14 pl-12 pr-4 rounded-full border-2 border-gray-200 focus:border-[#0066ff] focus:outline-none text-gray-900 placeholder-gray-400 no-override"
                                 />
                             </div>
                         </div>
 
                         {/* Category Filters */}
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => setActiveCategory(category)}
-                                    className={`h-10 px-5 rounded-full text-sm font-medium transition-all duration-200 ${activeCategory === category
-                                        ? "bg-[#0066ff] text-white shadow-lg"
-                                        : "border-2 border-[#0066ff] text-[#0066ff] hover:bg-[#0066ff] hover:text-white"
+                        <div className="w-full overflow-x-auto no-scrollbar scroll-smooth">
+                            <div className="flex sm:justify-center flex-nowrap items-center gap-3 px-4 py-2 min-w-max">
+                                {categories.map((category) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => setActiveCategory(category)}
+                                        className={`h-10 px-6 rounded-full text-sm font-semibold transition-all duration-300 transform active:scale-95 cursor-pointer ${activeCategory === category
+                                            ? "bg-gradient-to-r from-[#0066ff] to-[#00bfa6] text-white shadow-lg shadow-[#0066ff]/20 scale-105"
+                                            : "bg-white text-gray-600 hover:text-[#0066ff] border border-gray-200 hover:border-[#0066ff]/30 hover:bg-[#0066ff]/5"
                                         }`}
-                                >
-                                    {category}
-                                </button>
-                            ))}
+                                    >
+                                        {category}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -233,7 +235,7 @@ export default function BlogPage() {
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid lg:grid-cols-3 gap-8">
                         {/* Main Content - Left Side */}
-                        <div className="lg:col-span-2">
+                        <div className="lg:col-span-2 min-w-0">
                             {/* Featured Post */}
                             {featuredPost && (
                                 <article className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 mb-8">
@@ -269,8 +271,8 @@ export default function BlogPage() {
                                     </div>
 
                                     {/* Featured Content */}
-                                    <div className="p-8">
-                                        <h2 className="text-3xl font-bold text-gray-900 mb-4 hover:text-[#0066ff] transition-colors duration-200">
+                                    <div className="p-5 sm:p-8">
+                                        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 hover:text-[#0066ff] transition-colors duration-200">
                                             {featuredPost.title}
                                         </h2>
                                         <div 
@@ -280,16 +282,16 @@ export default function BlogPage() {
 
                                         {/* Meta and Social Share */}
                                         <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
-                                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0066ff] to-[#00bfa6] flex items-center justify-center text-white text-sm font-bold">
                                                         {featuredPost.author?.first_name?.[0] || 'D'}{featuredPost.author?.last_name?.[0] || 'G'}
                                                     </div>
                                                     <span className="font-medium text-gray-700">{getAuthorName(featuredPost.author)}</span>
                                                 </div>
-                                                <span>•</span>
+                                                <span className="hidden sm:inline">•</span>
                                                 <span>{formatDate(featuredPost.published_at)}</span>
-                                                <span>•</span>
+                                                <span className="hidden sm:inline">•</span>
                                                 <div className="flex items-center gap-1">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
@@ -354,10 +356,10 @@ export default function BlogPage() {
                                         onClick={() => handleBlogNavigation(post.id, post.slug)}
                                         className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#0066ff] hover:shadow-lg transition-all duration-300 cursor-pointer"
                                     >
-                                        <div className="flex gap-6">
+                                        <div className="flex flex-col sm:flex-row min-w-0">
                                             {/* Image or Icon */}
                                             {post.featured_image ? (
-                                                <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-l-2xl">
+                                                <div className="relative w-full h-48 sm:w-32 sm:h-32 flex-shrink-0 overflow-hidden rounded-t-2xl sm:rounded-l-2xl sm:rounded-tr-none">
                                                     <Image
                                                         src={post.featured_image}
                                                         alt={post.title}
@@ -366,7 +368,7 @@ export default function BlogPage() {
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="flex-shrink-0 p-6">
+                                                <div className="flex-shrink-0 p-5 sm:p-6 pb-0 sm:pb-6">
                                                     <div className="w-16 h-16 bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff] rounded-xl flex items-center justify-center">
                                                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
                                                             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -377,18 +379,18 @@ export default function BlogPage() {
                                             )}
 
                                             {/* Content */}
-                                            <div className="flex-1 py-6 pr-6">
+                                            <div className="flex-1 p-5 sm:py-6 sm:pr-6 sm:pl-0 min-w-0">
                                                 <div className="text-xs font-semibold text-[#0066ff] uppercase mb-2">
                                                     {getFirstCategory(post)}
                                                 </div>
-                                                <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-[#0066ff] transition-colors duration-200">
+                                                <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-[#0066ff] transition-colors duration-200 truncate">
                                                     {post.title}
                                                 </h3>
                                                 <div 
-                                                    className="text-gray-600 text-sm mb-3 line-clamp-2"
+                                                    className="text-gray-600 text-sm mb-3 line-clamp-2 [word-break:break-word]"
                                                     dangerouslySetInnerHTML={{ __html: post.excerpt?.replace(/<[^>]*>/g, '') || '' }}
                                                 />
-                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                                                     <span>{getAuthorName(post.author)}</span>
                                                     <span>•</span>
                                                     <span>{formatDate(post.published_at)}</span>
@@ -473,15 +475,15 @@ export default function BlogPage() {
                         </div>
 
                         {/* Sidebar - Right Side */}
-                        <div className="lg:col-span-1">
+                        <div className="lg:col-span-1 min-w-0">
                             <div className="sticky top-24 space-y-6">
                                 {/* Featured Newsroom */}
                                 <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
                                     <h3 className="text-lg font-bold text-gray-900 mb-4">Featured Newsroom</h3>
                                     <div className="space-y-4">
                                         {blogPosts.slice(0, 3).map((post) => (
-                                            <div key={post.id} className="flex items-start justify-between gap-3 pb-4 border-b border-gray-100 last:border-0">
-                                                <div className="flex-1">
+                                            <div key={post.id} className="flex items-start justify-between gap-3 pb-4 border-b border-gray-100 last:border-0 min-w-0">
+                                                <div className="flex-1 min-w-0">
                                                     <h4 className="text-sm font-semibold text-gray-900 hover:text-[#0066ff] transition-colors duration-200 cursor-pointer mb-1">
                                                         {getFirstCategory(post)}
                                                     </h4>
@@ -526,17 +528,20 @@ export default function BlogPage() {
                                 {/* Categories */}
                                 <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
                                     <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>
-                                    <div className="space-y-2">
+                                    <div className="flex flex-col gap-2">
                                         {categories.filter(cat => cat !== "All").map((category, index) => (
                                             <button
                                                 key={index}
                                                 onClick={() => setActiveCategory(category)}
-                                                className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${activeCategory === category
-                                                    ? "bg-[#0066ff] text-white"
-                                                    : "hover:bg-gray-100 text-gray-700"
+                                                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform active:scale-98 cursor-pointer flex items-center justify-between ${activeCategory === category
+                                                    ? "bg-gradient-to-r from-[#0066ff] to-[#00bfa6] text-white shadow-md shadow-[#0066ff]/10"
+                                                    : "bg-gray-50/50 hover:bg-gray-100 text-gray-700 border border-gray-100 hover:border-gray-200"
                                                     }`}
                                             >
-                                                {category}
+                                                <span>{category}</span>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className={`transition-transform duration-300 ${activeCategory === category ? 'text-white translate-x-1' : 'text-gray-400'}`}>
+                                                    <path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
                                             </button>
                                         ))}
                                     </div>
@@ -551,27 +556,27 @@ export default function BlogPage() {
             {/* Newsletter Section */}
             <section className="py-20 bg-white">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
-                    <div className="max-w-3xl mx-auto bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-2xl p-12 text-center">
-                        <h2 className="text-4xl font-bold text-white mb-4">
+                    <div className="max-w-3xl mx-auto bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-2xl p-6 sm:p-12 text-center">
+                        <h2 className="text-2xl sm:text-4xl font-bold text-white mb-4">
                             Get Health Insights Delivered
                         </h2>
                         <p className="text-lg text-white/90 mb-8">
                             Stay informed with the latest health research, tips, and exclusive insights.
                         </p>
-                        <form onSubmit={handleSubscription} className="flex items-center gap-3 max-w-md mx-auto">
+                        <form onSubmit={handleSubscription} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-md mx-auto">
                             <input
                                 type="email"
-                                placeholder="Enter your email"
+                                placeholder="Enter your email address"
                                 value={subscriptionEmail}
                                 onChange={(e) => setSubscriptionEmail(e.target.value)}
                                 disabled={isSubscribing}
-                                className="flex-1 h-12 px-6 rounded-full border-2 border-white/20 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:border-white disabled:opacity-50"
+                                className="flex-1 h-12 w-full px-6 rounded-full border border-white/35 bg-white/15 text-white placeholder-white/70 focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 focus:border-white focus:ring-2 focus:ring-white/20 transition-all duration-300 disabled:opacity-50 shadow-inner no-override"
                                 required
                             />
                             <button 
                                 type="submit"
                                 disabled={isSubscribing}
-                                className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-medium hover:bg-gray-100 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-semibold hover:bg-gray-50 active:scale-95 shadow-md hover:shadow-lg hover:shadow-black/10 transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto shrink-0"
                             >
                                 {isSubscribing ? 'Subscribing...' : 'Subscribe'}
                             </button>
@@ -583,15 +588,15 @@ export default function BlogPage() {
             {/* CTA Section */}
             <section className="py-24 bg-gray-50">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12 text-center">
-                    <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
                         Need Personalized Guidance?
                     </h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10">
                         Book a consultation for expert advice tailored to your specific health needs.
                     </p>
-                    <div className="flex flex-wrap items-center justify-center gap-4">
-                        <Link href="/booking">
-                            <button className="h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-xl transition-all duration-200 cursor-pointer">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
+                        <Link href="/booking" className="w-full sm:w-auto">
+                            <button className="w-full h-12 px-8 rounded-full bg-[#0066ff] text-white font-medium hover:bg-[#0052cc] hover:shadow-xl transition-all duration-200 cursor-pointer">
                                 Book a Consultation
                             </button>
                         </Link>
@@ -603,7 +608,7 @@ export default function BlogPage() {
                                     router.push('/dashboard/blog');
                                 }
                             }}
-                            className="h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer"
+                            className="w-full sm:w-auto h-12 px-8 rounded-full border-2 border-[#0066ff] text-[#0066ff] font-medium hover:bg-[#0066ff] hover:text-white transition-all duration-200 cursor-pointer"
                         >
                             Browse All Articles
                         </button>

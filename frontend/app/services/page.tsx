@@ -210,12 +210,12 @@ interface ServiceItem {
                         </p>
                     </div>
 
-                    <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
                         {combinedItems.map((item, index) => (
-                            <div key={index} className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 group flex flex-col h-full">
+                            <div key={index} className="bg-white rounded-2xl p-5 sm:p-8 border-2 border-gray-200 hover:border-[#0066ff] hover:shadow-xl transition-all duration-300 group flex flex-col h-full min-w-0">
                                 {/* Image or Icon */}
                                 {item.thumbnailUrl ? (
-                                    <div className="relative h-48 w-full mb-6 rounded-xl overflow-hidden">
+                                    <div className="relative h-48 w-full mb-6 rounded-xl overflow-hidden shrink-0">
                                         <Image 
                                             src={item.thumbnailUrl}
                                             alt={item.title}
@@ -226,16 +226,16 @@ interface ServiceItem {
                                 ) : null}
 
                                 {/* Header */}
-                                <div className="flex items-start justify-between mb-6">
-                                    <div className="flex items-center gap-4">
+                                <div className="flex items-start justify-between gap-4 mb-6 min-w-0">
+                                    <div className="flex items-center gap-4 min-w-0 flex-1">
                                         {!item.thumbnailUrl && (
                                             <div className="w-14 h-14 bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 shrink-0">
                                                 {item.icon}
                                             </div>
                                         )}
-                                        <div>
-                                            <h3 className="text-xl font-bold text-gray-900 line-clamp-1">{item.title}</h3>
-                                            <p className="text-sm text-gray-600">{item.duration}</p>
+                                        <div className="min-w-0 flex-1">
+                                            <h3 className="text-xl font-bold text-gray-900 truncate">{item.title}</h3>
+                                            <p className="text-sm text-gray-600 truncate">{item.duration}</p>
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0">
@@ -245,7 +245,7 @@ interface ServiceItem {
 
                                 {/* Description */}
                                 <div 
-                                    className="text-gray-600 mb-6 leading-relaxed line-clamp-3"
+                                    className="text-gray-600 mb-6 leading-relaxed line-clamp-3 [word-break:break-word]"
                                     dangerouslySetInnerHTML={{ 
                                         __html: item.description?.replace(/<[^>]*>/g, '') || '' 
                                     }}
@@ -254,12 +254,12 @@ interface ServiceItem {
                                 {/* Features */}
                                 <ul className="space-y-3 mb-8 flex-grow">
                                     {item.features.map((feature, idx) => (
-                                        <li key={idx} className="flex items-start gap-3 text-sm text-gray-700">
+                                        <li key={idx} className="flex items-start gap-3 text-sm text-gray-700 min-w-0">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="flex-shrink-0 mt-0.5">
                                                 <circle cx="12" cy="12" r="10" fill="#E0F2FE" />
                                                 <path d="M9 12l2 2 4-4" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
-                                            <span className="line-clamp-1">{feature}</span>
+                                            <span className="truncate">{feature}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -268,7 +268,7 @@ interface ServiceItem {
                                 {'isCourse' in item ? (
                                     <button 
                                         onClick={() => router.push(`/services/${item.id}`)}
-                                        className="w-full h-12 rounded-full bg-white border-2 border-[#0066ff] text-[#0066ff] hover:bg-[#0066ff] hover:text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                                        className="w-full h-12 rounded-full bg-white border-2 border-[#0066ff] text-[#0066ff] hover:bg-[#0066ff] hover:text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shrink-0"
                                     >
                                         View Course Details
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -276,7 +276,7 @@ interface ServiceItem {
                                         </svg>
                                     </button>
                                 ) : (
-                                    <Link href={item.link || '#'}>
+                                    <Link href={item.link || '#'} className="block w-full shrink-0">
                                         <button className="w-full h-12 rounded-full bg-[#0066ff] text-white hover:bg-[#0052cc] font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
                                             Book This Service
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

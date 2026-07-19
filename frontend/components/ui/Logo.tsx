@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function Logo({ className = "" }: { className?: string }) {
     return (
         <Link href="/" className={`flex items-center gap-2 ${className}`}>
-            <div className="relative w-96 h-40">
+            <div className="relative w-72 h-40 sm:w-64 sm:h-28 md:w-80 md:h-36 lg:w-96 lg:h-40">
                 <Image 
                     src="/rx-logo.png" 
                     alt="RxWithDrGeorge" 

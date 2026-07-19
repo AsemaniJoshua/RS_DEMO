@@ -1,0 +1,2 @@
+change argon 2 to bcryptjs
+for sending of emails, let's use Gmail OAuth2 api.

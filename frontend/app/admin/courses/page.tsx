@@ -189,8 +189,81 @@ export default function CoursesPage() {
                 </div>
             </div>
 
-            {/* Courses Table */}
-            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            {/* Courses Mobile Cards View */}
+            <div className="block md:hidden space-y-4">
+                {filteredCourses.length === 0 ? (
+                    <div className="bg-white rounded-xl p-8 text-center text-gray-500 border border-gray-100">
+                        No courses found
+                    </div>
+                ) : (
+                    filteredCourses.map((course) => (
+                        <div 
+                            key={course.id} 
+                            className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm space-y-3 cursor-pointer"
+                            onClick={() => window.location.href=`/admin/courses/${course.id}`}
+                        >
+                            <div className="flex items-center gap-3">
+                                {course.thumbnailUrl ? (
+                                    <img src={course.thumbnailUrl} alt={course.title} className="w-12 h-12 rounded-lg object-cover shrink-0" />
+                                ) : (
+                                    <div className="w-12 h-12 bg-gradient-to-br from-[#00d4aa] to-[#00bfa6] rounded-lg flex items-center justify-center text-white font-bold shrink-0">
+                                        {course.title.substring(0, 2).toUpperCase()}
+                                    </div>
+                                )}
+                                <div className="min-w-0 flex-1">
+                                    <div className="font-semibold text-gray-900 truncate">{course.title}</div>
+                                    <div className="text-xs text-gray-500">{course.category?.name || 'Uncategorized'}</div>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-between items-center text-sm border-t border-gray-100 pt-2">
+                                <div className="text-gray-600">Students: <span className="font-semibold text-gray-900">{course.students || 0}</span></div>
+                                <div className="text-gray-600">Price: <span className="font-semibold text-gray-900">{Number(course.price) === 0 ? "Free" : `GHS ${course.price}`}</span></div>
+                            </div>
+
+                            <div className="flex justify-between items-center border-t border-gray-100 pt-2">
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    course.status === "PUBLISHED" 
+                                        ? "bg-green-100 text-green-700" 
+                                        : "bg-gray-100 text-gray-700"
+                                }`}>
+                                    {course.status}
+                                </span>
+                                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                    <Link href={`/admin/courses/${course.id}`}>
+                                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600" title="View Details">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </button>
+                                    </Link>
+                                    <Link href={`/admin/courses/${course.id}/edit`}>
+                                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600" title="Edit">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2"/>
+                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                        </button>
+                                    </Link>
+                                    <button 
+                                        onClick={() => handleDeleteClick(course.id, course.title)}
+                                        className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600" 
+                                        title="Delete"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Courses Desktop Table */}
+            <div className="hidden md:block bg-white rounded-xl border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[768px]">
                     <thead className="bg-gray-50 border-b border-gray-100">

@@ -209,8 +209,100 @@ export default function EbooksPage() {
                 </div>
             </div>
 
-            {/* Ebooks Table */}
-            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            {/* Ebooks Mobile Cards View */}
+            <div className="block md:hidden space-y-4">
+                {isLoading ? (
+                    <div className="flex flex-col items-center gap-3 p-12 bg-white rounded-xl border border-gray-100">
+                        <div className="w-12 h-12 border-4 border-[#00d4aa] border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-gray-600">Loading ebooks...</p>
+                    </div>
+                ) : filteredEbooks.length === 0 ? (
+                    <div className="bg-white rounded-xl p-8 text-center text-gray-500 border border-gray-100">
+                        No ebooks found
+                    </div>
+                ) : (
+                    filteredEbooks.map((book) => (
+                        <div key={book.id} className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm space-y-3">
+                            <div className="flex items-start gap-3">
+                                <div className="w-12 h-16 relative rounded overflow-hidden shrink-0 bg-gray-100 shadow-sm">
+                                    {book.coverImage ? (
+                                        <img 
+                                            src={book.coverImage} 
+                                            alt={book.title}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="font-semibold text-gray-900 line-clamp-2" title={book.title}>{book.title}</div>
+                                    <div className="text-xs text-gray-500 mt-1">By {book.author}</div>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-between items-center text-sm border-t border-gray-100 pt-2">
+                                <div className="text-gray-600">Price: <span className="font-semibold text-gray-900">{book.price === 0 ? "Free" : `GHS ${book.price}`}</span></div>
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    book.status === "PUBLISHED" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+                                }`}>
+                                    {book.status === "PUBLISHED" ? "Published" : "Draft"}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center border-t border-gray-100 pt-2">
+                                <div className="flex gap-2">
+                                    <span className="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-xs font-medium">
+                                        {book.category?.name || "Uncategorized"}
+                                    </span>
+                                    <span className="px-2 py-0.5 bg-gray-50 text-gray-700 rounded text-xs font-medium">
+                                        {book.format}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                    <Link href={`/admin/ebooks/${book.id}`}>
+                                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="View details">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                                            </svg>
+                                        </button>
+                                    </Link>
+                                    <Link href={`/admin/ebooks/${book.id}/edit`}>
+                                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700" title="Edit ebook">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </button>
+                                    </Link>
+                                    <button
+                                        onClick={() => setDeleteModal({ id: book.id, title: book.title })}
+                                        disabled={isDeleting === book.id}
+                                        className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600 disabled:opacity-50"
+                                        title="Delete ebook"
+                                    >
+                                        {isDeleting === book.id ? (
+                                            <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Ebooks Desktop Table */}
+            <div className="hidden md:block bg-white rounded-xl border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
@@ -316,15 +408,6 @@ export default function EbooksPage() {
                                                         </svg>
                                                     )}
                                                 </button>
-                                                        {/* Delete Modal */}
-                                                        <DeleteEbookModal
-                                                            isOpen={!!deleteModal}
-                                                            title="Delete Ebook"
-                                                            message={`Are you sure you want to delete "${deleteModal?.title}"? This action cannot be undone.`}
-                                                            onCancel={() => setDeleteModal(null)}
-                                                            onConfirm={() => deleteModal && handleDelete(deleteModal.id, deleteModal.title)}
-                                                            loading={isDeleting === deleteModal?.id}
-                                                        />
                                             </div>
                                         </td>
                                     </tr>
@@ -334,6 +417,16 @@ export default function EbooksPage() {
                     </table>
                 </div>
             </div>
+
+            {/* Delete Modal */}
+            <DeleteEbookModal
+                isOpen={!!deleteModal}
+                title="Delete Ebook"
+                message={`Are you sure you want to delete "${deleteModal?.title}"? This action cannot be undone.`}
+                onCancel={() => setDeleteModal(null)}
+                onConfirm={() => deleteModal && handleDelete(deleteModal.id, deleteModal.title)}
+                loading={isDeleting === deleteModal?.id}
+            />
 
             {/* Category Modal */}
             <EbookCategoryManagementModal

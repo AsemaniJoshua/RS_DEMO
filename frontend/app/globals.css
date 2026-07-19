@@ -113,6 +113,16 @@ input[type="password"]::-ms-clear {
   display: none;
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 /* Force course search/filter inputs to always be visible */
 #course-search,
 #level-select,
@@ -135,7 +145,7 @@ input[type="password"]::-ms-clear {
 }
 
 /* Ultra-aggressive overrides for visibility */
-input, select, option {
+input:not(.no-override), select:not(.no-override), option:not(.no-override) {
   color: #111 !important;
   background: #fff !important;
   font-weight: 700 !important;
@@ -143,7 +153,7 @@ input, select, option {
   -webkit-text-fill-color: #111 !important;
   -webkit-text-stroke: 0.5px #fff !important;
 }
-input::placeholder {
+input:not(.no-override)::placeholder {
   color: black !important;
   opacity: 1 !important;
   /* font-weight: 700 !important; */

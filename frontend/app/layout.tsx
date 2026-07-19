@@ -31,9 +31,11 @@ export default function RootLayout({
         <AuthProvider>
           <ToastProvider />
           {!isAdminPage && !isAuthPage && !isDashboardPage && <Navbar />}
-          <ScrollAnimations>
-            {children}
-          </ScrollAnimations>
+          <div className="overflow-x-hidden w-full relative">
+            <ScrollAnimations>
+              {children}
+            </ScrollAnimations>
+          </div>
           {!isAdminPage && !isAuthPage && !isDashboardPage && <Footer />}
         </AuthProvider>
       </body>
