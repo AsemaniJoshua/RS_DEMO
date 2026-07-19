@@ -33,7 +33,7 @@ export default function RichTextEditor({ value, onChange, placeholder = "Start w
     ];
 
     return (
-        <div className="rich-text-editor">
+        <div className="rich-text-editor mb-6">
             <ReactQuill
                 theme="snow"
                 value={value}
@@ -41,7 +41,6 @@ export default function RichTextEditor({ value, onChange, placeholder = "Start w
                 modules={modules}
                 formats={formats}
                 placeholder={placeholder}
-                style={{ height: minHeight, marginBottom: '50px' }}
             />
             <style jsx global>{`
                 .rich-text-editor .ql-container {

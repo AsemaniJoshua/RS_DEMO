@@ -165,7 +165,7 @@ export default function BlogPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="py-20 lg:py-28 bg-white">
+            <section className="pt-20 pb-8 lg:pt-28 lg:pb-12 bg-white">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-4xl mx-auto text-center">
                         {/* Heading */}
@@ -219,7 +219,7 @@ export default function BlogPage() {
 
             {/* Loading State */}
             {loading && (
-                <section className="py-20 bg-gray-50">
+                <section className="pt-8 pb-20 bg-gray-50">
                     <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                         <div className="text-center">
                             <div className="w-16 h-16 mx-auto mb-4 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
@@ -231,7 +231,7 @@ export default function BlogPage() {
 
             {/* Blog Content with Sidebar */}
             {!loading && (
-            <section className="py-20 bg-gray-50">
+            <section className="pt-8 pb-20 bg-gray-50">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="grid lg:grid-cols-3 gap-8">
                         {/* Main Content - Left Side */}
@@ -246,7 +246,7 @@ export default function BlogPage() {
                                                 src={featuredPost.featured_image}
                                                 alt={featuredPost.title}
                                                 fill
-                                                className="object-cover"
+                                                className="object-contain"
                                             />
                                         ) : (
                                             <div className="w-24 h-24 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
@@ -359,12 +359,12 @@ export default function BlogPage() {
                                         <div className="flex flex-col sm:flex-row min-w-0">
                                             {/* Image or Icon */}
                                             {post.featured_image ? (
-                                                <div className="relative w-full h-48 sm:w-32 sm:h-32 flex-shrink-0 overflow-hidden rounded-t-2xl sm:rounded-l-2xl sm:rounded-tr-none">
+                                                <div className="relative w-full h-48 sm:w-32 sm:h-32 flex-shrink-0 overflow-hidden rounded-t-2xl sm:rounded-l-2xl sm:rounded-tr-none bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff]">
                                                     <Image
                                                         src={post.featured_image}
                                                         alt={post.title}
                                                         fill
-                                                        className="object-cover"
+                                                        className="object-contain"
                                                     />
                                                 </div>
                                             ) : (
@@ -563,23 +563,33 @@ export default function BlogPage() {
                         <p className="text-lg text-white/90 mb-8">
                             Stay informed with the latest health research, tips, and exclusive insights.
                         </p>
-                        <form onSubmit={handleSubscription} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-md mx-auto">
-                            <input
-                                type="email"
-                                placeholder="Enter your email address"
-                                value={subscriptionEmail}
-                                onChange={(e) => setSubscriptionEmail(e.target.value)}
-                                disabled={isSubscribing}
-                                className="flex-1 h-12 w-full px-6 rounded-full border border-white/35 bg-white/15 text-white placeholder-white/70 focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 focus:border-white focus:ring-2 focus:ring-white/20 transition-all duration-300 disabled:opacity-50 shadow-inner no-override"
-                                required
-                            />
-                            <button 
-                                type="submit"
-                                disabled={isSubscribing}
-                                className="h-12 px-8 rounded-full bg-white text-[#0066ff] font-semibold hover:bg-gray-50 active:scale-95 shadow-md hover:shadow-lg hover:shadow-black/10 transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto shrink-0"
-                            >
-                                {isSubscribing ? 'Subscribing...' : 'Subscribe'}
-                            </button>
+                        <form onSubmit={handleSubscription} className="w-full max-w-md mx-auto">
+                            <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-2 p-1.5 rounded-2xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+                                <div className="relative flex-1">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/80">
+                                            <rect width="20" height="16" x="2" y="4" rx="2" />
+                                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                        </svg>
+                                    </span>
+                                    <input
+                                        type="email"
+                                        placeholder="Enter your email address"
+                                        value={subscriptionEmail}
+                                        onChange={(e) => setSubscriptionEmail(e.target.value)}
+                                        disabled={isSubscribing}
+                                        className="h-12 w-full pl-12 pr-4 rounded-xl sm:rounded-full bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0066ff]/20 transition-all duration-300 disabled:opacity-50 no-override font-medium"
+                                        required
+                                    />
+                                </div>
+                                <button 
+                                    type="submit"
+                                    disabled={isSubscribing}
+                                    className="h-12 px-8 rounded-xl sm:rounded-full bg-gradient-to-r from-[#0066ff] to-[#00bfa6] text-white font-semibold hover:opacity-95 active:scale-95 shadow-md transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                                >
+                                    {isSubscribing ? 'Subscribing...' : 'Subscribe'}
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

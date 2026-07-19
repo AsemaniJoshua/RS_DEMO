@@ -144,8 +144,8 @@ export default function FeaturedContent() {
                                     </span>
 
                                     {/* Description */}
-                                    <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3">
-                                        {item.description || "Explore this resource to discover valuable insights and information."}
+                                    <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3 break-words [word-break:break-word]">
+                                        {(item.description || "Explore this resource to discover valuable insights and information.").replace(/<[^>]*>/g, '')}
                                     </p>
 
                                     {/* Learn More Link */}

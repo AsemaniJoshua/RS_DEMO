@@ -24,7 +24,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 setLoading(true);
                 if (productType === 'eBook') {
                     const response = await publicService.getPublicEbookById(id);
-                    // Backend returns { status: 'success', data: { ebook } }
                     const ebookData = (response.data as any)?.ebook || response.data;
                     if (ebookData) {
                         setProduct({ ...ebookData, type: 'eBook' as const });
@@ -92,11 +91,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     if (error || !product) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl p-12 text-center max-w-md border border-gray-200">
+                <div className="bg-white rounded-3xl p-8 sm:p-12 text-center max-w-md border border-gray-100 shadow-xl">
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h1>
                     <p className="text-gray-600 mb-6">{error || "This product doesn't exist."}</p>
                     <Link href="/products">
-                        <button className="px-6 py-3 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors">
+                        <button className="px-6 py-3 bg-[#0066ff] text-white rounded-full hover:bg-[#0052cc] transition-colors font-semibold cursor-pointer">
                             Back to Products
                         </button>
                     </Link>
@@ -106,202 +105,237 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200">
-                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12 py-6">
-                    <Link 
-                        href="/products" 
-                        className="inline-flex items-center gap-2 text-gray-600 hover:text-[#0066ff] transition-colors"
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 12H5m7 7l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        <span>Back to Products</span>
-                    </Link>
+        <div className="min-h-screen bg-gray-50/50">
+            {/* Breadcrumb */}
+            <div className="bg-white border-b border-gray-100">
+                <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12 py-4">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 font-medium overflow-x-auto whitespace-nowrap no-scrollbar">
+                        <Link href="/" className="hover:text-[#0066ff] transition-colors">Home</Link>
+                        <span className="text-gray-300">/</span>
+                        <Link href="/products" className="hover:text-[#0066ff] transition-colors">Products</Link>
+                        <span className="text-gray-300">/</span>
+                        <span className="text-gray-800 font-semibold truncate max-w-[200px] sm:max-w-xs">{product.title}</span>
+                    </div>
                 </div>
             </div>
 
-            {/* Product Details */}
+            {/* Main Content */}
             <section className="py-12 lg:py-16">
-                <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
-                    <div className="grid lg:grid-cols-2 gap-12 items-start">
-                        {/* Left: Image/Icon */}
-                        <div className="bg-white rounded-2xl p-8 border border-gray-200 sticky top-6">
-                            <div className="aspect-square relative bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff] rounded-xl flex items-center justify-center mb-6">
-                                {product.type === 'eBook' && (product as PublicEbook & { type: 'eBook' }).coverImage ? (
-                                    <Image 
-                                        src={(product as PublicEbook & { type: 'eBook' }).coverImage}
-                                        alt={product.title}
-                                        fill
-                                        className="object-cover rounded-xl"
-                                    />
-                                ) : product.type === 'Course' && (product as PublicCourse & { type: 'Course' }).thumbnailUrl ? (
-                                    <Image 
-                                        src={(product as PublicCourse & { type: 'Course' }).thumbnailUrl || ''}
-                                        alt={product.title}
-                                        fill
-                                        className="object-cover rounded-xl"
-                                    />
-                                ) : (
-                                    <div className="w-32 h-32 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
-                                        {product.type === "Course" ? (
-                                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <path d="M6 12v5c3 3 9 3 12 0v-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        ) : (
-                                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                                                <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Price & Action */}
-                            <div className="space-y-4">
-                                <div className="flex items-end justify-between">
-                                    <div>
-                                        <p className="text-sm text-gray-600 mb-1">Price</p>
-                                        <p className="text-3xl font-bold text-gray-900">{formatPrice(product.price)}</p>
-                                    </div>
-                                    <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                                        {product.type}
-                                    </span>
-                                </div>
-
-                                <button
-                                    onClick={handlePurchaseEnroll}
-                                    className="w-full px-6 py-4 bg-[#0066ff] text-white rounded-xl hover:bg-[#0052cc] transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl"
-                                >
-                                    {product.type === 'eBook' ? 'Get This eBook' : 'Enroll in Course'}
-                                </button>
-
-                                {!isAuthenticated && (
-                                    <p className="text-sm text-gray-600 text-center">
-                                        You'll be asked to log in to proceed with your purchase
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Features */}
-                            <div className="mt-6 pt-6 border-t border-gray-200">
-                                <h3 className="font-semibold text-gray-900 mb-3">What's Included:</h3>
-                                <ul className="space-y-2">
-                                    {product.type === 'eBook' ? (
-                                        <>
-                                            <li className="flex items-center gap-2 text-sm text-gray-700">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                {(product as PublicEbook & { type: 'eBook' }).pages} pages
-                                            </li>
-                                            <li className="flex items-center gap-2 text-sm text-gray-700">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                Instant download
-                                            </li>
-                                            <li className="flex items-center gap-2 text-sm text-gray-700">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                PDF format
-                                            </li>
-                                            <li className="flex items-center gap-2 text-sm text-gray-700">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                Lifetime access
-                                            </li>
-                                        </>
-                                    ) : (
-                                        <>
-                                            {(product as PublicCourse & { type: 'Course' }).duration && (
-                                                <li className="flex items-center gap-2 text-sm text-gray-700">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                        <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                    Duration: {(product as PublicCourse & { type: 'Course' }).duration}
-                                                </li>
-                                            )}
-                                            <li className="flex items-center gap-2 text-sm text-gray-700">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                Downloadable resources
-                                            </li>
-                                            <li className="flex items-center gap-2 text-sm text-gray-700">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                Lifetime access
-                                            </li>
-                                            <li className="flex items-center gap-2 text-sm text-gray-700">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                    <path d="M20 6L9 17l-5-5" stroke="#0066ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                Certificate of completion
-                                            </li>
-                                        </>
-                                    )}
-                                </ul>
-                            </div>
-                        </div>
-
-                        {/* Right: Details */}
-                        <div>
-                            <div className="mb-6">
-                                <div className="flex items-center gap-2 mb-3">
+                <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
+                    <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                        
+                        {/* LEFT COLUMN: Product Info & Description (Col-span 7) */}
+                        <div className="lg:col-span-7 space-y-8 order-2 lg:order-1">
+                            {/* Product Header */}
+                            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xl shadow-gray-100/10">
+                                <div className="flex flex-wrap items-center gap-2 mb-4">
                                     {product.category && (
-                                        <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium">
+                                        <span className="px-3.5 py-1.5 bg-purple-50 text-purple-700 rounded-full text-xs font-bold uppercase tracking-wider">
                                             {typeof product.category === 'object' ? product.category.name : product.category}
                                         </span>
                                     )}
-                                    <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-                                        Published
+                                    <span className="px-3.5 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
+                                        {product.type}
                                     </span>
                                 </div>
-                                <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.title}</h1>
+                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight tracking-tight mb-3 break-words [word-break:break-word]">
+                                    {product.title}
+                                </h1>
                                 {product.type === 'eBook' && (
-                                    <p className="text-lg text-gray-600">By {(product as PublicEbook & { type: 'eBook' }).author}</p>
+                                    <p className="text-sm sm:text-base text-gray-500 font-medium">By {(product as PublicEbook & { type: 'eBook' }).author}</p>
                                 )}
                             </div>
 
                             {/* Description */}
-                            <div className="bg-white rounded-2xl p-8 border border-gray-200 mb-6">
-                                <h2 className="text-2xl font-bold text-gray-900 mb-4">Description</h2>
-                                <div 
-                                    className="prose prose-lg max-w-none text-gray-700"
-                                    dangerouslySetInnerHTML={{ __html: product.description }}
-                                />
+                            <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-10 border border-gray-100 shadow-xl shadow-gray-100/10">
+                                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-50">Description</h2>
+                                {product.description ? (
+                                    <div 
+                                        className="prose prose-lg max-w-none text-gray-700 leading-relaxed [word-break:break-word] overflow-x-auto"
+                                        dangerouslySetInnerHTML={{ __html: product.description }}
+                                    />
+                                ) : (
+                                    <p className="text-gray-500 italic">No description provided for this product.</p>
+                                )}
                             </div>
 
-                            {/* Additional Info */}
+                            {/* Trust Features */}
                             <div className="grid sm:grid-cols-2 gap-6">
-                                <div className="bg-white rounded-xl p-6 border border-gray-200">
-                                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[#0066ff]">
-                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2"/>
+                                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-gray-100/5 flex gap-4">
+                                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-[#0066ff] shrink-0">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                         </svg>
                                     </div>
-                                    <h3 className="font-semibold text-gray-900 mb-2">Secure Payment</h3>
-                                    <p className="text-sm text-gray-600">Your payment information is encrypted and secure</p>
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 mb-1">Secure Payment</h3>
+                                        <p className="text-xs sm:text-sm text-gray-500">Your payment information is encrypted and secure</p>
+                                    </div>
                                 </div>
 
-                                <div className="bg-white rounded-xl p-6 border border-gray-200">
-                                    <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-3">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-green-600">
-                                            <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-gray-100/5 flex gap-4">
+                                    <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 shrink-0">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M20 6L9 17l-5-5" />
                                         </svg>
                                     </div>
-                                    <h3 className="font-semibold text-gray-900 mb-2">Instant Access</h3>
-                                    <p className="text-sm text-gray-600">Access your purchase immediately after payment</p>
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 mb-1">Instant Access</h3>
+                                        <p className="text-xs sm:text-sm text-gray-500">Access your purchase immediately after payment</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        {/* RIGHT COLUMN: Product Media & Action Card (Col-span 5) */}
+                        <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-6">
+                            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xl shadow-gray-100/25 space-y-6">
+                                {/* Thumbnail Image */}
+                                <div className="aspect-video sm:aspect-square lg:aspect-video relative bg-gradient-to-br from-[#E0F2FE] to-[#f0f9ff] rounded-2xl flex items-center justify-center overflow-hidden border border-gray-100 shadow-inner">
+                                    {product.type === 'eBook' && (product as PublicEbook & { type: 'eBook' }).coverImage ? (
+                                        <Image 
+                                            src={(product as PublicEbook & { type: 'eBook' }).coverImage}
+                                            alt={product.title}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : product.type === 'Course' && (product as PublicCourse & { type: 'Course' }).thumbnailUrl ? (
+                                        <Image 
+                                            src={(product as PublicCourse & { type: 'Course' }).thumbnailUrl || ''}
+                                            alt={product.title}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-20 h-20 bg-white rounded-2xl shadow-md flex items-center justify-center text-[#0066ff]">
+                                            {product.type === "Course" ? (
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                                                </svg>
+                                            ) : (
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
+                                                    <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+                                                </svg>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Price / Type Badge */}
+                                <div className="flex items-end justify-between pt-2">
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Price</p>
+                                        <p className="text-3xl sm:text-4xl font-extrabold text-gray-950 tracking-tight">{formatPrice(product.price)}</p>
+                                    </div>
+                                    <span className="px-3.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider border border-blue-100">
+                                        {product.type}
+                                    </span>
+                                </div>
+
+                                {/* Purchase / Enroll Button */}
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={handlePurchaseEnroll}
+                                        className="w-full h-14 rounded-full bg-[#0066ff] text-white font-bold hover:bg-[#0052cc] hover:shadow-lg hover:shadow-[#0066ff]/20 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                                    >
+                                        {product.type === 'eBook' ? 'Get This eBook' : 'Enroll in Course'}
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="5" y1="12" x2="19" y2="12" />
+                                            <polyline points="12 5 19 12 12 19" />
+                                        </svg>
+                                    </button>
+
+                                    {!isAuthenticated && (
+                                        <p className="text-xs text-gray-500 text-center font-medium">
+                                            You'll be asked to log in to proceed with your purchase
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* What's Included list */}
+                                <div className="pt-6 border-t border-gray-100">
+                                    <h4 className="font-bold text-gray-900 mb-4">What's Included</h4>
+                                    <ul className="space-y-3">
+                                        {product.type === 'eBook' ? (
+                                            <>
+                                                <li className="flex items-center gap-3 text-xs sm:text-sm text-gray-600 font-medium">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-50 text-[#0066ff] flex items-center justify-center shrink-0">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <polyline points="20 6 9 17 5 12" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>{(product as PublicEbook & { type: 'eBook' }).pages || 100} pages</span>
+                                                </li>
+                                                <li className="flex items-center gap-3 text-xs sm:text-sm text-gray-600 font-medium">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-50 text-[#0066ff] flex items-center justify-center shrink-0">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <polyline points="20 6 9 17 5 12" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>Instant download</span>
+                                                </li>
+                                                <li className="flex items-center gap-3 text-xs sm:text-sm text-gray-600 font-medium">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-50 text-[#0066ff] flex items-center justify-center shrink-0">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <polyline points="20 6 9 17 5 12" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>PDF format</span>
+                                                </li>
+                                                <li className="flex items-center gap-3 text-xs sm:text-sm text-gray-600 font-medium">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-50 text-[#0066ff] flex items-center justify-center shrink-0">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <polyline points="20 6 9 17 5 12" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>Lifetime access</span>
+                                                </li>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {(product as PublicCourse & { type: 'Course' }).duration && (
+                                                    <li className="flex items-center gap-3 text-xs sm:text-sm text-gray-600 font-medium">
+                                                        <div className="w-5 h-5 rounded-full bg-blue-50 text-[#0066ff] flex items-center justify-center shrink-0">
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                                <polyline points="20 6 9 17 5 12" />
+                                                            </svg>
+                                                        </div>
+                                                        <span>Duration: {(product as PublicCourse & { type: 'Course' }).duration}</span>
+                                                    </li>
+                                                )}
+                                                <li className="flex items-center gap-3 text-xs sm:text-sm text-gray-600 font-medium">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-50 text-[#0066ff] flex items-center justify-center shrink-0">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <polyline points="20 6 9 17 5 12" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>Downloadable resources</span>
+                                                </li>
+                                                <li className="flex items-center gap-3 text-xs sm:text-sm text-gray-600 font-medium">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-50 text-[#0066ff] flex items-center justify-center shrink-0">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <polyline points="20 6 9 17 5 12" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>Lifetime access</span>
+                                                </li>
+                                                <li className="flex items-center gap-3 text-xs sm:text-sm text-gray-600 font-medium">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-50 text-[#0066ff] flex items-center justify-center shrink-0">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                            <polyline points="20 6 9 17 5 12" />
+                                                        </svg>
+                                                    </div>
+                                                    <span>Certificate of completion</span>
+                                                </li>
+                                            </>
+                                        )}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </section>

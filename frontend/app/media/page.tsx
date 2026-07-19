@@ -83,7 +83,7 @@ export default function MediaPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="py-20 lg:py-28 bg-white">
+            <section className="pt-20 pb-8 lg:pt-28 lg:pb-12 bg-white">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                     <div className="max-w-4xl mx-auto text-center">
                         {/* Badge */}
@@ -107,19 +107,21 @@ export default function MediaPage() {
                         </p>
 
                         {/* Filter Buttons */}
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                            {filters.map((filter) => (
-                                <button
-                                    key={filter}
-                                    onClick={() => setActiveFilter(filter)}
-                                    className={`h-11 px-6 rounded-full font-medium transition-all duration-200 ${activeFilter === filter
-                                        ? "bg-[#0066ff] text-white shadow-lg"
-                                        : "border-2 border-[#0066ff] text-[#0066ff] hover:bg-[#0066ff] hover:text-white"
+                        <div className="w-full overflow-x-auto no-scrollbar scroll-smooth">
+                            <div className="flex sm:justify-center flex-nowrap items-center gap-3 px-4 py-2 min-w-max">
+                                {filters.map((filter) => (
+                                    <button
+                                        key={filter}
+                                        onClick={() => setActiveFilter(filter)}
+                                        className={`h-10 px-6 rounded-full text-sm font-semibold transition-all duration-300 transform active:scale-95 cursor-pointer ${activeFilter === filter
+                                            ? "bg-gradient-to-r from-[#0066ff] to-[#00bfa6] text-white shadow-lg shadow-[#0066ff]/20 scale-105"
+                                            : "bg-white text-gray-600 hover:text-[#0066ff] border border-gray-200 hover:border-[#0066ff]/30 hover:bg-[#0066ff]/5"
                                         }`}
-                                >
-                                    {filter}
-                                </button>
-                            ))}
+                                    >
+                                        {filter}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,7 +129,7 @@ export default function MediaPage() {
 
             {/* Loading State */}
             {loading && (
-                <section className="py-20 bg-gray-50">
+                <section className="pt-8 pb-20 bg-gray-50">
                     <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
                         <div className="text-center">
                             <div className="w-16 h-16 mx-auto mb-4 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
@@ -139,14 +141,14 @@ export default function MediaPage() {
 
             {/* Media Grid */}
             {!loading && (
-            <section className="py-20 bg-gray-50">
+            <section className="pt-8 pb-20 bg-gray-50">
                 <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 min-w-0">
                         {mediaItems.map((item) => (
                             <article 
                                 key={item.id} 
                                 onClick={() => handleMediaClick(item.id)}
-                                className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                                className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 group cursor-pointer min-w-0"
                             >
                                 {/* Thumbnail Area */}
                                 <div className="relative h-48 bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe]">
@@ -156,7 +158,7 @@ export default function MediaPage() {
                                             src={item.url}
                                             alt={item.original_name}
                                             fill
-                                            className="object-cover"
+                                            className="object-contain"
                                         />
                                     )}
                                     {item.file_type === 'VIDEO' && (
@@ -221,8 +223,8 @@ export default function MediaPage() {
 
                                     {/* Description */}
                                     {item.description && (
-                                        <p className="text-sm text-gray-600 line-clamp-3 mb-3">
-                                            {item.description}
+                                        <p className="text-sm text-gray-600 line-clamp-3 mb-3 break-words [word-break:break-word]">
+                                            {item.description.replace(/<[^>]*>/g, '')}
                                         </p>
                                     )}
 
@@ -258,23 +260,23 @@ export default function MediaPage() {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-3 gap-8 min-w-0">
                         {featuredBlogs.map((blog) => (
                             <div 
                                 key={blog.id} 
                                 onClick={() => handleBlogNavigation(blog.id)}
-                                className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 hover:border-[#0066ff] transition-all duration-300 cursor-pointer"
+                                className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 hover:border-[#0066ff] transition-all duration-300 cursor-pointer min-w-0"
                             >
-                                <div className="w-12 h-12 bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-xl flex items-center justify-center text-white mb-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-xl flex items-center justify-center text-white mb-4 shrink-0">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" />
                                         <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" />
                                     </svg>
                                 </div>
-                                <h3 className="text-sm font-semibold text-[#0066ff] mb-2">{getFirstCategory(blog)}</h3>
-                                <h4 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{blog.title}</h4>
+                                <h3 className="text-sm font-semibold text-[#0066ff] mb-2 truncate">{getFirstCategory(blog)}</h3>
+                                <h4 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 break-words [word-break:break-word]">{blog.title}</h4>
                                 <div 
-                                    className="text-sm text-gray-600 mb-3 line-clamp-2"
+                                    className="text-sm text-gray-600 mb-3 line-clamp-2 break-words [word-break:break-word]"
                                     dangerouslySetInnerHTML={{ __html: blog.excerpt?.replace(/<[^>]*>/g, '') || '' }}
                                 />
                                 <p className="text-sm text-gray-500">{formatDate(blog.published_at)}</p>

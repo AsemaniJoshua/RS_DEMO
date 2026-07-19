@@ -148,18 +148,13 @@ input[type="password"]::-ms-clear {
 input:not(.no-override), select:not(.no-override), option:not(.no-override) {
   color: #111 !important;
   background: #fff !important;
-  font-weight: 700 !important;
-  text-shadow: 0 0 2px #fff !important;
+  font-weight: 400 !important;
   -webkit-text-fill-color: #111 !important;
-  -webkit-text-stroke: 0.5px #fff !important;
 }
 input:not(.no-override)::placeholder {
-  color: black !important;
+  color: #9ca3af !important;
   opacity: 1 !important;
-  /* font-weight: 700 !important; */
-  text-shadow: 0 0 2px #fff !important;
-  -webkit-text-fill-color: black !important;
-  -webkit-text-stroke: 0.5px #fff !important;
+  -webkit-text-fill-color: #9ca3af !important;
 }
 /* select:focus, input:focus {
   outline: 2px solid #0066ff !important;
