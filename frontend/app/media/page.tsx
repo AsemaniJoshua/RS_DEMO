@@ -61,8 +61,8 @@ export default function MediaPage() {
     };
 
     // Handle blog navigation - redirect to public blog detail page
-    const handleBlogNavigation = (blogId: string) => {
-        router.push(`/blog/${blogId}`);
+    const handleBlogNavigation = (slugOrId: string) => {
+        router.push(`/blog/${slugOrId}`);
     };
 
     // Format date
@@ -264,7 +264,7 @@ export default function MediaPage() {
                         {featuredBlogs.map((blog) => (
                             <div 
                                 key={blog.id} 
-                                onClick={() => handleBlogNavigation(blog.id)}
+                                onClick={() => handleBlogNavigation(blog.slug || blog.id)}
                                 className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 hover:border-[#0066ff] transition-all duration-300 cursor-pointer min-w-0"
                             >
                                 <div className="w-12 h-12 bg-gradient-to-br from-[#0066ff] to-[#00bfa6] rounded-xl flex items-center justify-center text-white mb-4 shrink-0">

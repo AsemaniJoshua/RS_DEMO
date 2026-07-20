@@ -103,12 +103,12 @@ export default function BlogPage() {
 
     // Handle blog navigation to public detail page
     const handleBlogNavigation = (blogId: string, slug?: string) => {
-        router.push(`/blog/${blogId}`);
+        router.push(`/blog/${slug || blogId}`);
     };
 
     // Handle share functionality
     const handleShare = (platform: 'twitter' | 'linkedin' | 'whatsapp', post: PublicBlog) => {
-        const url = `${window.location.origin}/blog/${post.id}`;
+        const url = `${window.location.origin}/blog/${post.slug || post.id}`;
         const cleanExcerpt = post.excerpt?.replace(/<[^>]*>/g, '') || '';
         const text = `${post.title} - ${cleanExcerpt}`;
         
