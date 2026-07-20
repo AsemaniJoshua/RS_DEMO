@@ -224,6 +224,14 @@ export const publicService = {
     },
 
     /**
+     * Get single public blog by Slug (for shareable URLs)
+     * GET /api/v1/public/blog/slug/:slug
+     */
+    async getPublicBlogBySlug(slug: string): Promise<ApiResponse<PublicBlog>> {
+        return api.get<PublicBlog>(`/public/blog/slug/${slug}`);
+    },
+
+    /**
      * Get blog categories
      * GET /api/v1/public/blog-categories
      */
