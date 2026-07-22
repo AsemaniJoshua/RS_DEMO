@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { liveSessionsService } from "@/services/live-sessions-service";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
-export default function RecordingVerifyPage() {
+function RecordingVerifyContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const reference = searchParams.get("reference") || searchParams.get("trxref");
@@ -23,7 +23,6 @@ export default function RecordingVerifyPage() {
             return;
         }
         verifyPayment();
-        // eslint-disable-next-line
     }, [reference]);
 
     const verifyPayment = async () => {
@@ -88,5 +87,17 @@ export default function RecordingVerifyPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function RecordingVerifyPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+            </div>
+        }>
+            <RecordingVerifyContent />
+        </Suspense>
     );
 }

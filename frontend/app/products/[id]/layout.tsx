@@ -8,7 +8,8 @@ type Props = {
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
     const { id } = await params;
-    const { type } = await searchParams;
+    const search = searchParams ? await searchParams : {};
+    const type = search?.type;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
     
     let product = null;

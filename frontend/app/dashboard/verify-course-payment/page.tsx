@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { courseService } from "@/services/course-service";
 import toast from "react-hot-toast";
 
-export default function VerifyCoursePaymentPage() {
+function VerifyCoursePaymentContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [status, setStatus] = useState<'verifying' | 'success' | 'failed'>('verifying');
@@ -21,14 +21,12 @@ export default function VerifyCoursePaymentPage() {
             return;
         }
 
-        // Verify payment
         courseService.verifyCoursePayment(reference)
             .then((data) => {
                 setStatus('success');
                 setMessage('Course purchased successfully!');
                 toast.success('Payment verified successfully!');
                 
-                // Redirect to my courses after 3 seconds
                 setTimeout(() => {
                     router.push('/dashboard/courses');
                 }, 3000);
@@ -97,5 +95,17 @@ export default function VerifyCoursePaymentPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function VerifyCoursePaymentPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#0066ff] mx-auto"></div>
+            </div>
+        }>
+            <VerifyCoursePaymentContent />
+        </Suspense>
     );
 }
