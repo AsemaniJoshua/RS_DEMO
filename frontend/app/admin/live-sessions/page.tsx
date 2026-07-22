@@ -89,15 +89,15 @@ export default function AdminLiveSessionsPage() {
     }
 
     return (
-        <div className="p-8">
-            <div className="flex items-center justify-between mb-8">
+        <div className="p-4 md:p-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Live Sessions</h1>
-                    <p className="text-gray-600">Manage upcoming and past live sessions</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Live Sessions</h1>
+                    <p className="text-sm md:text-base text-gray-600">Manage upcoming and past live sessions</p>
                 </div>
                 <Link
                     href="/admin/live-sessions/create"
-                    className="px-4 py-2 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors flex items-center gap-2"
+                    className="w-full sm:w-auto px-4 py-2.5 bg-[#0066ff] text-white rounded-lg hover:bg-[#0052cc] transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -107,7 +107,78 @@ export default function AdminLiveSessionsPage() {
                 </Link>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            {/* Mobile Cards View */}
+            <div className="block md:hidden space-y-4 mb-6">
+                {sessions.length === 0 ? (
+                    <div className="bg-white rounded-xl p-8 text-center text-gray-500 border border-gray-200">
+                        No live sessions found
+                    </div>
+                ) : (
+                    sessions.map((session) => (
+                        <div 
+                            key={session.id} 
+                            onClick={() => window.location.href = `/admin/live-sessions/${session.id}`}
+                            className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm space-y-3 cursor-pointer"
+                        >
+                            <div className="flex items-start justify-between gap-2">
+                                <h3 className="font-semibold text-gray-900 line-clamp-2">{session.title}</h3>
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 ${getStatusColor(session.status)}`}>
+                                    {session.status}
+                                </span>
+                            </div>
+
+                            <div className="text-xs text-gray-600 space-y-1.5 pt-2 border-t border-gray-100">
+                                <div className="flex items-center gap-2">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
+                                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                    </svg>
+                                    <span>{formatDate(session.scheduled_date)} at {formatTime(session.scheduled_date)} ({session.duration_minutes} min)</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
+                                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                    </svg>
+                                    <span className="font-medium text-[#0066ff]">{session._count?.registrations || 0} registered</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
+                                <Link
+                                    href={`/admin/live-sessions/${session.id}`}
+                                    className="p-2 hover:bg-gray-100 rounded text-gray-600 transition-colors"
+                                    title="View Session"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12s-3.75 6.75-9.75 6.75S2.25 12 2.25 12z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </Link>
+                                <Link
+                                    href={`/admin/live-sessions/${session.id}/edit`}
+                                    className="px-3 py-1 text-sm text-[#0066ff] hover:bg-blue-50 rounded transition-colors"
+                                >
+                                    Edit
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        setSessionToDelete(session);
+                                        setShowDeleteModal(true);
+                                    }}
+                                    className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded transition-colors"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>

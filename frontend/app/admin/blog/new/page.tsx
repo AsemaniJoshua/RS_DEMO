@@ -41,22 +41,22 @@ export default function NewBlogPostPage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Post</h1>
-                    <p className="text-gray-600">Write and publish a new blog post</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Create New Post</h1>
+                    <p className="text-sm md:text-base text-gray-600">Write and publish a new blog post</p>
                 </div>
-                <Link href="/admin/blog">
-                    <button className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <Link href="/admin/blog" className="w-full sm:w-auto">
+                    <button className="w-full sm:w-auto px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200">
                         Cancel
                     </button>
                 </Link>
             </div>
 
             <form onSubmit={handleSubmit} className="max-w-4xl">
-                <div className="bg-white rounded-xl p-6 border border-gray-100 space-y-6">
+                <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 space-y-6">
                     {/* Title */}
                     <div>
                         <label className="block text-sm font-semibold text-gray-900 mb-2">
@@ -75,7 +75,7 @@ export default function NewBlogPostPage() {
                         <label className="block text-sm font-semibold text-gray-900 mb-2">
                             URL Slug <span className="text-red-500">*</span>
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                             <input
                                 type="text"
                                 name="slug"
@@ -96,7 +96,7 @@ export default function NewBlogPostPage() {
                     </div>
 
                     {/* Category and Status */}
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
                             <label className="block text-sm font-semibold text-gray-900 mb-2">
                                 Category <span className="text-red-500">*</span>

@@ -62,14 +62,14 @@ export default function CreateLiveSessionPage() {
                         </svg>
                         Back to Live Sessions
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Create New Live Session</h1>
-                    <p className="text-gray-600 mt-2">Schedule a new live session with Dr. George</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Create New Live Session</h1>
+                    <p className="text-sm md:text-base text-gray-600 mt-2">Schedule a new live session with Dr. George</p>
                 </div>
             </div>
 
             {/* Form */}
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-8">
+                <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-4 sm:p-8">
                     <div className="space-y-6">
                         {/* Title */}
                         <div>

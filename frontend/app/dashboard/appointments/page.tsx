@@ -98,7 +98,7 @@ export default function AppointmentsPage() {
 
             {/* Tabs */}
             <div className="bg-white rounded-xl border border-gray-200 mb-6">
-                <div className="flex border-b border-gray-200">
+                <div className="flex flex-col sm:flex-row border-b border-gray-200">
                     <button
                         onClick={() => setActiveTab("upcoming")}
                         className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${

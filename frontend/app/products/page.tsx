@@ -98,7 +98,7 @@ export default function ProductsPage() {
                         </div>
 
                         {/* Heading */}
-                        <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
                             Health Education{" "}
                             <span className="text-[#0066ff]">Resources</span>
                         </h1>
@@ -137,7 +137,7 @@ export default function ProductsPage() {
                         </div>
                     ) : (
                         <>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                                 {filteredProducts.map((product, index) => (
                                     <div 
                                         key={product.id} 

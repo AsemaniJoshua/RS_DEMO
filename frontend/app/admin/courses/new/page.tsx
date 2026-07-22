@@ -85,15 +85,15 @@ export default function AddCoursePage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Course</h1>
-                    <p className="text-gray-600">Create a new course for your students</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Add New Course</h1>
+                    <p className="text-sm md:text-base text-gray-600">Create a new course for your students</p>
                 </div>
-                <Link href="/admin/courses">
-                    <button className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <Link href="/admin/courses" className="w-full sm:w-auto">
+                    <button className="w-full sm:w-auto px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200">
                         Cancel
                     </button>
                 </Link>

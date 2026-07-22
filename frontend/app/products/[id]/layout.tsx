@@ -60,6 +60,6 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     };
 }
 
-export default function ProductLayout({ children }: Props) {
+export default function ProductLayout({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
 }

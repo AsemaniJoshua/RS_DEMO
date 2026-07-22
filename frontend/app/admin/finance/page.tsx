@@ -130,19 +130,19 @@ export default function FinancePage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8">
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Finance Management</h1>
-                <p className="text-gray-600">View all successful transactions across your platform</p>
+            <div className="mb-6 md:mb-8">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Finance Management</h1>
+                <p className="text-sm md:text-base text-gray-600">View all successful transactions across your platform</p>
             </div>
 
             {/* Tabs */}
             <div className="bg-white rounded-xl border border-gray-100 mb-6">
-                <div className="flex border-b border-gray-100">
+                <div className="flex flex-col sm:flex-row border-b border-gray-100">
                     <button
                         onClick={() => setActiveTab("courses")}
-                        className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+                        className={`flex-1 px-4 sm:px-6 py-3.5 sm:py-4 text-sm font-medium transition-colors ${
                             activeTab === "courses"
                                 ? "text-[#00d4aa] border-b-2 border-[#00d4aa] bg-[#00d4aa]/5"
                                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -158,7 +158,7 @@ export default function FinancePage() {
                     </button>
                     <button
                         onClick={() => setActiveTab("liveSessions")}
-                        className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+                        className={`flex-1 px-4 sm:px-6 py-3.5 sm:py-4 text-sm font-medium transition-colors ${
                             activeTab === "liveSessions"
                                 ? "text-[#00d4aa] border-b-2 border-[#00d4aa] bg-[#00d4aa]/5"
                                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -174,7 +174,7 @@ export default function FinancePage() {
                     </button>
                     <button
                         onClick={() => setActiveTab("ebooks")}
-                        className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+                        className={`flex-1 px-4 sm:px-6 py-3.5 sm:py-4 text-sm font-medium transition-colors ${
                             activeTab === "ebooks"
                                 ? "text-[#00d4aa] border-b-2 border-[#00d4aa] bg-[#00d4aa]/5"
                                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -196,10 +196,10 @@ export default function FinancePage() {
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="text-white/80 text-sm mb-1">Total Revenue ({activeTab === "courses" ? "Courses" : activeTab === "liveSessions" ? "Live Sessions" : "eBooks"})</p>
-                        <h2 className="text-3xl font-bold">{formatCurrency(calculateTotal())}</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold">{formatCurrency(calculateTotal())}</h2>
                     </div>
-                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <div className="w-12 h-12 md:w-16 md:h-16 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                             <line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                             <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -219,8 +219,8 @@ export default function FinancePage() {
                 </div>
             </div>
 
-            {/* Transactions Table */}
-            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            {/* Transactions Section */}
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden p-4 md:p-0">
                 {loading ? (
                     <div className="p-12 text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00d4aa] mx-auto mb-4"></div>
@@ -242,49 +242,77 @@ export default function FinancePage() {
                                         <p className="text-gray-500">Course purchase transactions will appear here</p>
                                     </div>
                                 ) : (
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full">
-                                            <thead>
-                                                <tr className="bg-gray-50 border-b border-gray-100">
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Customer</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Course</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Reference</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Date</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-gray-100">
-                                                {courseTransactions.map((transaction) => (
-                                                    <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
-                                                        <td className="px-6 py-4">
-                                                            <div>
-                                                                <p className="font-medium text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
-                                                                <p className="text-sm text-gray-500">{transaction.user.email}</p>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <p className="text-gray-900">{transaction.course.title}</p>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <p className="font-semibold text-gray-900">{formatCurrency(transaction.amount)}</p>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <code className="text-xs text-gray-800 bg-gray-100 px-2 py-1 rounded">{transaction.paymentReference}</code>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <p className="text-sm text-gray-600">{formatDate(transaction.purchasedAt)}</p>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                                {transaction.status}
-                                                            </span>
-                                                        </td>
+                                    <>
+                                        {/* Mobile Cards View */}
+                                        <div className="block md:hidden space-y-3">
+                                            {courseTransactions.map((transaction) => (
+                                                <div key={transaction.id} className="bg-gray-50/70 border border-gray-100 rounded-xl p-4 space-y-2">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <div>
+                                                            <p className="font-semibold text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
+                                                            <p className="text-xs text-gray-500">{transaction.user.email}</p>
+                                                        </div>
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 shrink-0">
+                                                            {transaction.status}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm font-medium text-gray-800 pt-1">{transaction.course.title}</p>
+                                                    <div className="flex items-center justify-between pt-2 border-t border-gray-200/60 text-xs">
+                                                        <span className="font-bold text-[#00d4aa] text-base">{formatCurrency(transaction.amount)}</span>
+                                                        <span className="text-gray-500">{formatDate(transaction.purchasedAt)}</span>
+                                                    </div>
+                                                    <div className="pt-1">
+                                                        <code className="text-[11px] text-gray-700 bg-gray-200/70 px-2 py-0.5 rounded font-mono block truncate">{transaction.paymentReference}</code>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Desktop Table View */}
+                                        <div className="hidden md:block overflow-x-auto">
+                                            <table className="w-full">
+                                                <thead>
+                                                    <tr className="bg-gray-50 border-b border-gray-100">
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Customer</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Course</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Amount</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Reference</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Date</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Status</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody className="divide-y divide-gray-100">
+                                                    {courseTransactions.map((transaction) => (
+                                                        <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <div>
+                                                                    <p className="font-medium text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
+                                                                    <p className="text-sm text-gray-500">{transaction.user.email}</p>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="text-gray-900">{transaction.course.title}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="font-semibold text-gray-900">{formatCurrency(transaction.amount)}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <code className="text-xs text-gray-800 bg-gray-100 px-2 py-1 rounded">{transaction.paymentReference}</code>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="text-sm text-gray-600">{formatDate(transaction.purchasedAt)}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                    {transaction.status}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </>
                                 )}
                             </>
                         )}
@@ -304,49 +332,77 @@ export default function FinancePage() {
                                         <p className="text-gray-500">Recording purchase transactions will appear here</p>
                                     </div>
                                 ) : (
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full">
-                                            <thead>
-                                                <tr className="bg-gray-50 border-b border-gray-100">
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Customer</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Recording</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Reference</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Date</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-gray-100">
-                                                {liveSessionTransactions.map((transaction) => (
-                                                    <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
-                                                        <td className="px-6 py-4">
-                                                            <div>
-                                                                <p className="font-medium text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
-                                                                <p className="text-sm text-gray-500">{transaction.user.email}</p>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <p className="text-gray-900">{transaction.session.title}</p>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <p className="font-semibold text-gray-900">{formatCurrency(transaction.amount)}</p>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <code className="text-xs text-gray-800 bg-gray-100 px-2 py-1 rounded">{transaction.payment_reference}</code>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <p className="text-sm text-gray-600">{formatDate(transaction.purchased_at)}</p>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                                {transaction.payment_status}
-                                                            </span>
-                                                        </td>
+                                    <>
+                                        {/* Mobile Cards View */}
+                                        <div className="block md:hidden space-y-3">
+                                            {liveSessionTransactions.map((transaction) => (
+                                                <div key={transaction.id} className="bg-gray-50/70 border border-gray-100 rounded-xl p-4 space-y-2">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <div>
+                                                            <p className="font-semibold text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
+                                                            <p className="text-xs text-gray-500">{transaction.user.email}</p>
+                                                        </div>
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 shrink-0">
+                                                            {transaction.payment_status}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm font-medium text-gray-800 pt-1">{transaction.session.title}</p>
+                                                    <div className="flex items-center justify-between pt-2 border-t border-gray-200/60 text-xs">
+                                                        <span className="font-bold text-[#00d4aa] text-base">{formatCurrency(transaction.amount)}</span>
+                                                        <span className="text-gray-500">{formatDate(transaction.purchased_at)}</span>
+                                                    </div>
+                                                    <div className="pt-1">
+                                                        <code className="text-[11px] text-gray-700 bg-gray-200/70 px-2 py-0.5 rounded font-mono block truncate">{transaction.payment_reference}</code>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Desktop Table View */}
+                                        <div className="hidden md:block overflow-x-auto">
+                                            <table className="w-full">
+                                                <thead>
+                                                    <tr className="bg-gray-50 border-b border-gray-100">
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Customer</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Recording</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Amount</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Reference</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Date</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Status</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody className="divide-y divide-gray-100">
+                                                    {liveSessionTransactions.map((transaction) => (
+                                                        <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <div>
+                                                                    <p className="font-medium text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
+                                                                    <p className="text-sm text-gray-500">{transaction.user.email}</p>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="text-gray-900">{transaction.session.title}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="font-semibold text-gray-900">{formatCurrency(transaction.amount)}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <code className="text-xs text-gray-800 bg-gray-100 px-2 py-1 rounded">{transaction.payment_reference}</code>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="text-sm text-gray-600">{formatDate(transaction.purchased_at)}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                    {transaction.payment_status}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </>
                                 )}
                             </>
                         )}
@@ -366,49 +422,77 @@ export default function FinancePage() {
                                         <p className="text-gray-500">eBook purchase transactions will appear here</p>
                                     </div>
                                 ) : (
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full">
-                                            <thead>
-                                                <tr className="bg-gray-50 border-b border-gray-100">
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Customer</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">eBook</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Reference</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Date</th>
-                                                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-gray-100">
-                                                {ebookTransactions.map((transaction) => (
-                                                    <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
-                                                        <td className="px-6 py-4">
-                                                            <div>
-                                                                <p className="font-medium text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
-                                                                <p className="text-sm text-gray-500">{transaction.user.email}</p>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <p className="text-gray-900">{transaction.ebook.title}</p>
-                                                        </td>
-                                        <td className="px-6 py-4">
-                                                            <p className="font-semibold text-gray-900">{formatCurrency(transaction.amount)}</p>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <code className="text-xs text-gray-800 bg-gray-100 px-2 py-1 rounded">{transaction.paymentReference}</code>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <p className="text-sm text-gray-600">{formatDate(transaction.purchasedAt)}</p>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                                {transaction.status}
-                                                            </span>
-                                                        </td>
+                                    <>
+                                        {/* Mobile Cards View */}
+                                        <div className="block md:hidden space-y-3">
+                                            {ebookTransactions.map((transaction) => (
+                                                <div key={transaction.id} className="bg-gray-50/70 border border-gray-100 rounded-xl p-4 space-y-2">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <div>
+                                                            <p className="font-semibold text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
+                                                            <p className="text-xs text-gray-500">{transaction.user.email}</p>
+                                                        </div>
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 shrink-0">
+                                                            {transaction.status}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm font-medium text-gray-800 pt-1">{transaction.ebook.title}</p>
+                                                    <div className="flex items-center justify-between pt-2 border-t border-gray-200/60 text-xs">
+                                                        <span className="font-bold text-[#00d4aa] text-base">{formatCurrency(transaction.amount)}</span>
+                                                        <span className="text-gray-500">{formatDate(transaction.purchasedAt)}</span>
+                                                    </div>
+                                                    <div className="pt-1">
+                                                        <code className="text-[11px] text-gray-700 bg-gray-200/70 px-2 py-0.5 rounded font-mono block truncate">{transaction.paymentReference}</code>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Desktop Table View */}
+                                        <div className="hidden md:block overflow-x-auto">
+                                            <table className="w-full">
+                                                <thead>
+                                                    <tr className="bg-gray-50 border-b border-gray-100">
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Customer</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">eBook</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Amount</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Reference</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Date</th>
+                                                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase">Status</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody className="divide-y divide-gray-100">
+                                                    {ebookTransactions.map((transaction) => (
+                                                        <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <div>
+                                                                    <p className="font-medium text-gray-900">{transaction.user.first_name} {transaction.user.last_name}</p>
+                                                                    <p className="text-sm text-gray-500">{transaction.user.email}</p>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="text-gray-900">{transaction.ebook.title}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="font-semibold text-gray-900">{formatCurrency(transaction.amount)}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <code className="text-xs text-gray-800 bg-gray-100 px-2 py-1 rounded">{transaction.paymentReference}</code>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="text-sm text-gray-600">{formatDate(transaction.purchasedAt)}</p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                    {transaction.status}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </>
                                 )}
                             </>
                         )}

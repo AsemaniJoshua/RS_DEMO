@@ -191,7 +191,7 @@ export default function UserLiveSessionsPage() {
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">All Sessions</h2>
                     
                     {/* Filter Tabs */}
-                    <div className="inline-flex gap-2 mb-6 bg-white p-1 rounded-lg border border-gray-200">
+                    <div className="flex flex-wrap gap-2 mb-6 bg-white p-1 rounded-lg border border-gray-200">
                     <button
                         onClick={() => setFilter('all')}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${

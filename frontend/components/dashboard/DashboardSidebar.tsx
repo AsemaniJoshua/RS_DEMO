@@ -148,7 +148,7 @@ export default function DashboardSidebar({ isMobileMenuOpen = false, onMobileMen
             }`}>
                 {/* Logo/Brand */}
                 <div className="p-6 border-b border-gray-200">
-                    <Link href="/" className="flex items-center gap-3">
+                    <Link href="/" onClick={onMobileMenuClose} className="flex items-center gap-3">
                         <div className="relative w-48 h-16">
                             <Image 
                                 src="/rx-logo.png" 
@@ -169,6 +169,7 @@ export default function DashboardSidebar({ isMobileMenuOpen = false, onMobileMen
                                 <li key={index}>
                                     <Link
                                         href={item.href}
+                                        onClick={onMobileMenuClose}
                                         className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                                             isActive
                                                 ? "bg-[#0066ff] text-white shadow-lg shadow-blue-500/30"
