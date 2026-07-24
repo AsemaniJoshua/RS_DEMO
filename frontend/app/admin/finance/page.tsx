@@ -67,7 +67,7 @@ export default function FinancePage() {
     const [liveSessionTransactions, setLiveSessionTransactions] = useState<LiveSessionTransaction[]>([]);
     const [ebookTransactions, setEbookTransactions] = useState<EbookTransaction[]>([]);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.rxwithdrgeorge.com/api/v1';
 
     useEffect(() => {
         fetchTransactions();
