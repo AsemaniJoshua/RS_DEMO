@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import { mediaService, MediaItem } from "@/services/media-service";
 import toast from "react-hot-toast";
 import { 
@@ -18,8 +19,7 @@ import {
 } from "lucide-react";
 
 export default function DashboardMediaDetailClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const router = useRouter();
     const [item, setItem] = useState<MediaItem | null>(null);
     const [isLoading, setIsLoading] = useState(true);

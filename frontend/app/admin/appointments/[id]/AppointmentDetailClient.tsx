@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { appointmentService, Appointment } from "@/services/appointment-service";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import toast from "react-hot-toast";
 import DeleteAppointmentModal from "@/components/admin/DeleteAppointmentModal";
 import { 
@@ -22,9 +23,8 @@ import {
 } from "lucide-react";
 
 export default function AppointmentDetailClient() {
-    const params = useParams();
+    const appointmentId = useDynamicParam("id");
     const router = useRouter();
-    const appointmentId = params?.id as string;
     const [appointment, setAppointment] = useState<Appointment | null>(null);
     const [loading, setLoading] = useState(true);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);

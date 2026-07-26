@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import { usersService, User } from "@/services/users-service";
 import { ApiError } from "@/lib/api";
 import toast from 'react-hot-toast';
 
 export default function UserDetailsClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);

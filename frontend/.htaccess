@@ -14,22 +14,40 @@ Options -Indexes -MultiViews
   # 2. Allow Next.js internal static assets through
   RewriteRule ^_next/ - [L]
 
-  # 3. MATCH .HTML FILES FOR STATIC ROUTES:
-  # When /login or /login/ is requested, strip any trailing slash and check if login.html exists.
+  # 3. MATCH EXACT .HTML FILES FOR STATIC ROUTES:
+  # E.g. /login -> login.html, /admin/courses -> admin/courses.html, /admin/appointments/new -> admin/appointments/new.html
   RewriteCond %{REQUEST_URI} ^/(.*?)/?$
   RewriteCond %{DOCUMENT_ROOT}/%1.html -f
   RewriteRule ^ /%1.html [L]
 
-  # Subdirectory/Relative fallback check for .html files
   RewriteCond %{REQUEST_FILENAME} ^(.*?)/?$
   RewriteCond %1.html -f
   RewriteRule ^(.*?)/?$ $1.html [L]
 
-  # 4. SPA FALLBACK: If not a physical file or static .html page,
-  # fallback to index.html so Next.js client router handles it.
+  # 4. DYNAMIC EDIT ROUTE MATCH:
+  # E.g. /admin/appointments/<id>/edit -> /admin/appointments/placeholder/edit.html
+  RewriteCond %{REQUEST_URI} ^/(.+)/[^/]+/edit/?$
+  RewriteCond %{DOCUMENT_ROOT}/%1/placeholder/edit.html -f
+  RewriteRule ^ /%1/placeholder/edit.html [L]
+
+  RewriteCond %{REQUEST_FILENAME} ^(.*)/[^/]+/edit/?$
+  RewriteCond %1/placeholder/edit.html -f
+  RewriteRule ^(.*)/[^/]+/edit/?$ $1/placeholder/edit.html [L]
+
+  # 5. DYNAMIC DETAIL ROUTE MATCH:
+  # E.g. /admin/appointments/<id> -> /admin/appointments/placeholder.html
+  RewriteCond %{REQUEST_URI} ^/(.+)/[^/]+/?$
+  RewriteCond %{DOCUMENT_ROOT}/%1/placeholder.html -f
+  RewriteRule ^ /%1/placeholder.html [L]
+
+  RewriteCond %{REQUEST_FILENAME} ^(.*)/[^/]+/?$
+  RewriteCond %1/placeholder.html -f
+  RewriteRule ^(.*)/[^/]+/?$ $1/placeholder.html [L]
+
+  # 6. SPA FALLBACK: If not a physical file or dynamic placeholder, fallback to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule ^ index.html [L]
 </IfModule>
 
-# 5. Error handling
+# 7. Error handling
 ErrorDocument 404 /404.html

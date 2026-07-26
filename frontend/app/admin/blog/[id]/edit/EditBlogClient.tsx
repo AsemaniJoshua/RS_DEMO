@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import BlogForm from "@/components/admin/BlogForm";
 import { blogService, Blog } from "@/services/blog-service";
 import toast from "react-hot-toast";
 
 export default function EditBlogClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const [blog, setBlog] = useState<Blog | undefined>(undefined);
     const [loading, setLoading] = useState(true);
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Link from "next/link";
 import { ebookService, type Ebook } from "@/services/ebook-service";
 import toast from "react-hot-toast";
@@ -20,10 +21,9 @@ import {
 } from "lucide-react";
 
 export default function EbookStoreDetailClient() {
-    const params = useParams();
+    const id = useDynamicParam("id");
     const router = useRouter();
     const searchParams = useSearchParams();
-    const id = params?.id as string;
     
     const [ebook, setEbook] = useState<Ebook | null>(null);
     const [isPurchased, setIsPurchased] = useState(false);

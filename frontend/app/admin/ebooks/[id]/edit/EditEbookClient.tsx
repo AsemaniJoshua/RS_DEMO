@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Link from "next/link";
 import { ebookService, EbookCategory } from "@/services/ebook-service";
 import ImageUpload from "@/components/admin/ImageUpload";
@@ -10,8 +11,7 @@ import RichTextEditor from "@/components/admin/RichTextEditor";
 import toast from "react-hot-toast";
 
 export default function EditEbookClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);

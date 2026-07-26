@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import { blogService, Blog } from "@/services/blog-service";
 import toast from "react-hot-toast";
 import { 
@@ -17,8 +18,7 @@ import {
 } from "lucide-react";
 
 export default function BlogDetailsClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const router = useRouter();
     const [blog, setBlog] = useState<Blog | null>(null);
     const [loading, setLoading] = useState(true);

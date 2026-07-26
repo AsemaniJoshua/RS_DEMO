@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Link from "next/link";
 import { usersService, User } from "@/services/users-service";
 import { ApiError } from "@/lib/api";
@@ -12,8 +13,7 @@ const statuses = ["ACTIVE", "SUSPENDED"];
 
 export default function EditUserClient() {
     const router = useRouter();
-    const params = useParams();
-    const userId = params?.id as string;
+    const userId = useDynamicParam("id");
 
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);

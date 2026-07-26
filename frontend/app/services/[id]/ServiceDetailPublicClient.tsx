@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { publicService, PublicCourse } from "@/services/public-service";
 
 export default function ServiceDetailPublicClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const router = useRouter();
     const { isAuthenticated } = useAuth();
     const [service, setService] = useState<PublicCourse | null>(null);

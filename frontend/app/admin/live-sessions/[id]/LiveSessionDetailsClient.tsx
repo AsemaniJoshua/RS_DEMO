@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import { liveSessionsService, type LiveSession, type SessionRegistration } from "@/services/live-sessions-service";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
 export default function LiveSessionDetailsClient() {
-    const params = useParams();
-    const sessionId = params?.id as string;
+    const sessionId = useDynamicParam("id");
     const router = useRouter();
     
     const [session, setSession] = useState<LiveSession | null>(null);

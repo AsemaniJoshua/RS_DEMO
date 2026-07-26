@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import { courseService } from "@/services/course-service";
 import { useAuth } from "@/contexts/auth-context";
 import toast from "react-hot-toast";
 
 export default function BrowseCourseDetailClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const { user } = useAuth();
     const [course, setCourse] = useState<any>(null);
     const [loading, setLoading] = useState(true);

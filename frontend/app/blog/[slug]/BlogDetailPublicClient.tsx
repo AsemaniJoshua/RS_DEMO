@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { publicService, PublicBlog } from "@/services/public-service";
 
 export default function BlogDetailPublicClient() {
-    const params = useParams();
-    const slug = params?.slug as string;
+    const slug = useDynamicParam("slug");
     const router = useRouter();
     const { isAuthenticated } = useAuth();
     const [blog, setBlog] = useState<PublicBlog | null>(null);

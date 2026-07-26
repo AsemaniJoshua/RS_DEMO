@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import { speakingService, SpeakingEvent } from "@/services/speaking-service";
 import Link from "next/link";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import { Calendar, MapPin, ArrowLeft, Clock, Tag, Globe, Info, ImageIcon } from "lucide-react";
 
 export default function DashboardSpeakingDetailClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const router = useRouter();
     const [event, setEvent] = useState<SpeakingEvent | null>(null);
     const [isLoading, setIsLoading] = useState(true);

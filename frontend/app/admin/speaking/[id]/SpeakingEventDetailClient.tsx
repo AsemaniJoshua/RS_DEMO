@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { speakingService, SpeakingEvent } from "@/services/speaking-service";
@@ -21,8 +22,7 @@ import {
 
 export default function SpeakingEventDetailClient() {
     const router = useRouter();
-    const params = useParams();
-    const eventId = params?.id as string;
+    const eventId = useDynamicParam("id");
 
     const [isLoading, setIsLoading] = useState(true);
     const [deleteModal, setDeleteModal] = useState(false);

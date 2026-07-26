@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Link from "next/link";
 import { ebookService, Ebook } from "@/services/ebook-service";
 import toast from "react-hot-toast";
@@ -19,8 +19,7 @@ import {
 } from "lucide-react";
 
 export default function MyLibraryEbookDetailClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const [ebook, setEbook] = useState<Ebook | null>(null);
     const [loading, setLoading] = useState(true);
 

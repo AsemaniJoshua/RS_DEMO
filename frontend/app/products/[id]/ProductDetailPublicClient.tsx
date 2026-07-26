@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams, useParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import { useAuth } from "@/contexts/auth-context";
 import { publicService, PublicEbook, PublicCourse } from "@/services/public-service";
 import Image from "next/image";
 
 export default function ProductDetailPublicClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const router = useRouter();
     const searchParams = useSearchParams();
     const productType = searchParams?.get('type') as 'eBook' | 'Course' | null;

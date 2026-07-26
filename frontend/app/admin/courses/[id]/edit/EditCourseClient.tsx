@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Link from "next/link";
 import { courseService } from "@/services/course-service";
 import toast from "react-hot-toast";
@@ -10,8 +11,7 @@ import FileUpload from "@/components/admin/FileUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function EditCourseClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import Link from "next/link";
 import { liveSessionsService, type LiveSession } from "@/services/live-sessions-service";
 import toast from "react-hot-toast";
@@ -28,9 +29,8 @@ const stripHtmlAndDecode = (html: string): string => {
 };
 
 export default function DashboardLiveSessionDetailClient() {
-    const params = useParams();
+    const sessionId = useDynamicParam("id");
     const router = useRouter();
-    const sessionId = params?.id as string;
     
     const [session, setSession] = useState<LiveSession | null>(null);
     const [loading, setLoading] = useState(true);

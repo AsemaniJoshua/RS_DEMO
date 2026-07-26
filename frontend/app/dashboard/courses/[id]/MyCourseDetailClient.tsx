@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useDynamicParam } from "@/hooks/useDynamicParam";
 import { courseService } from "@/services/course-service";
 import toast from "react-hot-toast";
 
 export default function MyCourseDetailClient() {
-    const params = useParams();
-    const id = params?.id as string;
+    const id = useDynamicParam("id");
     const [course, setCourse] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
