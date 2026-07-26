@@ -1,16 +1,35 @@
+# Disable directory listing and MultiViews to prevent routing conflicts
+Options -Indexes -MultiViews
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
 
-  # Serve existing static files and directories directly
-  RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d
+  # Prevent Apache mod_dir from redirecting directories with trailing slashes
+  DirectorySlash Off
+
+  # 1. Allow existing physical files through (CSS, JS, images, etc.)
+  RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
 
-  # Redirect HTML routes smoothly
-  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
-  RewriteRule ^(.*)$ $1.html [L]
+  # 2. Allow Next.js internal static assets through
+  RewriteRule ^_next/ - [L]
 
-  # Fallback for dynamic single page application routes
+  # 3. MATCH .HTML FILES FOR STATIC ROUTES:
+  # When /login or /login/ is requested, strip any trailing slash and check if login.html exists.
+  RewriteCond %{REQUEST_URI} ^/(.*?)/?$
+  RewriteCond %{DOCUMENT_ROOT}/%1.html -f
+  RewriteRule ^ /%1.html [L]
+
+  # Subdirectory/Relative fallback check for .html files
+  RewriteCond %{REQUEST_FILENAME} ^(.*?)/?$
+  RewriteCond %1.html -f
+  RewriteRule ^(.*?)/?$ $1.html [L]
+
+  # 4. SPA FALLBACK: If not a physical file or static .html page,
+  # fallback to index.html so Next.js client router handles it.
+  RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule ^ index.html [L]
 </IfModule>
+
+# 5. Error handling
+ErrorDocument 404 /404.html
