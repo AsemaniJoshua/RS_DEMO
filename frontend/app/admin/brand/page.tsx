@@ -9,8 +9,9 @@ import CredentialsTab from '@/components/admin/PersonalBrand/CredentialsTab';
 import ExpertiseTab from '@/components/admin/PersonalBrand/ExpertiseTab';
 import AchievementsTab from '@/components/admin/PersonalBrand/AchievementsTab';
 import SocialMediaTab from '@/components/admin/PersonalBrand/SocialMediaTab';
+import StatsTab from '@/components/admin/PersonalBrand/StatsTab';
 
-type Tab = 'profile' | 'credentials' | 'expertise' | 'achievements' | 'social';
+type Tab = 'profile' | 'credentials' | 'expertise' | 'achievements' | 'social' | 'stats';
 
 export default function PersonalBrandPage() {
     const [personalBrand, setPersonalBrand] = useState<PersonalBrand | null>(null);
@@ -151,6 +152,15 @@ export default function PersonalBrandPage() {
                     <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke="currentColor" strokeWidth="2"/>
                 </svg>
             )
+        },
+        {
+            id: 'stats' as Tab,
+            label: 'Stats & Highlights',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="inline-block">
+                    <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+            )
         }
     ];
 
@@ -245,6 +255,13 @@ export default function PersonalBrandPage() {
                     )}
                     {activeTab === 'social' && (
                         <SocialMediaTab
+                            personalBrand={personalBrand}
+                            onUpdate={fetchPersonalBrand}
+                            isEditMode={isEditMode}
+                        />
+                    )}
+                    {activeTab === 'stats' && (
+                        <StatsTab
                             personalBrand={personalBrand}
                             onUpdate={fetchPersonalBrand}
                             isEditMode={isEditMode}

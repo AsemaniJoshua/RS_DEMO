@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { ScrollAnimations } from "@/components/ui/ScrollAnimations";
 import { AuthProvider } from "@/contexts/auth-context";
 import ToastProvider from "@/components/providers/ToastProvider";
+import PwaInstallPrompt from "@/components/pwa/PwaInstallPrompt";
 import "./globals.css";
 
 export default function RootLayout({
@@ -24,12 +25,23 @@ export default function RootLayout({
   
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
+        <meta name="theme-color" content="#0066ff" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Dr. George" />
+      </head>
       <body
         suppressHydrationWarning
         className={`antialiased`}
       >
         <AuthProvider>
           <ToastProvider />
+          <PwaInstallPrompt />
           {!isAdminPage && !isAuthPage && !isDashboardPage && <Navbar />}
           <div className="overflow-x-hidden w-full relative">
             <ScrollAnimations>

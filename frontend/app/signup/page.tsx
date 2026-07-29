@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ApiError } from "@/lib/api";
 import toast from 'react-hot-toast';
 
-export default function SignupPage() {
+function SignupContent() {
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -21,7 +20,10 @@ export default function SignupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
+
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get('redirect');
     const { signup } = useAuth();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,10 +62,16 @@ export default function SignupPage() {
             });
             
             setSuccess(true);
-            // Redirect to login after successful signup
+            toast.success("Account created successfully!");
+            
+            // Redirect to login preserving the redirect target
+            const loginTarget = redirectUrl 
+                ? `/login?redirect=${encodeURIComponent(redirectUrl)}` 
+                : '/login';
+
             setTimeout(() => {
-                router.push('/login');
-            }, 2000);
+                router.push(loginTarget);
+            }, 1500);
         } catch (err) {
             const apiError = err as ApiError;
             const errorMessage = apiError.message || "Signup failed. Please try again.";
@@ -81,11 +89,11 @@ export default function SignupPage() {
                 <div className="max-w-md w-full py-4">
                     {/* Logo/Brand */}
                     <div className="mb-3">
-                        <h2 className=" text-3xl font-bold text-gray-900">
-                            Create Account
+                        <h2 className="text-3xl font-bold text-gray-900">
+                            Create Patient Account
                         </h2>
                         <p className="mt-2 text-sm text-gray-600">
-                            Join us to start your health journey
+                            Join us to start your personalized health journey & book appointments
                         </p>
                     </div>
 
@@ -97,7 +105,7 @@ export default function SignupPage() {
                                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
                                     <path d="M8 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
-                                <p className="text-sm text-green-800 font-medium">Account created successfully! Redirecting to login...</p>
+                                <p className="text-sm text-green-800 font-medium">Account created successfully! Redirecting to sign in...</p>
                             </div>
                         </div>
                     )}
@@ -267,7 +275,7 @@ export default function SignupPage() {
                                 </>
                             ) : (
                                 <>
-                                    Create Account
+                                    Create Patient Account
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                         <path d="M5 12h14m-7-7l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
@@ -280,7 +288,10 @@ export default function SignupPage() {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
                             Already have an account?{" "}
-                            <Link href="/login" className="font-medium text-[#0066ff] hover:text-[#0052cc] transition-colors">
+                            <Link 
+                                href={redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : "/login"} 
+                                className="font-semibold text-[#0066ff] hover:text-[#0052cc] transition-colors hover:underline"
+                            >
                                 Sign in
                             </Link>
                         </p>
@@ -311,16 +322,16 @@ export default function SignupPage() {
                     </h1>
 
                     <p className="text-lg text-white/90 mb-8 leading-relaxed">
-                        Create an account today to access personalized features, track your progress, and get the expert support you need.
+                        Create a patient account today to access personalized features, book consultations, track your progress, and get expert support.
                     </p>
 
                     {/* Features List */}
                     <div className="space-y-4">
                         {[
-                            "Track your medication history",
-                            "Book appointments with specialists",
-                            "Access exclusive educational courses",
-                            "Secure and private health records"
+                            "Track your appointment schedule",
+                            "Book consultations with Dr. George",
+                            "Access exclusive health resources & courses",
+                            "Secure and private patient portal"
                         ].map((feature, index) => (
                             <div key={index} className="flex items-center gap-3">
                                 <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -345,5 +356,17 @@ export default function SignupPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="w-10 h-10 border-4 border-[#0066ff] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        }>
+            <SignupContent />
+        </Suspense>
     );
 }

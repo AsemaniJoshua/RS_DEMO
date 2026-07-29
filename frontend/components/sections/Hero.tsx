@@ -17,12 +17,15 @@ const ArrowRightIcon = () => (
     </svg>
 );
 
+import { useState, useEffect } from "react";
+import { brandStatsService } from "@/services/brand-stats-service";
+
 // Animated counter component
 function AnimatedStat({ value, label }: { value: string; label: string }) {
     const { ref, isInView } = useInView();
     
     // Parse numeric value from string like "10K+", "500+", "15+"
-    const numericValue = parseInt(value.replace(/[^0-9]/g, ''));
+    const numericValue = parseInt(value.replace(/[^0-9]/g, '')) || 0;
     const suffix = value.match(/[^0-9]+$/)?.[0] || '';
     const prefix = value.match(/^[^0-9]+/)?.[0] || '';
     
@@ -43,11 +46,20 @@ function AnimatedStat({ value, label }: { value: string; label: string }) {
 }
 
 export default function Hero() {
+    const [brandStats, setBrandStats] = useState(brandStatsService.getStats());
+
+    useEffect(() => {
+        const updateStats = () => setBrandStats(brandStatsService.getStats());
+        updateStats();
+        window.addEventListener('brand_stats_updated', updateStats);
+        return () => window.removeEventListener('brand_stats_updated', updateStats);
+    }, []);
+
     const stats = [
-        { value: "10K+", label: "Happy Patients" },
-        { value: "15+", label: "Years Experience" },
-        { value: "500+", label: "Resources" },
-        { value: "50+", label: "Expert Topics" },
+        { value: brandStats.happyPatients, label: "Happy Patients" },
+        { value: brandStats.yearsExperience, label: "Years Experience" },
+        { value: brandStats.resources, label: "Resources" },
+        { value: brandStats.expertTopics, label: "Expert Topics" },
     ];
 
     return (

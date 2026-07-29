@@ -249,12 +249,15 @@ function LoginContent() {
                     </div> */}
 
                     {/* Sign Up Link */}
-                    {/* <p className="mt-6 text-center text-sm text-gray-600">
+                    <p className="mt-6 text-center text-sm text-gray-600">
                         Don't have an account?{" "}
-                        <Link href="/signup" className="font-medium text-[#0066ff] hover:text-[#0052cc] transition-colors">
+                        <Link 
+                            href={redirectUrl ? `/signup?redirect=${encodeURIComponent(redirectUrl)}` : "/signup"} 
+                            className="font-semibold text-[#0066ff] hover:text-[#0052cc] transition-colors hover:underline"
+                        >
                             Create an account
                         </Link>
-                    </p> */}
+                    </p>
                 </div>
             </div>
 

@@ -29,9 +29,30 @@ export interface Profile {
     location: string;
     short_bio: string;
     full_bio: string;
+    happyPatients?: string;
+    yearsExperience?: string;
+    resources?: string;
+    expertTopics?: string;
+    speakingEventsOverride?: string;
     personal_brand_id: string;
     created_at: string;
     updated_at: string;
+}
+
+export interface UpdateProfileData {
+    fullName: string;
+    professional_title?: string;
+    tagline: string;
+    email: string;
+    phoneNumber: string;
+    location: string;
+    short_bio: string;
+    full_bio: string;
+    happyPatients?: string;
+    yearsExperience?: string;
+    resources?: string;
+    expertTopics?: string;
+    speakingEventsOverride?: string;
 }
 
 export interface SocialMedia {

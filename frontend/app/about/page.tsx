@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { publicService, PublicPersonalBrand, AreaOfExpertise, CredentialCertification, AchievementAward } from "@/services/public-service";
+import { brandStatsService } from "@/services/brand-stats-service";
 
 const UserCheckIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -38,37 +39,49 @@ const getAcronym = (str: string) => {
 
 const getExpertiseIcon = (name: string) => {
     const n = name.toLowerCase();
-    if (n.includes("med") || n.includes("drug") || n.includes("pharma")) {
+    if (n.includes("marketing") || n.includes("strateg") || n.includes("business") || n.includes("digital")) {
         return (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                <path d="M22 12A10 10 0 1 1 12 2v10z" />
+                <path d="M12 2A10 10 0 0 1 22 12" />
             </svg>
         );
     }
-    if (n.includes("surg") || n.includes("clinic") || n.includes("therap")) {
+    if (n.includes("med") || n.includes("drug") || n.includes("pharma")) {
+        return (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.5 20.5l-7-7a5 5 0 0 1 7.07-7.07l7 7a5 5 0 0 1-7.07 7.07z" />
+                <path d="M8.5 8.5l7 7" />
+            </svg>
+        );
+    }
+    if (n.includes("surg") || n.includes("clinic") || n.includes("therap") || n.includes("hospital")) {
         return (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
             </svg>
         );
     }
-    if (n.includes("edu") || n.includes("speak") || n.includes("train")) {
+    if (n.includes("edu") || n.includes("speak") || n.includes("train") || n.includes("book")) {
         return (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
             </svg>
         );
     }
-    if (n.includes("consult") || n.includes("care") || n.includes("health")) {
+    if (n.includes("consult") || n.includes("care") || n.includes("health") || n.includes("community")) {
         return (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
         );
     }
     return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
     );
 };
@@ -86,6 +99,8 @@ const getExpertiseStyles = (index: number) => {
 export default function AboutPage() {
     const [personalBrand, setPersonalBrand] = useState<PublicPersonalBrand | null>(null);
     const [loading, setLoading] = useState(true);
+    const [speakingCount, setSpeakingCount] = useState<number | null>(null);
+    const [brandStats, setBrandStats] = useState(brandStatsService.getStats());
 
     useEffect(() => {
         const fetchData = async () => {
@@ -100,7 +115,26 @@ export default function AboutPage() {
                 setLoading(false);
             }
         };
+
+        const fetchSpeakingCount = async () => {
+            try {
+                const res = await publicService.getSpeakingEvents();
+                const events = (res.data as any)?.events || res.data || [];
+                if (Array.isArray(events)) {
+                    setSpeakingCount(events.length);
+                }
+            } catch (e) {
+                console.error("Failed to fetch speaking events count", e);
+            }
+        };
+
         fetchData();
+        fetchSpeakingCount();
+
+        const updateStats = () => setBrandStats(brandStatsService.getStats());
+        updateStats();
+        window.addEventListener('brand_stats_updated', updateStats);
+        return () => window.removeEventListener('brand_stats_updated', updateStats);
     }, []);
 
     const expertise: AreaOfExpertise[] = personalBrand?.areasOfExpertise || [];
@@ -211,13 +245,8 @@ export default function AboutPage() {
                                         {/* Ambient background glow inside each card */}
                                         <div className={`absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-300 ${style.iconBg}`}></div>
 
-                                        {/* Glowing Icon Wrapper */}
-                                        <div className={`w-14 h-14 ${style.iconBg} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg group-hover:rotate-6 group-hover:scale-110 transition-all duration-300`}>
-                                            {getExpertiseIcon(item.name)}
-                                        </div>
-
                                         {/* Content */}
-                                        <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">{item.name}</h3>
+                                        <h3 className="text-2xl font-bold text-white mb-3 tracking-tight pt-2">{item.name}</h3>
                                         <p className="text-white/85 leading-relaxed text-[15px] mb-6">
                                             Specialized clinical insights, evidence-based guidance, and professional consultation in {item.name.toLowerCase()}.
                                         </p>
@@ -485,7 +514,7 @@ export default function AboutPage() {
                                                 <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
                                         ),
-                                        value: "10,000+",
+                                        value: brandStats.happyPatients,
                                         label: "Patients Served",
                                         gradient: "from-[#0066ff] to-[#00acac]"
                                     },
@@ -496,7 +525,7 @@ export default function AboutPage() {
                                                 <path d="M19 13v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6m7-4v10m-7-3l7-7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
                                         ),
-                                        value: "500+",
+                                        value: brandStats.speakingEventsOverride || (speakingCount !== null ? `${speakingCount}+` : "0"),
                                         label: "Speaking Events",
                                         gradient: "from-[#00acac] to-[#00bfa6]"
                                     },
