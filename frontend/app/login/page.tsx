@@ -72,9 +72,9 @@ function LoginContent() {
     };
 
     return (
-        <div className="h-screen overflow-hidden flex">
+        <div className="min-h-screen flex flex-col lg:flex-row">
             {/* Left Side - Form Section */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center bg-white p-8 overflow-y-auto">
+            <div className="w-full lg:w-1/2 flex items-center justify-center bg-white p-4 sm:p-8">
                 <div className="max-w-md w-full">
                     {/* Logo/Brand */}
                     <div className="mb-8">
@@ -262,7 +262,7 @@ function LoginContent() {
             </div>
 
             {/* Right Side - Text/Brand Section */}
-            <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-[#0066ff] to-[#00bfa6] items-center justify-center p-12 relative overflow-hidden">
+            <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-[#0066ff] to-[#00bfa6] items-center justify-center p-12 relative min-h-screen lg:fixed lg:right-0 lg:top-0 lg:bottom-0">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl"></div>
