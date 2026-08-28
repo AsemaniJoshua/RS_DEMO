@@ -36,23 +36,23 @@ export default function Services() {
     const services: Service[] = [
         {
             icon: <ShieldIcon />,
-            title: "Drug Safety",
-            description: "Expert guidance on medication safety and preventing adverse drug reactions."
+            title: "Medication Guidance",
+            description: "Professional guidance to help you understand your medicines, use them safely and identify potential medication-related concerns."
         },
         {
             icon: <HeartIcon />,
-            title: "Disease Prevention",
-            description: "Proactive health strategies to prevent chronic diseases and promote wellness."
+            title: "Health & Disease Education",
+            description: "Clear, practical information on common health conditions, prevention and healthier everyday choices."
         },
         {
             icon: <UsersIcon />,
-            title: "Telepharmacy",
-            description: "Virtual consultations for medication reviews and health optimization."
+            title: "Pharmacist Consultation",
+            description: "Personalized pharmacist consultations to discuss medication use, medication-related concerns and other appropriate pharmaceutical care needs."
         },
         {
             icon: <BookOpenIcon />,
-            title: "Health Education",
-            description: "Evidence-based resources to empower your health decisions."
+            title: "Health Resources",
+            description: "Evidence-informed articles, videos and educational resources designed to make important health information easier to understand."
         }
     ];
 
@@ -62,11 +62,11 @@ export default function Services() {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                        Comprehensive Healthcare{" "}
-                        <span className="text-[#0066ff]">Solutions</span>
+                        How RxWithDrGeorge{" "}
+                        <span className="text-[#0066ff]">Can Help</span>
                     </h2>
-                    <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                        From medication safety to wellness optimization, discover how we can support your health journey.
+                    <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        From professional pharmaceutical support to practical health education, RxWithDrGeorge helps you understand your medicines, navigate health information and make better-informed health decisions.
                     </p>
                 </div>
 

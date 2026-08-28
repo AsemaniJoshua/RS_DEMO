@@ -24,7 +24,8 @@ import { brandStatsService } from "@/services/brand-stats-service";
 function AnimatedStat({ value, label }: { value: string; label: string }) {
     const { ref, isInView } = useInView();
     
-    // Parse numeric value from string like "10K+", "500+", "15+"
+    // Check if value contains numbers for count up animation (e.g. "120K+")
+    const hasDigits = /\d/.test(value);
     const numericValue = parseInt(value.replace(/[^0-9]/g, '')) || 0;
     const suffix = value.match(/[^0-9]+$/)?.[0] || '';
     const prefix = value.match(/^[^0-9]+/)?.[0] || '';
@@ -32,15 +33,20 @@ function AnimatedStat({ value, label }: { value: string; label: string }) {
     const count = useCountUp({ 
         end: numericValue,
         duration: 2000,
-        trigger: isInView
+        trigger: isInView && hasDigits
     });
 
+    const displayValue = hasDigits ? `${prefix}${count}${suffix}` : value;
+
     return (
-        <div ref={ref}>
-            <div className="text-3xl sm:text-4xl font-bold text-white mb-1">
-                {prefix}{count}{suffix}
+        <div 
+            ref={ref}
+            className="group relative p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 backdrop-blur-md transition-all duration-300 flex flex-col justify-between h-full shadow-lg shadow-black/10 hover:border-teal-400/40"
+        >
+            <div className="text-lg sm:text-xl xl:text-2xl font-bold text-white mb-1 leading-snug tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-teal-200">
+                {displayValue}
             </div>
-            <div className="text-sm text-gray-300 font-medium">{label}</div>
+            <div className="text-xs sm:text-sm text-gray-300 font-medium leading-snug">{label}</div>
         </div>
     );
 }
@@ -56,10 +62,10 @@ export default function Hero() {
     }, []);
 
     const stats = [
-        { value: brandStats.happyPatients, label: "Happy Patients" },
-        { value: brandStats.yearsExperience, label: "Years Experience" },
-        { value: brandStats.resources, label: "Resources" },
-        { value: brandStats.expertTopics, label: "Expert Topics" },
+        { value: "120K+", label: "Community on Social media" },
+        { value: "WHO FIDES", label: "Member" },
+        { value: "Health Influencer", label: "of the Year 2023" },
+        { value: "PharmD", label: "Licensed Pharmacist" },
     ];
 
     return (
@@ -88,7 +94,7 @@ export default function Hero() {
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-teal-400/30 bg-teal-500/10 backdrop-blur-xs mb-8">
                             <CheckBadgeIcon />
-                            <span className="text-sm font-medium text-teal-300">Trusted Healthcare Expert</span>
+                            <span className="text-sm font-medium text-teal-300">Pharmacist • Health Communicator • Public Health Advocate</span>
                         </div>
 
                         {/* Heading */}
@@ -101,7 +107,7 @@ export default function Hero() {
 
                         {/* Description */}
                         <p className="text-lg sm:text-xl text-gray-200 mb-10 leading-relaxed max-w-xl">
-                            Expert guidance in drug safety, disease prevention, and personalized telepharmacy services. Your trusted partner for evidence-based health education.
+                            Through RxWithDrGeorge, Dr George Anagli combines pharmaceutical expertise with health education to make reliable health information clear, practical and accessible, helping people make better-informed decisions about their health.
                         </p>
 
                         {/* CTA Buttons - Left Aligned */}
@@ -112,19 +118,19 @@ export default function Hero() {
                                 className="bg-gradient-to-r from-[#0066ff] to-[#00ccff] hover:from-[#0052cc] hover:to-[#00b8e6] shadow-lg shadow-blue-500/30 border-0 px-8 py-4 text-lg"
                                 onClick={() => window.location.href = '/booking'}
                             >
-                                Book a Consultation
+                                Work With Dr George
                                 <ArrowRightIcon />
                             </Button>
                             <button 
                                 className="px-8 py-4 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-white font-medium hover:bg-white/10 transition-all duration-200 text-lg"
                                 onClick={() => window.location.href = '/products'}
                             >
-                                Explore Resources
+                                Explore Health Resources
                             </button>
                         </div>
 
                         {/* Stats - Left Aligned */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 border-t border-white/10 pt-10">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 border-t border-white/10 pt-8">
                             {stats.map((stat, index) => (
                                 <AnimatedStat 
                                     key={index} 
@@ -171,13 +177,13 @@ export default function Hero() {
 
                         {/* 4. Orbiting Satellites - Trust Signals */}
                         
-                        {/* Satellite 1: Patient Count (Top Right) */}
+                        {/* Satellite 1: Community Count (Top Right) */}
                         <div className="absolute top-[20%] right-[15%] z-20 animate-[float_8s_ease-in-out_infinite]">
                             <div className="flex flex-col items-center gap-2">
-                                <div className="relative flex items-center justify-center w-16 h-16 bg-[#1e293b]/90 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl">
-                                    <span className="text-xl font-bold text-white">10K+</span>
+                                <div className="relative flex items-center justify-center px-4 py-2 bg-[#1e293b]/90 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl">
+                                    <span className="text-xl font-bold text-white">120K+</span>
                                 </div>
-                                <span className="px-2 py-1 rounded-full bg-blue-500/20 text-xs font-medium text-blue-200 backdrop-blur-sm border border-blue-500/20">Happy Patients</span>
+                                <span className="px-2 py-1 rounded-full bg-blue-500/20 text-xs font-medium text-blue-200 backdrop-blur-sm border border-blue-500/20">Social Community</span>
                             </div>
                         </div>
 
